@@ -1,0 +1,24 @@
+program
+test1
+;
+
+{
+	multi-line
+	block
+	comment
+}
+
+%$% // unrecognized character
+	
+print 1 div			2;
+    const 20 mod 3;
+        const 0;
+            const 3 * 4 + 5 - 6 =	7;
+
+/ single-slash comment
+// double-slash comment
+
+begin...
+end
+
+{ block comment unclosed
