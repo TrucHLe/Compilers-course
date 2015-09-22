@@ -3,4 +3,7 @@
 // This is a comment
 456// This is another comment
   *  7890
++
 ;
+*
+PRINT

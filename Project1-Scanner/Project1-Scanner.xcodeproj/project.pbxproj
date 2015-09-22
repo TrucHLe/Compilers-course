@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4DA714751B9CD7CF009207D5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA714741B9CD7CF009207D5 /* main.cpp */; };
-		4DA714801B9CD816009207D5 /* Scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA7147E1B9CD816009207D5 /* Scanner.cpp */; };
+		4DB21EF31BB194B500EA12B6 /* Scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB21EF21BB194B500EA12B6 /* Scanner.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,8 +32,8 @@
 		4DA7147B1B9CD7E9009207D5 /* test0.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test0.txt; sourceTree = "<group>"; };
 		4DA7147C1B9CD7F3009207D5 /* StateTransitionTable.tsv */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateTransitionTable.tsv; sourceTree = "<group>"; };
 		4DA7147D1B9CD7FA009207D5 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
-		4DA7147E1B9CD816009207D5 /* Scanner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scanner.cpp; sourceTree = "<group>"; };
 		4DA7147F1B9CD816009207D5 /* Scanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scanner.h; sourceTree = "<group>"; };
+		4DB21EF21BB194B500EA12B6 /* Scanner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scanner.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				4DA714741B9CD7CF009207D5 /* main.cpp */,
-				4DA7147E1B9CD816009207D5 /* Scanner.cpp */,
+				4DB21EF21BB194B500EA12B6 /* Scanner.cpp */,
 				4DA7147F1B9CD816009207D5 /* Scanner.h */,
 				4DA7147D1B9CD7FA009207D5 /* Constants.h */,
 				4DA7147C1B9CD7F3009207D5 /* StateTransitionTable.tsv */,
@@ -135,7 +135,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DA714801B9CD816009207D5 /* Scanner.cpp in Sources */,
+				4DB21EF31BB194B500EA12B6 /* Scanner.cpp in Sources */,
 				4DA714751B9CD7CF009207D5 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

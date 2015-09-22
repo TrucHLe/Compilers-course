@@ -115,7 +115,7 @@ ostream& operator << ( ostream& out, const Token& token )
             break;
             
         case OTHERERROR:
-            out << "(!) Unrecognized character found";
+            out << "(!) Unrecognized character " << token.lexeme;
             break;
             
     }
@@ -436,14 +436,18 @@ Token Scanner::next()
             return token;
             
         case INTEGER_T:
-            --column_number;
+            if ( column_number > 1 )
+                --column_number;
+            
             current_lexeme.erase( current_lexeme.length() - 1, 1 );
             token.setToken( token_line, token_column, INTEGER_T, current_lexeme );
             current_lexeme = "";
             return token;
             
         case SETEQUAL_T:
-            --column_number;
+            if ( column_number > 1 )
+                --column_number;
+            
             current_lexeme.erase( current_lexeme.length() - 1, 1 );
             token.setToken( token_line, token_column, SETEQUAL_T, current_lexeme );
             current_lexeme = "";
