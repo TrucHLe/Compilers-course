@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include "Constants.h"
-#include "Scanner.h"
+#include "Parser.h"
 
 using namespace std;
 using std::ifstream;
@@ -41,24 +41,23 @@ int main(int argc, const char * argv[])
         return 0;
     }
 
-    Scanner scanner( input );
+    
+    Parser parser( input );
     //
-    // !Open text file
+    // !Open text file and pass it to Scanner object
     //---------------------------------------------
     
     
     
     // Loop through all characters of
     // text file and output each token
-    Token token;
-    
-    do
-    {
-        token = scanner.next();
-        cout << token << endl;
-        
-    } while ( token.type != EOF_T );
-    cout << endl;
+//    do
+//    {
+//        token = scanner.next();
+//        cout << token << endl;
+//        
+//    } while ( token.type != EOF_T );
+//    cout << endl;
     
     
     return 0;
