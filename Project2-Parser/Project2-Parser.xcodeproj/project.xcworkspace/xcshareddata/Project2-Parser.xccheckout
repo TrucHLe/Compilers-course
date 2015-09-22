@@ -5,16 +5,16 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>70F5980D-55D9-4DE4-84FC-FDA0BDA64D3B</string>
+	<string>956590CD-2432-4A3B-84E8-14B4370390A5</string>
 	<key>IDESourceControlProjectName</key>
-	<string>Project1-Scanner</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>6ED8305AF472F024A7BFA71CEFD40029FCD25AB6</key>
 		<string>https://github.com/TrucHLe/Compilers-course.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Project1-Scanner/Project1-Scanner.xcodeproj</string>
+	<string>Project2-Parser/Project2-Parser.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>6ED8305AF472F024A7BFA71CEFD40029FCD25AB6</key>
