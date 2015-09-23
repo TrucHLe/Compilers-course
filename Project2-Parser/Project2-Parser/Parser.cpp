@@ -26,13 +26,14 @@ Parser::Parser( Scanner s ) : scanner( s )
         token = scanner.next();
         
         if ( noSyntaxError( token ) )
+        {
             tokens.push_back( token );
+        }
 
     } while ( token.type != EOF_T );
-
     
     current_index = 0;
-    current_token = tokens.at( current_index );
+    current_token = tokens.at( 0 );
 
     parse();
 }
@@ -59,7 +60,7 @@ bool Parser::noSyntaxError( Token token )
             return false;
             
         default:
-            return false;
+            return true;
     }
 }
 
@@ -68,13 +69,17 @@ bool Parser::noSyntaxError( Token token )
 //===----------------------------------------------------------------------===//
 // Advance to the next token in tokens
 //===----------------------------------------------------------------------===//
-void Parser::advance( int steps )
+Token Parser::advance()
 {
+    Token token = current_token;
+    
     if ( current_index < tokens.size() )
     {
-        current_index += steps ;
+        ++current_index;
         current_token = tokens.at( current_index );
     }
+    
+    return token;
 }
 
 
@@ -82,315 +87,32 @@ void Parser::advance( int steps )
 //===----------------------------------------------------------------------===//
 // Match current_token's type with each standard statement structure
 // match should move to the next checked token
+// if it is matched, advance and return the old token
 //===----------------------------------------------------------------------===//
-void Parser::match( int tokenType )
+Token Parser::match( int tokenType )
 {
-
-    switch ( tokenType )
+    if ( check( tokenType ) )
+        return advance();
+    else
     {
-        case PRGRM_T:
-            if ( current_token.type == PRGRM_T )
-            {
-                if ( tokens.at( current_index + 1 ).type == IDENT_T ) //multi-step verification to print exact error message
-                {
-                    if ( tokens.at( current_index + 2 ).type == SEMICOLON_T ) {}
-                    else
-                    {
-                        cout << "(!) Expected ';' at " << tokens.at( current_index + 2 ).line << ":" << tokens.at( current_index + 2 ).column << endl;
-                        exit( 1 );
-                    }
-                }
-                else
-                {
-                    cout << "(!) Expected an identifier at " << tokens.at( current_index + 1 ).line << ":" << tokens.at( current_index + 1 ).column << endl;
-                    exit( 1 );
-                }
-            }
-            else
-            {
-                cout << "(!) Expected 'program' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-            
-        case CONST_T:
-            if ( current_token.type == CONST_T )
-            {
-                if ( tokens.at( current_index + 1 ).type == IDENT_T )
-                {
-                    if ( tokens.at( current_index + 2 ).type == SETEQUAL_T )
-                    {
-                        if ( tokens.at( current_index + 3 ).type == SINGLE0_T ||
-                             tokens.at( current_index + 3 ).type == INTEGER_T )
-                        {
-                            if ( tokens.at( current_index + 4 ).type == SEMICOLON_T ) {}
-                            else
-                            {
-                                cout << "(!) Expected ';' at " << tokens.at( current_index + 4 ).line << ":" << tokens.at( current_index + 4 ).column << endl;
-                                exit( 1 );
-                            }
-                        }
-                        else
-                        {
-                            cout << "(!) Expected a number at " << tokens.at( current_index + 3 ).line << ":" << tokens.at( current_index + 3 ).column << endl;
-                            exit( 1 );
-                        }
-                    }
-                    else
-                    {
-                        cout << "(!) Expected '=' at " << tokens.at( current_index + 2 ).line << ":" << tokens.at( current_index + 2 ).column << endl;
-                        exit( 1 );
-                    }
-                }
-                else
-                {
-                    cout << "(!) Expected an identifier at " << tokens.at( current_index + 1 ).line << ":" << tokens.at( current_index + 1 ).column << endl;
-                    exit( 1 );
-                }
-            }
-            else
-            {
-                cout << "(!) Expected 'const' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-            
-        case BEGIN_T:
-            if ( current_token.type == BEGIN_T ) {}
-            else
-            {
-                cout << "(!) Expected 'begin' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case END_T:
-            if ( current_token.type == END_T ) {}
-            else
-            {
-                cout << "(!) Expected 'end' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case PRINT_ST:
-            if ( current_token.type == PRINT_ST ) {}
-            else
-            {
-                cout << "(!) Expected 'print' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case DIV_ST:
-            if ( current_token.type == DIV_ST ) {}
-            else
-            {
-                cout << "(!) Expected 'div' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case MOD_ST:
-            if ( current_token.type == MOD_ST ) {}
-            else
-            {
-                cout << "(!) Expected 'mod' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case SINGLE0_T:
-            if ( current_token.type == SINGLE0_T ) {}
-            else
-            {
-                cout << "(!) Expected a number at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case INTEGER_T:
-            if ( current_token.type == INTEGER_T ) {}
-            else
-            {
-                cout << "(!) Expected a number at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-
-            
-        case ADDITION_ST:
-            if ( current_token.type == ADDITION_ST ) {}
-            else
-            {
-                cout << "(!) Expected '+' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case SUBTRACT_ST:
-            if ( current_token.type == SUBTRACT_ST ) {}
-            else
-            {
-                cout << "(!) Expected '-' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case ASTERISK_ST:
-            if ( current_token.type == ASTERISK_ST ) {}
-            else
-            {
-                cout << "(!) Expected '*' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-
-            
-        case PERIOD_T:
-            if ( current_token.type == PERIOD_T ) {}
-            else
-            {
-                cout << "(!) Expected '.' at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
-            
-            
-        case EOF_T:
-            if ( current_token.type == EOF_T ) {}
-            else
-            {
-                cout << "(!) Expected to reach end of file at " << current_token.line << ":" << current_token.column << endl;
-                exit( 1 );
-            }
+        cout << "(!) Expected " << nameOf( tokenType ) << " at " << current_token.line << ":" << current_token.column << endl;
+        exit( 1 );
     }
 }
 
 
 
 //===----------------------------------------------------------------------===//
-// Check whether the current statement contains tokenType
-// return if current type = expected type
+// Check whether the current token's type equal tokenType
 //===----------------------------------------------------------------------===//
 bool Parser::check( int tokenType )
 {
-    switch ( tokenType )
-    {
-        case PRGRM_T:
-            if ( current_token.type == PRGRM_T )
-                return true;
-            else
-                return false;
-            
-            
-        case CONST_T:
-            if ( current_token.type == CONST_T )
-                return true;
-            else
-                return false;
-            
-            
-        case BEGIN_T:
-            if ( current_token.type == BEGIN_T )
-                return true;
-            else
-                return false;
-            
-            
-        case END_T:
-            if ( current_token.type == END_T )
-                return true;
-            else
-                return false;
-            
-            
-        case PRINT_ST:
-            if ( current_token.type == PRINT_ST )
-                return true;
-            else
-                return false;
-            
-            
-        case DIV_ST:
-            if ( current_token.type == DIV_ST )
-                return true;
-            else
-                return false;
-            
-            
-        case MOD_ST:
-            if ( current_token.type == MOD_ST )
-                return true;
-            else
-                return false;
-            
-            
-        case SINGLE0_T:
-            if ( current_token.type == SINGLE0_T )
-                return true;
-            else
-                return false;
-            
-            
-        case INTEGER_T:
-            if ( current_token.type == INTEGER_T )
-                return true;
-            else
-                return false;
-            
-            
-        case SETEQUAL_T:
-            if ( current_token.type == SETEQUAL_T )
-                return true;
-            else
-                return false;
-            
-            
-        case ADDITION_ST:
-            if ( current_token.type == ADDITION_ST )
-                return true;
-            else
-                return false;
-            
-            
-        case SUBTRACT_ST:
-            if ( current_token.type == SUBTRACT_ST )
-                return true;
-            else
-                return false;
-            
-            
-        case ASTERISK_ST:
-            if ( current_token.type == ASTERISK_ST )
-                return true;
-            else
-                return false;
-            
-            
-        case SEMICOLON_T:
-            if ( current_token.type == SEMICOLON_T )
-                return true;
-            else
-                return false;
-            
-            
-        case PERIOD_T:
-            if ( current_token.type == PERIOD_T )
-                return true;
-            else
-                return false;
-            
-            
-        case EOF_T:
-            if ( current_token.type == EOF_T )
-                return true;
-            else
-                return false;
-            
-            
-        default:
-            return false;
-    }
+    if ( nameOf( tokenType ) == "NUM" && nameOf( current_token.type ) == "NUM" )
+        return true;
+    else if ( current_token.type == tokenType )
+        return true;
+    else
+        return false;
 }
 
 
@@ -401,12 +123,10 @@ bool Parser::check( int tokenType )
 void Parser::parseProgram()
 {
     match( PRGRM_T );
-    advance( 3 );
-    
+    match( IDENT_T );
+    match( SEMICOLON_T );
     parseBlock();
-    
     match( PERIOD_T );
-    advance( 1 );
 }
 
 
@@ -414,10 +134,7 @@ void Parser::parseProgram()
 void Parser::parseBlock()
 {
     parseConstantDeclarations();
-    
     match( BEGIN_T );
-    advance( 1 );
-    
     parseStatements();
     match( END_T );
 }
@@ -442,13 +159,12 @@ void Parser::parseConstantDeclarations()
 void Parser::parseConstantDeclaration()
 {
     match( CONST_T );
-    advance( 5 );
+    Token key = match( IDENT_T );
+    match( SETEQUAL_T );
+    Token value = match( INTEGER_T );
+    match( SEMICOLON_T );
     
-    // Constant grammar = CONST ID ASSIGN NUM SEMI
-    // After match( CONST_T ), current_index is now at SEMI's subsequent token
-    // Hence, index of ID = current_index - 4, and index of NUM = current_index - 2
-    //
-    pair<string, int> constant = make_pair( tokens.at( current_index - 4 ).lexeme, stoi( tokens.at( current_index - 2 ).lexeme ) );
+    pair<string, int> constant = make_pair( key.lexeme, stoi( value.lexeme ) );
     constants.insert( constant );
 }
 
@@ -469,12 +185,8 @@ void Parser::parseStatements()
 void Parser::parseStatement()
 {
     match( PRINT_ST );
-    advance( 1 );
-    
     parseExpression();
-    
     match( SEMICOLON_T );
-    advance( 1 );
 }
 
 
@@ -484,20 +196,20 @@ void Parser::parseExpression()
     if ( check( ADDITION_ST ) )
     {
         parseExpression();
-        
-        match( ADDITION_ST );
-        advance( 1 );
-        
+        Token add = match( ADDITION_ST );
         parseTerm();
+        
+        // Print operator after parseFactor
+        // because printing in post-fix
+        cout << add.lexeme << " ";
     }
     else if ( check( SUBTRACT_ST ) )
     {
         parseExpression();
-        
-        match( SUBTRACT_ST );
-        advance( 1 );
-        
+        Token subtract = match( SUBTRACT_ST );
         parseTerm();
+        
+        cout << subtract.lexeme << " ";
     }
     else
         parseTerm();
@@ -510,29 +222,26 @@ void Parser::parseTerm()
     if ( check( ASTERISK_ST ) )
     {
         parseTerm();
-        
-        match( ASTERISK_ST );
-        advance( 1 );
-        
+        Token star = match( ASTERISK_ST );
         parseFactor();
+
+        cout << star.lexeme << " ";
     }
     else if ( check( DIV_ST ) )
     {
         parseTerm();
-        
-        match( DIV_ST );
-        advance( 1 );
-        
+        Token div = match( DIV_ST );
         parseFactor();
+        
+        cout << div.lexeme << " ";
     }
     else if ( check( MOD_ST ) )
     {
         parseTerm();
-        
-        match( MOD_ST );
-        advance( 1 );
-        
+        Token mod = match( MOD_ST );
         parseFactor();
+        
+        cout << mod.lexeme << " ";
     }
     else
         parseFactor();
@@ -544,20 +253,22 @@ void Parser::parseFactor()
 {
     if ( check( SINGLE0_T ) )
     {
-        match( SINGLE0_T ); //push num to stack
-        advance( 1 );
+        Token num = match( SINGLE0_T );
+        cout << num.lexeme << " ";
     }
     else if ( check( INTEGER_T ) )
     {
-        match( INTEGER_T );
-        advance( 1 );
+        Token num = match( INTEGER_T );
+        cout << num.lexeme << " ";
     }
-    else if ( check( IDENT_T ) ) //push num to stack
+    else if ( check( IDENT_T ) )
     {
-        match( IDENT_T ); ////look up and push num to stack
-        advance( 1 );
+        Token id = match( IDENT_T );
         
-        int value = constants.at( tokens.at( current_index - 1 ).lexeme ); //unordered_map auto throws out-of-range error if it doesn't have the passed key
+        // unordered_map auto throws out-of-range
+        // error if it doesn't have the passed key
+        int value = constants.at( id.lexeme );
+        cout << value << " ";
     }
     else
     {

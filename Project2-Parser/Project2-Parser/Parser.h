@@ -34,8 +34,8 @@ public:
     void parse(); //main
     bool noSyntaxError( Token token );
     
-    void advance( int steps );
-    void match( int tokenType );
+    Token advance();
+    Token match( int tokenType );
     bool check( int tokenType );
     
     // Hehe, look at all these baby parsers <3

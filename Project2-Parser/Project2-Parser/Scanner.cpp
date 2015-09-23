@@ -9,6 +9,97 @@
 #include "Scanner.h"
 
 
+
+//===----------------------------------------------------------------------===//
+// Format a Token for display on cout
+//
+string nameOf( int tokenType )
+{
+    switch ( tokenType )
+    {
+        case PRGRM_T:
+            return "PROGRAM";
+            
+        case CONST_T:
+            return "CONST";
+            
+        case BEGIN_T:
+            return "BEGIN";
+            
+        case END_T:
+            return "END";
+            
+        case PRINT_ST:
+            return "PRINT";
+            
+        case DIV_ST:
+            return "DIV";
+            
+        case MOD_ST:
+            return "MOD";
+            
+        case IDENT_T:
+            return "ID ";
+            
+        case SINGLE0_T:
+            return "NUM ";
+            
+        case INTEGER_T:
+            return "NUM ";
+            
+        case SETEQUAL_T:
+            return "ASSIGN";
+            
+        case ADDITION_ST:
+            return "PLUS";
+            
+        case SUBTRACT_ST:
+            return "MINUS";
+            
+        case ASTERISK_ST:
+            return "STAR";
+            
+        case SEMICOLON_T:
+            return "SEMI";
+            
+        case PERIOD_T:
+            return "PERIOD";
+            
+        case EOF_T:
+            return "EOF";
+            
+        case SLASHERROR_T:
+            return "(!) Missing a second slash '/'";
+            
+        case BRACKETERROR_T:
+            return "(!) Missing a closing bracket '}'";
+            
+        case OTHERERROR:
+            return "(!) Unrecognized character ";
+            
+        default:
+            return "";
+    }
+}
+
+
+ostream& operator << ( ostream& out, const Token& token )
+{
+    if ( nameOf( token.type ) == "ID" ||
+        nameOf( token.type ) == "NUM" ||
+        nameOf( token.type ) == "OTHERERROR" )
+        out << nameOf( token.type ) << " " << token.lexeme << " " << token.line << ":" << token.column;
+    else
+        out << nameOf( token.type ) << " " << token.line << ":" << token.column;
+    
+    return out;
+}
+//
+// !Format a Token for display on cout
+//===----------------------------------------------------------------------===//
+
+
+
 //===----------------------------------------------------------------------===//
 // Token constructor
 //===----------------------------------------------------------------------===//
@@ -30,103 +121,6 @@ void Token::setToken( int l, int c, int t, string lex )
 }
 
 
-
-//===------------------------------===//
-// Format a Token for display on cout
-//===------------------------------===//
-ostream& operator << ( ostream& out, const Token& token )
-{
-    switch ( token.type )
-    {
-        case PRGRM_T:
-            out << "PROGRAM";
-            break;
-            
-        case CONST_T:
-            out << "CONST";
-            break;
-            
-        case BEGIN_T:
-            out << "BEGIN";
-            break;
-            
-        case END_T:
-            out << "END";
-            break;
-            
-        case PRINT_ST:
-            out << "PRINT";
-            break;
-            
-        case DIV_ST:
-            out << "DIV";
-            break;
-            
-        case MOD_ST:
-            out << "MOD";
-            break;
-            
-        case IDENT_T:
-            out << "ID " << token.lexeme;
-            break;
-            
-        case SINGLE0_T:
-            out << "NUM " << token.lexeme;
-            break;
-            
-        case INTEGER_T:
-            out << "NUM " << token.lexeme;
-            break;
-            
-        case SETEQUAL_T:
-            out << "ASSIGN";
-            break;
-            
-        case ADDITION_ST:
-            out << "PLUS";
-            break;
-            
-        case SUBTRACT_ST:
-            out << "MINUS";
-            break;
-            
-        case ASTERISK_ST:
-            out << "STAR";
-            break;
-            
-        case SEMICOLON_T:
-            out << "SEMI";
-            break;
-            
-        case PERIOD_T:
-            out << "PERIOD";
-            break;
-            
-        case EOF_T:
-            out << "EOF";
-            break;
-            
-        case SLASHERROR_T:
-            out << "(!) Missing a second slash '/'";
-            break;
-            
-        case BRACKETERROR_T:
-            out << "(!) Missing a closing bracket '}'";
-            break;
-            
-        case OTHERERROR:
-            out << "(!) Unrecognized character " << token.lexeme;
-            break;
-            
-    }
-    
-    
-    
-    out << " " << token.line << ":" << token.column;
-    
-    return out;
-    
-}
 
 
 

@@ -24,6 +24,7 @@ int main(int argc, const char * argv[])
     string filename;
     ifstream input;
     
+    /*
     if ( argc != 2 )
     {
         cout << "(!) Fail to run program. Please enter a filename." << endl;
@@ -33,6 +34,9 @@ int main(int argc, const char * argv[])
     }
     
     filename = argv[1];
+    */
+    
+    cin >> filename;
     input.open( filename );
     
     if ( input.fail() )

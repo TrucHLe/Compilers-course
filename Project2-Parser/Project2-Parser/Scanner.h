@@ -36,10 +36,10 @@ public:
     string lexeme;
     
     void setToken( int l, int c, int t, string lex );
-    
 };
 
 // Format a Token for display on output stream (cout)
+string nameOf( int tokenType );
 ostream& operator << ( ostream& out, const Token& token );
 
 
