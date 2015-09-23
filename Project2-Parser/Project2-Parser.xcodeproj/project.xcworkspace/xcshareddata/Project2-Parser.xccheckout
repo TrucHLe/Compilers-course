@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>956590CD-2432-4A3B-84E8-14B4370390A5</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>Project2-Parser</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>6ED8305AF472F024A7BFA71CEFD40029FCD25AB6</key>
 		<string>https://github.com/TrucHLe/Compilers-course.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Project2-Parser/Project2-Parser.xcodeproj/project.xcworkspace</string>
+	<string>Project2-Parser/Project2-Parser.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>6ED8305AF472F024A7BFA71CEFD40029FCD25AB6</key>

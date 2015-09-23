@@ -22,14 +22,10 @@ class Parser
     
 private:
     Scanner scanner;
-    int token_index;
+    Token current_token;
     unordered_map<string, int> constants_map;
+    int current_index;
 
-    Token current_token; //consider deleting
-    int current_token_index; //consider deleting
-    
-    
-    
     
 public:
     Parser( Scanner s );
@@ -56,8 +52,6 @@ public:
     
     //construction
     void parseDummy();
-    bool noGrammarError(); //can actually make this a void function, but use bool for consistent appearance
-    bool matches( int tokenType );
     //!construction
 };
 
