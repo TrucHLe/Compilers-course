@@ -62,7 +62,7 @@ bool Parser::noSyntaxError( Token token )
             return false;
             
         default:
-            return true;
+            return false;
     }
 }
 
@@ -173,13 +173,11 @@ bool Parser::match( int tokenType )
                 return false;
             
             
-            
         case DIV_ST:
             if ( current_token.type == DIV_ST )
                 return true;
             else
                 return false;
-            
             
             
         case MOD_ST:
@@ -189,7 +187,6 @@ bool Parser::match( int tokenType )
                 return false;
             
             
-            
         case ADDITION_ST:
             if ( current_token.type == ADDITION_ST )
                 return true;
@@ -197,13 +194,11 @@ bool Parser::match( int tokenType )
                 return false;
             
             
-            
         case SUBTRACT_ST:
             if ( current_token.type == SUBTRACT_ST )
                 return true;
             else
                 return false;
-
             
             
         case ASTERISK_ST:
@@ -213,14 +208,11 @@ bool Parser::match( int tokenType )
                 return false;
             
             
-            
         case INTEGER_T: //match both INTEGER_T and SINGLE0_T since they both represent type NUM
             if ( current_token.type == INTEGER_T || current_token.type == SINGLE0_T )
                 return true;
             else
                 return false;
-            
-            
             
             
         default:
@@ -235,8 +227,10 @@ bool Parser::match( int tokenType )
 //===----------------------------------------------------------------------===//
 bool Parser::check( int tokenType )
 {
-    //check with what's left in tokens
-    
+    for ( int i = current_token.index; i < tokens.size(); ++i )
+        if ( tokens.at( i ).type == tokenType )
+            return true;
+    return false;
 }
 
 
