@@ -33,10 +33,9 @@ public:
     int line;
     int column;
     int type;
-    int index; //to use in Parser
     string lexeme;
     
-    void setToken( int l, int c, int t, int i, string lex );
+    void setToken( int l, int c, int t, string lex );
     
 };
 
@@ -59,7 +58,6 @@ private:
     int column_number;
     int token_line;
     int token_column;
-    int token_index;
     
 public:
     Scanner( ifstream& i );

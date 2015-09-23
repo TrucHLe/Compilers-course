@@ -23,7 +23,7 @@ class Parser
 private:
     Scanner scanner;
     Token current_token;
-    unordered_map<string, int> constants_map;
+    unordered_map<string, int> constants;
     int current_index;
 
     
@@ -32,10 +32,10 @@ public:
     vector<Token> tokens; //Parser don't have instant access to Scanner. Hence, store all scanned tokens in vector<Token> tokens.
     
     void parse(); //main
-    void advance(); //consider deleting
     bool noSyntaxError( Token token );
     
-    bool match( int tokenType );
+    void advance( int steps );
+    void match( int tokenType );
     bool check( int tokenType );
     
     // Hehe, look at all these baby parsers <3
