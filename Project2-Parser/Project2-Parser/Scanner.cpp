@@ -21,11 +21,12 @@ Token::Token()
 //===------------------------------===//
 // Set token
 //===------------------------------===//
-void Token::setToken( int l, int c, int t, string lex )
+void Token::setToken( int l, int c, int t, int i, string lex )
 {
     line    = l;
     column  = c;
     type    = t;
+    index   = i;
     lexeme  = lex;
 }
 
@@ -137,6 +138,7 @@ Scanner::Scanner( ifstream &i ) : input( i )
 {
     line_number     = 1;
     column_number   = 1;
+    token_index     = 0;
     getline( i, current_line ); //Set current line to first line of file
 }
 
@@ -359,8 +361,9 @@ Token Scanner::next()
             // Check if identifier is a keyword
             if ( strcasecmp( current_lexeme.c_str(), "program" ) == 0 )
             {
-                //    setToken( line, column, type, lexeme )
-                token.setToken( token_line, token_column, PRGRM_T, current_lexeme );
+                //    setToken( line, column, type, index, lexeme )
+                token.setToken( token_line, token_column, PRGRM_T, token_index, current_lexeme );
+                ++token_index;
                 
                 // Intentionally repeat the 2 lines below in each case so that
                 // next() can end immediately after it matched a condition
@@ -372,7 +375,8 @@ Token Scanner::next()
             
             else if ( strcasecmp( current_lexeme.c_str(), "const" ) == 0 )
             {
-                token.setToken( token_line, token_column, CONST_T, current_lexeme );
+                token.setToken( token_line, token_column, CONST_T, token_index, current_lexeme );
+                ++token_index;
                 current_lexeme = "";
                 return token;
                 
@@ -380,7 +384,8 @@ Token Scanner::next()
             
             else if ( strcasecmp( current_lexeme.c_str(), "begin" ) == 0 )
             {
-                token.setToken( token_line, token_column, BEGIN_T, current_lexeme );
+                token.setToken( token_line, token_column, BEGIN_T, token_index, current_lexeme );
+                ++token_index;
                 current_lexeme = "";
                 return token;
                 
@@ -388,7 +393,8 @@ Token Scanner::next()
             
             else if ( strcasecmp( current_lexeme.c_str(), "end" ) == 0 )
             {
-                token.setToken( token_line, token_column, END_T, current_lexeme );
+                token.setToken( token_line, token_column, END_T, token_index, current_lexeme );
+                ++token_index;
                 current_lexeme = "";
                 return token;
                 
@@ -396,7 +402,8 @@ Token Scanner::next()
             
             else if ( strcasecmp( current_lexeme.c_str(), "print" ) == 0 )
             {
-                token.setToken( token_line, token_column, PRINT_ST, current_lexeme );
+                token.setToken( token_line, token_column, PRINT_ST, token_index, current_lexeme );
+                ++token_index;
                 current_lexeme = "";
                 return token;
                 
@@ -404,7 +411,8 @@ Token Scanner::next()
             
             else if ( strcasecmp( current_lexeme.c_str(), "div" ) == 0 )
             {
-                token.setToken( token_line, token_column, DIV_ST, current_lexeme );
+                token.setToken( token_line, token_column, DIV_ST, token_index, current_lexeme );
+                ++token_index;
                 current_lexeme = "";
                 return token;
                 
@@ -412,7 +420,8 @@ Token Scanner::next()
             
             else if ( strcasecmp( current_lexeme.c_str(), "mod" ) == 0 )
             {
-                token.setToken( token_line, token_column, MOD_ST, current_lexeme );
+                token.setToken( token_line, token_column, MOD_ST, token_index, current_lexeme );
+                ++token_index;
                 current_lexeme = "";
                 return token;
                 
@@ -420,7 +429,8 @@ Token Scanner::next()
             
             else
             {
-                token.setToken( token_line, token_column, IDENT_T, current_lexeme );
+                token.setToken( token_line, token_column, IDENT_T, token_index, current_lexeme );
+                ++token_index;
                 current_lexeme = "";
                 return token;
             }
@@ -431,7 +441,8 @@ Token Scanner::next()
             // Does not have to subtract last column number
             // or earse last character because single 0 (and
             // some other identifiers) ends on itself
-            token.setToken( token_line, token_column, SINGLE0_T, current_lexeme );
+            token.setToken( token_line, token_column, SINGLE0_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
@@ -440,7 +451,8 @@ Token Scanner::next()
                 --column_number;
             
             current_lexeme.erase( current_lexeme.length() - 1, 1 );
-            token.setToken( token_line, token_column, INTEGER_T, current_lexeme );
+            token.setToken( token_line, token_column, INTEGER_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
@@ -449,52 +461,62 @@ Token Scanner::next()
                 --column_number;
             
             current_lexeme.erase( current_lexeme.length() - 1, 1 );
-            token.setToken( token_line, token_column, SETEQUAL_T, current_lexeme );
+            token.setToken( token_line, token_column, SETEQUAL_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case ADDITION_ST:
-            token.setToken( token_line, token_column, ADDITION_ST, current_lexeme );
+            token.setToken( token_line, token_column, ADDITION_ST, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case SUBTRACT_ST:
-            token.setToken( token_line, token_column, SUBTRACT_ST, current_lexeme );
+            token.setToken( token_line, token_column, SUBTRACT_ST, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case ASTERISK_ST:
-            token.setToken( token_line, token_column, ASTERISK_ST, current_lexeme );
+            token.setToken( token_line, token_column, ASTERISK_ST, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case SEMICOLON_T:
-            token.setToken( token_line, token_column, SEMICOLON_T, current_lexeme );
+            token.setToken( token_line, token_column, SEMICOLON_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case PERIOD_T:
-            token.setToken( token_line, token_column, PERIOD_T, current_lexeme );
+            token.setToken( token_line, token_column, PERIOD_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case EOF_T:
-            token.setToken( token_line, token_column, EOF_T, current_lexeme );
+            token.setToken( token_line, token_column, EOF_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case SLASHERROR_T:
-            token.setToken( token_line, token_column, SLASHERROR_T, current_lexeme );
+            token.setToken( token_line, token_column, SLASHERROR_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             
         case BRACKETERROR_T:
-            token.setToken( token_line, token_column, BRACKETERROR_T, current_lexeme );
+            token.setToken( token_line, token_column, BRACKETERROR_T, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
         
         case OTHERERROR:
-            token.setToken( token_line, token_column, OTHERERROR, current_lexeme );
+            token.setToken( token_line, token_column, OTHERERROR, token_index, current_lexeme );
+            ++token_index;
             current_lexeme = "";
             return token;
             

@@ -1,0 +1,33 @@
+<Program> -->
+	program ID ; <Block> .
+
+<Block> -->
+	<ConstDecls> begin <Stmts> end
+
+<ConstDecls> -->
+	<ConstDecl> <ConstDecls>
+	| ɛ
+
+<ConstDecl> --> const ID = NUM ;
+
+<Stmts> -->
+	<Stmt> <Stmts>
+	| ɛ
+
+<Stmt> -->
+	print <Expr> ;
+
+<Expr> -->
+	<Expr> + <Term>
+	| <Expr> - <Term>
+	| <Term>
+
+<Term> -->
+	<Term> * <Factor>
+	| <Term> div <Factor>
+	| <Term> mod <Factor>
+	| <Factor>
+
+<Factor> -->
+	NUM
+	| ID

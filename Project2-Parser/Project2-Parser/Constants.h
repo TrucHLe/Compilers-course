@@ -9,7 +9,7 @@
 const int MAXCELLSPERSTRING = 82;  // 80 characters as well as \n plus \0.
 
 // Declaring constants for use in switch statements.
-const int IDENT_T			= 100; //✔︎
+const int IDENT_T			= 100; //✔︎ Identifier
 const int EOF_T 			= 101; //✔︎
 const int OTHERERROR 		= 102; //✔︎ ERROR State, NOT an actual Token.
 const int DOUBLEGREATER_T 	= 103;
@@ -39,7 +39,7 @@ const int AMPERSAND_T 		= 126;
 const int SLASHCOMMENT_T 	= 127;
 const int SLASHERROR_T 		= 128; //✔︎ ERROR STATE / is not followed by another /
 const int BRACKETERROR_T 	= 129; //✔︎ Comment is attempting to end without a }
-const int INTEGER_T 		= 130; //✔︎
+const int INTEGER_T 		= 130; //✔︎ Number
 const int SPECIALID_T 		= 131;
 const int OR_ST 			= 132; // Keyword OR
 const int AND_ST 			= 133; // Keyword AND

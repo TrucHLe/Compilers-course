@@ -9,24 +9,56 @@
 #ifndef __Project2_Parser__Parser__
 #define __Project2_Parser__Parser__
 
-#include <stdio.h>
-#include <fstream>
+#include <stdio.h>  
+#include <fstream>          //ifstream
+#include <vector>           //vector
+#include <unordered_map>    //unordered_map, aka hashmap
 #include "Scanner.h"
+#include "Constants.h"
 
 
 class Parser
 {
     
 private:
-    ifstream& input;
+    Scanner scanner;
+    int token_index;
+    unordered_map<string, int> constants_map;
+
+    Token current_token; //consider deleting
+    int current_token_index; //consider deleting
+    
+    
+    
     
 public:
-    Parser( ifstream& i );
-    Scanner scanner;
-    Token token;
+    Parser( Scanner s );
+    vector<Token> tokens; //Parser don't have instant access to Scanner. Hence, store all scanned tokens in vector<Token> tokens.
+    
+    void parse(); //main
+    void advance(); //consider deleting
+    bool noSyntaxError( Token token );
+    
+    bool match( int tokenType );
+    bool check( int tokenType );
+    
+    // Hehe, look at all these baby parsers <3
+    void parseProgram();
+    void parseBlock();
+    void parseConstantDeclarations();
+    void parseConstantDeclaration();
+    void parseStatements();
+    void parseStatement();
+    void parseExpression();
+    void parseTerm();
+    void parseFactor();
     
     
-    bool isValidStatement( Token token );
+    //construction
+    void parseDummy();
+    bool noGrammarError(); //can actually make this a void function, but use bool for consistent appearance
+    bool matches( int tokenType );
+    //!construction
 };
 
 

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include "Constants.h"
+#include "Scanner.h"
 #include "Parser.h"
 
 using namespace std;
@@ -42,7 +43,9 @@ int main(int argc, const char * argv[])
     }
 
     
-    Parser parser( input );
+    Scanner scanner( input );
+    Parser parser( scanner );
+    
     //
     // !Open text file and pass it to Scanner object
     //---------------------------------------------
