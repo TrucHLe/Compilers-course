@@ -35,6 +35,11 @@ Parser::Parser( Scanner s ) : scanner( s )
     current_index = 0;
     current_token = tokens.at( 0 );
 
+//    for ( int i = 0; i < tokens.size(); ++i )
+//    {
+//        cout << tokens.at( i ) << endl;
+//    }
+
     parse();
 }
 
@@ -49,15 +54,15 @@ bool Parser::noSyntaxError( Token token )
     {
         case SLASHERROR_T:
             cout << token << endl;
-            return false;
+            exit( 1 );
             
         case BRACKETERROR_T:
             cout << token << endl;
-            return false;
+            exit( 1 );
             
         case OTHERERROR:
             cout << token << endl;
-            return false;
+            exit( 1 );
             
         default:
             return true;
@@ -73,7 +78,7 @@ Token Parser::advance()
 {
     Token token = current_token;
     
-    if ( current_index < tokens.size() )
+    if ( current_index + 1 < tokens.size() )
     {
         ++current_index;
         current_token = tokens.at( current_index );
@@ -107,6 +112,10 @@ Token Parser::match( int tokenType )
 //===----------------------------------------------------------------------===//
 bool Parser::check( int tokenType )
 {
+//    cout << "Current: " << current_token << endl;
+//    cout << "Expected: " << nameOf( tokenType ) << endl;
+//    cout << endl;
+    
     if ( nameOf( tokenType ) == "NUM" && nameOf( current_token.type ) == "NUM" )
         return true;
     else if ( current_token.type == tokenType )
@@ -184,67 +193,76 @@ void Parser::parseStatements()
 
 void Parser::parseStatement()
 {
-    match( PRINT_ST );
+    Token print = match( PRINT_ST );
     parseExpression();
     match( SEMICOLON_T );
+    cout << nameOf( print.type ) << endl;
 }
 
 
 
 void Parser::parseExpression()
 {
+    parseTerm();
+    parseExpressionRest();
+}
+
+
+
+void Parser::parseExpressionRest()
+{
     if ( check( ADDITION_ST ) )
     {
-        parseExpression();
         Token add = match( ADDITION_ST );
         parseTerm();
-        
-        // Print operator after parseFactor
-        // because printing in post-fix
-        cout << add.lexeme << " ";
+        cout << add.lexeme << endl; //this one stays here. Check Grammar.txt if confused.
+        parseExpressionRest();
     }
     else if ( check( SUBTRACT_ST ) )
     {
-        parseExpression();
         Token subtract = match( SUBTRACT_ST );
         parseTerm();
-        
-        cout << subtract.lexeme << " ";
+        cout << subtract.lexeme << endl;
+        parseExpressionRest();
     }
-    else
-        parseTerm();
+    else {}
+    
 }
 
 
 
 void Parser::parseTerm()
 {
+    parseFactor();
+    parseTermRest();
+}
+
+
+
+void Parser::parseTermRest()
+{
     if ( check( ASTERISK_ST ) )
     {
-        parseTerm();
         Token star = match( ASTERISK_ST );
         parseFactor();
-
-        cout << star.lexeme << " ";
+        cout << star.lexeme << endl;
+        parseTermRest();
     }
     else if ( check( DIV_ST ) )
     {
-        parseTerm();
         Token div = match( DIV_ST );
         parseFactor();
-        
-        cout << div.lexeme << " ";
+        cout << nameOf( div.type ) << endl;
+        parseTermRest();
     }
     else if ( check( MOD_ST ) )
     {
-        parseTerm();
         Token mod = match( MOD_ST );
         parseFactor();
-        
-        cout << mod.lexeme << " ";
+        cout << nameOf( mod.type ) << endl;
+        parseTermRest();
     }
-    else
-        parseFactor();
+    else {}
 }
 
 
@@ -254,12 +272,12 @@ void Parser::parseFactor()
     if ( check( SINGLE0_T ) )
     {
         Token num = match( SINGLE0_T );
-        cout << num.lexeme << " ";
+        cout << num.lexeme << endl;
     }
     else if ( check( INTEGER_T ) )
     {
         Token num = match( INTEGER_T );
-        cout << num.lexeme << " ";
+        cout << num.lexeme << endl;
     }
     else if ( check( IDENT_T ) )
     {
@@ -268,11 +286,11 @@ void Parser::parseFactor()
         // unordered_map auto throws out-of-range
         // error if it doesn't have the passed key
         int value = constants.at( id.lexeme );
-        cout << value << " ";
+        cout << value << endl;
     }
     else
     {
-        cout << "(!) Expected either a number or an identifier at " << current_token.line << ":" << current_token.column << endl;
+        cout << "(!) Expected either a NUM or an ID at " << current_token.line << ":" << current_token.column << endl;
         exit( 1 );
     }
 }
@@ -290,61 +308,3 @@ void Parser::parse()
     parseProgram();
     match( EOF_T );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//===----------------------------------------------------------------------===//
-// Parse Dummy
-//===----------------------------------------------------------------------===//
-/*
-void Parser::parseDummy()
-{
-    while ( current_token.type != EOF_T )
-    {
-        if ( matches( PRGRM_T ) )
-        {
-            advance();
-            
-            // do something in case begin doesn't follow immediately
-            if ( matches( BEGIN_T ) )
-            {
-                advance();
-                // do something with matches( END_T )
-                if ( matches( CONST_T ) )
-                {
-                    
-                    // The above matchedExpression condition has advanced
-                    // current_token to SEMI, so we have to go back
-                    // a couple cells to get the integer's ID and NUM
-                    //
-                    string id = tokens.at( current_index - 2 ).lexeme;
-                    int num = stoi( tokens.at( current_index - 1 ).lexeme );
-                    
-                    constants_map.insert( { id, num } );
-                    
-                }
-                
-                advance();
-                
-            }
-            
-            //work through Howard's pseudocode
-            
-            
-        }
-        
-        advance();
-    }
-}
-*/

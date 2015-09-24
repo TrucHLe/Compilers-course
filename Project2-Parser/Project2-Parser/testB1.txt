@@ -1,0 +1,5 @@
+program testB1 ;
+const hi = 4;
+begin
+	print 5 div hi;
+end.

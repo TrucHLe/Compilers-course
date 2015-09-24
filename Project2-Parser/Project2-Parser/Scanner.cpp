@@ -39,13 +39,13 @@ string nameOf( int tokenType )
             return "MOD";
             
         case IDENT_T:
-            return "ID ";
+            return "ID";
             
         case SINGLE0_T:
-            return "NUM ";
+            return "NUM";
             
         case INTEGER_T:
-            return "NUM ";
+            return "NUM";
             
         case SETEQUAL_T:
             return "ASSIGN";
@@ -75,7 +75,7 @@ string nameOf( int tokenType )
             return "(!) Missing a closing bracket '}'";
             
         case OTHERERROR:
-            return "(!) Unrecognized character ";
+            return "(!) Unrecognized character";
             
         default:
             return "";
@@ -85,9 +85,10 @@ string nameOf( int tokenType )
 
 ostream& operator << ( ostream& out, const Token& token )
 {
-    if ( nameOf( token.type ) == "ID" ||
-        nameOf( token.type ) == "NUM" ||
-        nameOf( token.type ) == "OTHERERROR" )
+    if ( token.type == IDENT_T ||
+         token.type == SINGLE0_T ||
+         token.type == INTEGER_T ||
+         token.type == OTHERERROR )
         out << nameOf( token.type ) << " " << token.lexeme << " " << token.line << ":" << token.column;
     else
         out << nameOf( token.type ) << " " << token.line << ":" << token.column;

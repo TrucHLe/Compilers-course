@@ -17,16 +17,24 @@
 <Stmt> -->
 	print <Expr> ;
 
-<Expr> -->
-	<Expr> + <Term>
-	| <Expr> - <Term>
-	| <Term>
 
-<Term> -->
-	<Term> * <Factor>
-	| <Term> div <Factor>
-	| <Term> mod <Factor>
-	| <Factor>
+<Expr> -->
+	<Term> <ExprRest>
+
+<ExprRest> —>
+	+ <Term> <ExprRest>
+	| - <Term> <ExprRest>
+	| ɛ
+//print +, - right after matching <Term>
+
+<Term> —->
+	<Factor> <TermRest>
+
+<TermRest> —->
+	| * <Factor> <TermRest>
+	| div <Factor> <TermRest>
+	| mod <Factor> <TermRest>
+	| ɛ
 
 <Factor> -->
 	NUM

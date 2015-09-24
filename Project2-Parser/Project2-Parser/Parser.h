@@ -21,7 +21,7 @@ class Parser
 {
     
 private:
-    Scanner scanner;
+    Scanner scanner; //&
     Token current_token;
     unordered_map<string, int> constants;
     int current_index;
@@ -29,7 +29,7 @@ private:
     
 public:
     Parser( Scanner s );
-    vector<Token> tokens; //Parser don't have instant access to Scanner. Hence, store all scanned tokens in vector<Token> tokens.
+    vector<Token> tokens;
     
     void parse(); //main
     bool noSyntaxError( Token token );
@@ -46,13 +46,10 @@ public:
     void parseStatements();
     void parseStatement();
     void parseExpression();
+    void parseExpressionRest();
     void parseTerm();
+    void parseTermRest();
     void parseFactor();
-    
-    
-    //construction
-    void parseDummy();
-    //!construction
 };
 
 

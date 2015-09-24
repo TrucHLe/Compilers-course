@@ -1,9 +1,7 @@
-12 +	3
-   -
-// This is a comment
-456// This is another comment
-  *  7890
-+
-;
-*
-PRINT
+program demo3;
+const a = 1;
+const b = 2;
+const d = 4;
+begin
+	print a + b * 3 div d - 5;
+end.
