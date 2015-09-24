@@ -33,7 +33,9 @@ int main(int argc, const char * argv[])
         return 0;
     }
     
-    filename = argv[1];     //cin >> filename;
+    filename = argv[1];
+    //cin >> filename;
+    
     input.open( filename );
     
     if ( input.fail() )
@@ -44,8 +46,7 @@ int main(int argc, const char * argv[])
     }
 
     
-    Scanner scanner( input );
-    Parser parser( scanner );
+    Parser parser( input );
     
     //
     // !Open text file and pass it to Scanner object

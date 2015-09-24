@@ -1,16 +1,18 @@
 program
 test1
 ;
-
+const x = 9;
+begin
 {
 	multi-line
 	block
 	comment
 }
 
-%$% // unrecognized character
+//%$% // unrecognized character
 	
 print 1 div			2;
+end.
     const 20 mod 3;
         const 0;
             const 3 * 4 + 5 - 6 =	7;

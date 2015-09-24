@@ -12,87 +12,62 @@
 //===----------------------------------------------------------------------===//
 // Parser constructor:
 //
-// - Initializes scanner in initilization list because it is a const
+// - Initialize scanner in initilization list because it is a const
 // thus cannot be initialized (aka changed) inside the constructor.
-// - Checks sysntax errors and pushes all scanned tokens in vector<Token> tokens.
-// - Checks grammar errors.
+// - Parse
 //===----------------------------------------------------------------------===//
-Parser::Parser( Scanner s ) : scanner( s )
+Parser::Parser( ifstream& i ) : scanner( i )
 {
-    Token token;
-    
-    do
-    {
-        token = scanner.next();
-        
-        if ( noSyntaxError( token ) )
-        {
-            tokens.push_back( token );
-        }
-
-    } while ( token.type != EOF_T );
-    
-    current_index = 0;
-    current_token = tokens.at( 0 );
-
-//    for ( int i = 0; i < tokens.size(); ++i )
-//    {
-//        cout << tokens.at( i ) << endl;
-//    }
-
+    token = scanner.next();
     parse();
 }
 
 
 
 //===----------------------------------------------------------------------===//
-// Check if token has any syntax error state
+// Check if token has any syntax error
 //===----------------------------------------------------------------------===//
-bool Parser::noSyntaxError( Token token )
+void Parser::checkSyntaxError()
 {
     switch ( token.type )
     {
         case SLASHERROR_T:
+            cout << "slash" << endl;
             cout << token << endl;
             exit( 1 );
             
         case BRACKETERROR_T:
+            cout << "bracket" << endl;
             cout << token << endl;
             exit( 1 );
             
         case OTHERERROR:
+            cout << "other" << endl;
             cout << token << endl;
             exit( 1 );
             
         default:
-            return true;
+            break;
     }
 }
 
 
 
 //===----------------------------------------------------------------------===//
-// Advance to the next token in tokens
+// Scan the next token
 //===----------------------------------------------------------------------===//
 Token Parser::advance()
 {
-    Token token = current_token;
-    
-    if ( current_index + 1 < tokens.size() )
-    {
-        ++current_index;
-        current_token = tokens.at( current_index );
-    }
-    
-    return token;
+    Token current_token = token;
+    token = scanner.next();
+    return current_token;
 }
 
 
 
 //===----------------------------------------------------------------------===//
-// Match current_token's type with each standard statement structure
-// match should move to the next checked token
-// if it is matched, advance and return the old token
+// Match current token's type with each standard statement structure
+// If it's matched, advance and return the old token
 //===----------------------------------------------------------------------===//
 Token Parser::match( int tokenType )
 {
@@ -100,7 +75,7 @@ Token Parser::match( int tokenType )
         return advance();
     else
     {
-        cout << "(!) Expected " << nameOf( tokenType ) << " at " << current_token.line << ":" << current_token.column << endl;
+        cout << "(!) Expected " << nameOf( tokenType ) << " at " << token.line << ":" << token.column << endl;
         exit( 1 );
     }
 }
@@ -112,13 +87,10 @@ Token Parser::match( int tokenType )
 //===----------------------------------------------------------------------===//
 bool Parser::check( int tokenType )
 {
-//    cout << "Current: " << current_token << endl;
-//    cout << "Expected: " << nameOf( tokenType ) << endl;
-//    cout << endl;
-    
-    if ( nameOf( tokenType ) == "NUM" && nameOf( current_token.type ) == "NUM" )
+    // NUM case to match both SINGLE0_T and INTEGER_T
+    if ( nameOf( tokenType ) == "NUM" && nameOf( token.type ) == "NUM" )
         return true;
-    else if ( current_token.type == tokenType )
+    else if ( token.type == tokenType )
         return true;
     else
         return false;
@@ -290,12 +262,12 @@ void Parser::parseFactor()
     }
     else
     {
-        cout << "(!) Expected either a NUM or an ID at " << current_token.line << ":" << current_token.column << endl;
+        cout << "(!) Expected either NUM or ID at " << token.line << ":" << token.column << endl;
         exit( 1 );
     }
 }
 //
-// !baby parsers
+// !Baby parsers
 //===----------------------------------------------------------------------===//
 
 

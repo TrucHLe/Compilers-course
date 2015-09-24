@@ -68,6 +68,8 @@ string nameOf( int tokenType )
         case EOF_T:
             return "EOF";
             
+        // Still leave error cases here although next()
+        // will have already checked to help future debugging
         case SLASHERROR_T:
             return "(!) Missing a second slash '/'";
             
@@ -85,10 +87,7 @@ string nameOf( int tokenType )
 
 ostream& operator << ( ostream& out, const Token& token )
 {
-    if ( token.type == IDENT_T ||
-         token.type == SINGLE0_T ||
-         token.type == INTEGER_T ||
-         token.type == OTHERERROR )
+    if ( token.type == IDENT_T || token.type == SINGLE0_T || token.type == INTEGER_T || token.type == OTHERERROR )
         out << nameOf( token.type ) << " " << token.lexeme << " " << token.line << ":" << token.column;
     else
         out << nameOf( token.type ) << " " << token.line << ":" << token.column;
@@ -481,22 +480,27 @@ Token Scanner::next()
         case SLASHERROR_T:
             token.setToken( token_line, token_column, SLASHERROR_T, current_lexeme );
             current_lexeme = "";
-            return token;
+            cout << "(!) Missing a second slash '/' " << token.line << ":" << token.column << endl;
+            exit( 1 );
+            
             
         case BRACKETERROR_T:
             token.setToken( token_line, token_column, BRACKETERROR_T, current_lexeme );
             current_lexeme = "";
-            return token;
+            cout << "(!) Missing a closing bracket '}' " << token.line << ":" << token.column << endl;
+            exit( 1 );
         
         case OTHERERROR:
             token.setToken( token_line, token_column, OTHERERROR, current_lexeme );
             current_lexeme = "";
+            cout << "(!) Unrecognized character " << token.lexeme << " " << token.line << ":" << token.column << endl;
+            exit( 1 );
+            
+            
+        // switch statement is exhaustive
+        // This line is just to make Xcode happy.
+        default:
             return token;
             
     }
-    
-    // switch statement is exhaustive
-    // This line is just to make Xcode happy.
-    return token;
-    
 }

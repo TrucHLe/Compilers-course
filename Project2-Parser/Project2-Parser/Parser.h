@@ -21,24 +21,21 @@ class Parser
 {
     
 private:
-    Scanner scanner; //&
-    Token current_token;
+    Scanner scanner;
+    Token token;
     unordered_map<string, int> constants;
-    int current_index;
 
     
 public:
-    Parser( Scanner s );
-    vector<Token> tokens;
+    Parser( ifstream& i );
     
     void parse(); //main
-    bool noSyntaxError( Token token );
-    
+    void checkSyntaxError();    
     Token advance();
     Token match( int tokenType );
     bool check( int tokenType );
     
-    // Hehe, look at all these baby parsers <3
+    // Baby parsers <3
     void parseProgram();
     void parseBlock();
     void parseConstantDeclarations();
