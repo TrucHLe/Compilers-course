@@ -254,11 +254,18 @@ void Parser::parseFactor()
     else if ( check( IDENT_T ) )
     {
         Token id = match( IDENT_T );
-        
-        // unordered_map auto throws out-of-range
-        // error if it doesn't have the passed key
-        int value = constants.at( id.lexeme );
-        cout << value << endl;
+		unordered_map<string, int>::const_iterator isDelcared = constants.find(id.lexeme);
+
+		if (isDelcared == constants.end())
+		{
+			cout << "(!) Constant " << id.lexeme << " was not declared" << endl;
+			exit( 1 );
+		}
+		else
+		{
+			int value = constants.at( id.lexeme );
+			cout << value << endl;
+		}
     }
     else
     {
