@@ -3,5 +3,5 @@ const a = 1;
 const b = 2;
 const d = 4;
 begin
-	print a + b * 3 div d - 5;
+	print a + b * 3 div c - 5;
 end.

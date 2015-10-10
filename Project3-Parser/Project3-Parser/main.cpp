@@ -24,7 +24,7 @@ int main(int argc, const char * argv[])
 	string filename;
 	ifstream input;
 	
-	
+	/* CLI running, uncomment when turn in
 	if ( argc != 2 )
 	{
 		cout << "(!) Fail to run program. Please enter a filename." << endl;
@@ -34,7 +34,10 @@ int main(int argc, const char * argv[])
 	}
 	
 	filename = argv[1];
-	//cin >> filename;
+	*/
+	
+	cout << "Enter file name: "; // /Users/Bamboo/Developer/Compilers-course/Project3-Parser/Project3-Parser/test2.txt
+	cin >> filename;
 	
 	input.open( filename );
 	

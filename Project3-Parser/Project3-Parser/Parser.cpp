@@ -25,35 +25,6 @@ Parser::Parser( ifstream& i ) : scanner( i )
 
 
 //===----------------------------------------------------------------------===//
-// Check if token has any syntax error
-//===----------------------------------------------------------------------===//
-void Parser::checkSyntaxError()
-{
-    switch ( token.type )
-    {
-        case SLASHERROR_T:
-            cout << "slash" << endl;
-            cout << token << endl;
-            exit( 1 );
-            
-        case BRACKETERROR_T:
-            cout << "bracket" << endl;
-            cout << token << endl;
-            exit( 1 );
-            
-        case OTHERERROR:
-            cout << "other" << endl;
-            cout << token << endl;
-            exit( 1 );
-            
-        default:
-            break;
-    }
-}
-
-
-
-//===----------------------------------------------------------------------===//
 // Scan the next token
 //===----------------------------------------------------------------------===//
 Token Parser::advance()
@@ -258,7 +229,7 @@ void Parser::parseFactor()
 
 		if (isDelcared == constants.end())
 		{
-			cout << "(!) Constant " << id.lexeme << " was not declared" << endl;
+			cout << "(!) Constant " << id.lexeme << " at " << token.line << ":" << token.column << " was not declared" << endl;
 			exit( 1 );
 		}
 		else

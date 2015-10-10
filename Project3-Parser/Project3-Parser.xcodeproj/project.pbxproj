@@ -37,6 +37,7 @@
 		4D64F5F31BC993D700355E36 /* test0.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test0.txt; sourceTree = "<group>"; };
 		4D64F5F41BC993D700355E36 /* test1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test1.txt; sourceTree = "<group>"; };
 		4D64F5F51BC993D700355E36 /* test2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test2.txt; sourceTree = "<group>"; };
+		4D64F5F81BC9A0DA00355E36 /* Grammar.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Grammar.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +77,7 @@
 				4D64F5EF1BC993D700355E36 /* Scanner.h */,
 				4D64F5F01BC993D700355E36 /* Constants.h */,
 				4D64F5F11BC993D700355E36 /* StateTransitionTable.tsv */,
+				4D64F5F81BC9A0DA00355E36 /* Grammar.txt */,
 				4D64F5F21BC993D700355E36 /* testB0.txt */,
 				4D64F5F31BC993D700355E36 /* test0.txt */,
 				4D64F5F41BC993D700355E36 /* test1.txt */,

@@ -30,7 +30,6 @@ public:
     Parser( ifstream& i );
     
     void parse(); //main
-    void checkSyntaxError();    
     Token advance();
     Token match( int tokenType );
     bool check( int tokenType );

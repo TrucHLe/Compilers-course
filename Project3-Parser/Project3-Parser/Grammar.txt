@@ -1,0 +1,178 @@
+<Program> -->
+	program ID ; <Block> .
+
+
+<Block> -->
+	<ConstDecls> <VarDecls> <ProcDecls> begin <Stmts> end
+
+
+<ConstDecls> -->
+	<ConstDecl> <ConstDecls>
+	| ɛ
+
+
+<ConstDecl> -->
+	const ID = <Sign> NUM ;
+
+
+<Sign> -->
+	-
+	| ɛ
+
+
+<VarDecls> -->
+	<VarDecl> <VarDecls>
+	| ɛ
+
+
+<VarDecl> -->
+	var ID : <Type> ;
+
+
+<Type> -->
+	int
+	| bool
+
+
+<ProcDecls> -->
+	<ProcDecl> <ProcDecls>
+	| ɛ
+
+
+<ProcDecl> -->
+	proc ID <ParamList> ; <Block> ;
+
+
+<ParamList> -->
+	( <Params> )
+	| ɛ
+
+
+<Params> -->
+	<Param> <ParamRest>
+
+
+<ParamRest> -->
+	, <Params>
+	| ɛ
+
+
+<Param> -->
+	ID : <Type>
+	| var ID : <Type>
+
+
+<Stmts> -->
+	<Stmt> <Stmts>
+	| ɛ
+
+
+<Stmt> -->
+	ID <StmtID> ;
+	| begin <Stmts> end ;
+	| if <Expr> then <Stmt> <StmtIf>
+	| while <Expr> do <Stmt>
+	| prompt STRING <StmtPrompt> ;
+	| print <Items> ;
+
+
+<StmtID> -->
+	= <Expr>
+	| <ArgList>
+
+
+<StmtIf> -->
+	else <Stmt>
+	| ɛ
+
+
+<StmtPrompt> -->
+	, ID
+	| ɛ
+
+
+<ArgList> -->
+	( <Args> )
+	| ɛ
+
+
+<Args> -->
+	<Expr> <ArgsRest>
+
+
+<ArgsRest> -->
+	, <Args>
+	| ɛ
+
+
+<Items> -->
+	<Item> <ItemsRest>
+
+
+<ItemsRest> -->
+	, <Items>
+	| ɛ
+
+
+<Item> -->
+	<Expr>
+	| STRING
+
+
+<Expr> -->
+	<SimpleExpr> <ExprRest>
+
+
+<ExprRest>
+	<RelOp> <SimpleExpr>
+	| ɛ
+
+
+<RelOp> -->
+	==
+	| <>
+	| <=
+	| >=
+	| <
+	| >
+
+
+<SimpleExpr> -->
+	<Term> <SimpleExprRest>
+
+
+<SimpleExprRest> -->
+	<AddOp> <Term> <SimpleExprRest>
+	| ɛ
+
+
+<AddOp> -->
+	+
+	| -
+	| or
+
+
+<Term> -->
+	<Factor> <TermRest>
+
+
+<TermRest> -->
+	<MulOp> <Factor> <TermRest>
+	| ɛ
+
+
+<MulOp> -->
+	*
+	| div
+	| mod
+	| and
+
+
+<Factor> -->
+	NUM
+	| ID
+	| true
+	| false
+	| - <Factor>
+	| not <Factor>
+	| ( <Expr> )

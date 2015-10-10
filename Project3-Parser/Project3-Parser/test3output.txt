@@ -1,0 +1,87 @@
+Program demo3
+  Block
+    Const x = 6
+    Const y = 7
+    Const z = -120
+    Var a : Int
+    Var b : Bool
+    Var c1 : Int
+    Var c2 : Int
+    Proc foo
+      Block
+        Const a = 42
+        Var b : Bool
+        Assign c1
+          BinOp Times
+            Id x
+            Id y
+        Assign b
+          BinOp EQ
+            Id a
+            Id c1
+        IfThen
+          Id b
+          Print
+            StringItem "Hooray!"
+    Proc bar
+      Val n : Int
+      Val b : Bool
+      Var r : Int
+      Block
+        Proc fact
+          Val n : Int
+          Var r : Int
+          Block
+            IfThen
+              BinOp Or
+                Id b
+                UnOp Not
+                  Id b
+              IfThenElse
+                BinOp GT
+                  Id n
+                  Num 0
+                Sequence
+                  Call fact
+                    BinOp Minus
+                      Id n
+                      Num 1
+                    Id r
+                  Assign r
+                    BinOp Times
+                      Id r
+                      Id n
+                Assign r
+                  BinOp Mod
+                    BinOp Plus
+                      Id y
+                      Id x
+                    Num 2
+        While
+          Id b
+          Sequence
+            Assign b
+              UnOp Not
+                Id b
+            Call foo
+        Call fact
+          Id n
+          Id r
+    Prompt2 "Enter a number", a
+    Call bar
+      Id a
+      BinOp LT
+        Id x
+        Id y
+      Id c2
+    Print
+      StringItem "The answer is ""
+      ExprItem
+        BinOp Plus
+          BinOp Minus
+            Id c2
+            UnOp Neg
+              Id z
+          Id c1
+      StringItem ""!"
+    Prompt "Hit any key to end"
