@@ -189,17 +189,21 @@ void Scanner::advance()
 int Scanner::getNextState( int currentState, char currentChar )
 {
     int column;
-    static int state_transition_table[ 7 ][ 16 ] = {
-    //  0       1       2       3       4       5       6       7       8       9       10      11      12      13      14      15
-    //  L       0       D       =       +       -       *       ;       .       /       {       }       CR      WS      EOF     OTHER
-        1,      163,	2,      3,      113,	114,	115,	123,	125,	4,      6,      102,	0,      0,      101,	102,
-        1,      1,      1,      100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,
-        130,	2,      2,      130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,
-        112,	112,	112,	111,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,
-        128,	128,	128,	128,	128,	128,	128,	128,	128,	5,      128,	128,	128,	128,	128,	128,
-        5,      5,      5,      5,      5,      5,      5,      5,      5,      5,      5,      5,      0,      5,      0,      5,
-        6,      6,      6,      6,      6,      6,      6,      6,      6,      6,      6,      0,      6,      6,      129,	6
-    };
+	static int state_transition_table[ 11 ][ 23 ] = {
+	//	0		1		2		3		4		5		6		7		8		9		10		11		12		13		14		15		16		17		18		19		20		21		22
+	//	L		0		D		=		<		>		+		-		*		:		;		,		.		"		(		)		/		{		}		CR		WS		EOF		OTHER
+		1,		163,	2,		3,		7,		8,		113,	114,	115,	164,	123,	124,	125,	9,		118,	119,	4,		6,		102,	0,		0,		101,	102,
+		1,		1,		1,		100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,	100,
+		130,	2,		2,		130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,	130,
+		112,	112,	112,	111,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,	112,
+		128,	128,	128,	128,	128,	128,	128,	128,	128,	128,	128,	128,	128,	128,	128,	128,	5,		128,	128,	128,	128,	128,	128,
+		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		5,		0,		5,		0,		5,
+		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		6,		0,		6,		6,		129,	6,
+		107,	107,	107,	109,	107,	110,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,	107,
+		106,	106,	106,	105,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,	106,
+		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		10,		9,		9,		9,		9,		9,		121,	9,		122,	9,
+		120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	9,		120,	120,	120,	120,	120,	120,	120,	120,	120
+	};
     
     
     
@@ -211,30 +215,44 @@ int Scanner::getNextState( int currentState, char currentChar )
         column = 2;
     else if ( currentChar == '=' )
         column = 3;
+	else if ( currentChar == '<' )
+		column = 4;
+	else if ( currentChar == '>' )
+		column = 5;
     else if ( currentChar == '+' )
-        column = 4;
-    else if ( currentChar == '-' )
-        column = 5;
-    else if ( currentChar == '*' )
         column = 6;
-    else if ( currentChar == ';' )
+    else if ( currentChar == '-' )
         column = 7;
-    else if ( currentChar == '.' )
+    else if ( currentChar == '*' )
         column = 8;
-    else if ( currentChar == '/' )
-        column = 9;
-    else if ( currentChar == '{' )
+	else if ( currentChar == ':' )
+		column = 9;
+    else if ( currentChar == ';' )
         column = 10;
+	else if ( currentChar == ',' )
+		column = 11;
+    else if ( currentChar == '.' )
+        column = 12;
+	else if ( currentChar == '"' )
+		column = 13;
+	else if ( currentChar == '(' )
+		column = 14;
+	else if ( currentChar == ')' )
+		column = 15;
+    else if ( currentChar == '/' )
+        column = 16;
+    else if ( currentChar == '{' )
+        column = 17;
     else if ( currentChar == '}' )
-        column = 11;
+        column = 18;
     else if ( currentChar == '\n' ) // compare with CR before WS, otherwise
-        column = 12;                // will miss CR because WS includes CR
+        column = 19;                // will miss CR because WS includes CR
     else if ( isspace( currentChar ) )
-        column = 13;
+        column = 20;
     else if ( currentChar == EOF )
-        column = 14;
+        column = 21;
     else
-        column = 15;
+        column = 22;
     
     
     
@@ -303,16 +321,28 @@ int Scanner::getNextTerminalState()
             case SINGLE0_T:         return current_state;
             case INTEGER_T:         return current_state;
             case SETEQUAL_T:        return current_state;
+			case ISEQUAL_ST:		return current_state;
+			case NOTEQUAL_ST:		return current_state;
+			case LESSER_ST:			return current_state;
+			case LESSEQUAL_ST:		return current_state;
+			case GREATER_ST:		return current_state;
+			case GREQUAL_ST:		return current_state;
             case ADDITION_ST:       return current_state;
             case SUBTRACT_ST:       return current_state;
             case ASTERISK_ST:       return current_state;
+			case COLON_T:			return current_state;
             case SEMICOLON_T:       return current_state;
+			case COMMA_T:			return current_state;
             case PERIOD_T:          return current_state;
-            case EOF_T:             return current_state;
+			case STRINGCONST_T:		return current_state;
+			case CRERRORCONST_T:	return current_state;
+			case EOFERRORCONST_T:	return current_state;
+			case LEFTPARENTH_T:		return current_state;
+			case RIGHTPARENTH_T:	return current_state;
             case SLASHERROR_T:      return current_state;
             case BRACKETERROR_T:    return current_state;
+			case EOF_T:             return current_state;
             case OTHERERROR:        return current_state;
-                
         }
         
     } while ( 1 );
@@ -336,9 +366,10 @@ Token Scanner::next()
     {
         case IDENT_T:
             
-            // Subtract current column number by 1 to
-            // read again since we just found a Token
-            // except for the first input line
+            // Subtract current column number by 1
+			// (unless current column is 0)
+			// to read again because we detect an identifier
+			// by looking 1 character ahead.
             if ( column_number > 1 )
                 --column_number;
             
@@ -411,7 +442,35 @@ Token Scanner::next()
                 return token;
                 
             }
-            
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "var" ) == 0 )
+			{
+				token.setToken( token_line, token_column, VAR_ID, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "int" ) == 0 )
+			{
+				token.setToken( token_line, token_column, INT_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "bool" ) == 0 )
+			{
+				token.setToken( token_line, token_column, BOOLEAN_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "proc" ) == 0 )
+			{
+				token.setToken( token_line, token_column, PROC_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
             else
             {
                 token.setToken( token_line, token_column, IDENT_T, current_lexeme );
