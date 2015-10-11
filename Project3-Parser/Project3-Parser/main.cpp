@@ -49,8 +49,14 @@ int main(int argc, const char * argv[])
 	}
 	
 	
-	//Parser parser( input );
-
+	Parser parser( input );
+	//ASTNode* node = parser.parseProgram();
+	//cout << node->toString() //toString takes indentation //look at Exam1 on I Drive
+	//ask Program Node to print here
+	//delete node //make destructor in AST.h
+	
+	
+	
 	//Test scanner
 	Scanner scanner( input );
 	Token token;

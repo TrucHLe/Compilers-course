@@ -12,52 +12,52 @@
 
 //===----------------------------------------------------------------------===//
 // Format a Token for display on cout
-// *recheck
+//
 string nameOf( int tokenType )
 {
     switch ( tokenType )
     {
-		case IDENT_T:			return "ID";	//debugging purpose, cmt out when parse
-        case PRGRM_T:			return "Program";
-        case CONST_T:			return "Const";
-        case BEGIN_T:			return "Begin";	//debugging purpose, cmt out when parse
-        case END_T:				return "End";	//debugging purpose, cmt out when parse
-        case PRINT_ST:			return "Print";
-        case DIV_ST:			return "Div";
-        case MOD_ST:			return "Mod";
-		case VAR_ID:			return "Var";
-		case INT_T:				return "Int";
-		case BOOLEAN_T:			return "Bool";
-		case PROC_T:			return "Proc";
-		case IF_T:				return "IfThen";
-		case ELSE_T:			return "IfThenElse";
-		case WHILE_T:			return "While";
-		case DO_T:				return "Do";	//debugging purpose, cmt out when parse
-		case PROMPT_T:			return "Prompt";
-		case AND_ST:			return "And";
-		case OR_ST:				return "Or";
-		case NOT_ST:			return "Not";
-		case TRUE_T:			return "True";
-		case FALSE_T:			return "False";
-        case SINGLE0_T:			return "Num";	//nameOf these cases are not
-        case INTEGER_T:			return "Num";	//needed for project 3
-        case SETEQUAL_T:		return "Assign";
+		case IDENT_T:			return "ID";
+        case PRGRM_T:			return "PROGRAM";
+        case CONST_T:			return "CONST";
+        case BEGIN_T:			return "BEGIN";
+        case END_T:				return "END";
+        case PRINT_ST:			return "PRINT";
+        case DIV_ST:			return "DIV";
+        case MOD_ST:			return "MOD";
+		case VAR_ID:			return "VAR";
+		case INT_T:				return "INT";
+		case BOOLEAN_T:			return "BOOL";
+		case PROC_T:			return "PROC";
+		case IF_T:				return "IF-THEN";
+		case ELSE_T:			return "IF-THEN-ELSE";
+		case WHILE_T:			return "WHILE";
+		case DO_T:				return "DO";
+		case PROMPT_T:			return "PROMPT";
+		case AND_ST:			return "AND";
+		case OR_ST:				return "OR";
+		case NOT_ST:			return "NOT";
+		case TRUE_T:			return "TRUE";
+		case FALSE_T:			return "FALSE";
+        case SINGLE0_T:			return "NUM";
+        case INTEGER_T:			return "NUM";
+        case SETEQUAL_T:		return "ASSIGN";
 		case ISEQUAL_ST:		return "EQ";
 		case LESSER_ST:			return "LT";
 		case LESSEQUAL_ST:		return "LE";
 		case NOTEQUAL_ST:		return "NE";
 		case GREATER_ST:		return "GT";
 		case GREQUAL_ST:		return "GE";
-        case ADDITION_ST:		return "Plus";
-        case SUBTRACT_ST:		return "Minus";
-        case ASTERISK_ST:		return "Times";
-		case COLON_T:			return "Colon";	//debugging purpose, cmt out when parse
-        case SEMICOLON_T:		return "Semi";	//debugging purpose, cmt out when parse
-		case COMMA_T:			return "Comma";	//debugging purpose, cmt out when parse
-        case PERIOD_T:			return "Period";//debugging purpose, cmt out when parse
-		case STRINGCONST_T:		return "StringItem";
-		case LEFTPARENTH_T:		return "LeftParenthesis";
-		case RIGHTPARENTH_T:	return "RightParenthesis";
+        case ADDITION_ST:		return "PLUS";
+        case SUBTRACT_ST:		return "MINUS";
+        case ASTERISK_ST:		return "TIMES";
+		case COLON_T:			return "COLON";
+        case SEMICOLON_T:		return "SEMI";
+		case COMMA_T:			return "COMMA";
+        case PERIOD_T:			return "PERIOD";
+		case STRINGCONST_T:		return "STRING";
+		case LEFTPARENTH_T:		return "PAREN-LEFT";
+		case RIGHTPARENTH_T:	return "PAREN-RIGHT";
         case EOF_T:				return "EOF";
 			
 			

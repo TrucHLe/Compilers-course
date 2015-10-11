@@ -10,6 +10,7 @@
 		4D64F5E61BC993B700355E36 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64F5E51BC993B700355E36 /* main.cpp */; };
 		4D64F5F61BC993D700355E36 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64F5EC1BC993D700355E36 /* Parser.cpp */; };
 		4D64F5F71BC993D700355E36 /* Scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64F5EE1BC993D700355E36 /* Scanner.cpp */; };
+		4D64F5FD1BCA0EAB00355E36 /* AST.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64F5FB1BCA0EAB00355E36 /* AST.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +39,8 @@
 		4D64F5F51BC993D700355E36 /* test2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test2.txt; sourceTree = "<group>"; };
 		4D64F5F81BC9A0DA00355E36 /* Grammar.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Grammar.txt; sourceTree = "<group>"; };
 		4D64F5FA1BC9BDB600355E36 /* StateTransitionTable.tsv */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateTransitionTable.tsv; sourceTree = "<group>"; };
+		4D64F5FB1BCA0EAB00355E36 /* AST.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST.cpp; sourceTree = "<group>"; };
+		4D64F5FC1BCA0EAB00355E36 /* AST.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AST.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +74,8 @@
 			isa = PBXGroup;
 			children = (
 				4D64F5E51BC993B700355E36 /* main.cpp */,
+				4D64F5FB1BCA0EAB00355E36 /* AST.cpp */,
+				4D64F5FC1BCA0EAB00355E36 /* AST.h */,
 				4D64F5EC1BC993D700355E36 /* Parser.cpp */,
 				4D64F5ED1BC993D700355E36 /* Parser.h */,
 				4D64F5EE1BC993D700355E36 /* Scanner.cpp */,
@@ -142,6 +147,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D64F5FD1BCA0EAB00355E36 /* AST.cpp in Sources */,
 				4D64F5F71BC993D700355E36 /* Scanner.cpp in Sources */,
 				4D64F5F61BC993D700355E36 /* Parser.cpp in Sources */,
 				4D64F5E61BC993B700355E36 /* main.cpp in Sources */,
@@ -261,6 +267,7 @@
 				4D64F5EB1BC993B700355E36 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

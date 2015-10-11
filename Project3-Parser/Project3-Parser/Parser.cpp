@@ -85,10 +85,12 @@ void Parser::parseProgram()
 
 void Parser::parseBlock()
 {
+	//
     parseConstantDeclarations();
     match( BEGIN_T );
     parseStatements();
     match( END_T );
+	//create Block AST Node(ConstDecl, Stmt), return a pointer to this
 }
 
 
@@ -97,10 +99,11 @@ void Parser::parseConstantDeclarations()
 {
     if ( check( CONST_T ) )
     {
-        parseConstantDeclaration();
+		
+        parseConstantDeclaration(); //return list
         parseConstantDeclarations();
     }
-    else {}
+    else {} //return list
 }
 
 
@@ -116,8 +119,8 @@ void Parser::parseConstantDeclaration()
     Token value = match( INTEGER_T );
     match( SEMICOLON_T );
     
-    pair<string, int> constant = make_pair( key.lexeme, stoi( value.lexeme ) );
-    constants.insert( constant );
+    pair<string, int> constant = make_pair( key.lexeme, stoi( value.lexeme ) );//
+    constants.insert( constant );//
 }
 
 
