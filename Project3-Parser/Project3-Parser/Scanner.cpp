@@ -12,82 +12,71 @@
 
 //===----------------------------------------------------------------------===//
 // Format a Token for display on cout
-//
+// *recheck
 string nameOf( int tokenType )
 {
     switch ( tokenType )
     {
-        case PRGRM_T:
-            return "PROGRAM";
-            
-        case CONST_T:
-            return "CONST";
-            
-        case BEGIN_T:
-            return "BEGIN";
-            
-        case END_T:
-            return "END";
-            
-        case PRINT_ST:
-            return "PRINT";
-            
-        case DIV_ST:
-            return "DIV";
-            
-        case MOD_ST:
-            return "MOD";
-            
-        case IDENT_T:
-            return "ID";
-            
-        case SINGLE0_T:
-            return "NUM";
-            
-        case INTEGER_T:
-            return "NUM";
-            
-        case SETEQUAL_T:
-            return "ASSIGN";
-            
-        case ADDITION_ST:
-            return "PLUS";
-            
-        case SUBTRACT_ST:
-            return "MINUS";
-            
-        case ASTERISK_ST:
-            return "STAR";
-            
-        case SEMICOLON_T:
-            return "SEMI";
-            
-        case PERIOD_T:
-            return "PERIOD";
-            
-        case EOF_T:
-            return "EOF";
-            
+		case IDENT_T:			return "ID";	//debugging purpose, cmt out when parse
+        case PRGRM_T:			return "Program";
+        case CONST_T:			return "Const";
+        case BEGIN_T:			return "Begin";	//debugging purpose, cmt out when parse
+        case END_T:				return "End";	//debugging purpose, cmt out when parse
+        case PRINT_ST:			return "Print";
+        case DIV_ST:			return "Div";
+        case MOD_ST:			return "Mod";
+		case VAR_ID:			return "Var";
+		case INT_T:				return "Int";
+		case BOOLEAN_T:			return "Bool";
+		case PROC_T:			return "Proc";
+		case IF_T:				return "IfThen";
+		case ELSE_T:			return "IfThenElse";
+		case WHILE_T:			return "While";
+		case DO_T:				return "Do";	//debugging purpose, cmt out when parse
+		case PROMPT_T:			return "Prompt";
+		case AND_ST:			return "And";
+		case OR_ST:				return "Or";
+		case NOT_ST:			return "Not";
+		case TRUE_T:			return "True";
+		case FALSE_T:			return "False";
+        case SINGLE0_T:			return "Num";	//nameOf these cases are not
+        case INTEGER_T:			return "Num";	//needed for project 3
+        case SETEQUAL_T:		return "Assign";
+		case ISEQUAL_ST:		return "EQ";
+		case LESSER_ST:			return "LT";
+		case LESSEQUAL_ST:		return "LE";
+		case NOTEQUAL_ST:		return "NE";
+		case GREATER_ST:		return "GT";
+		case GREQUAL_ST:		return "GE";
+        case ADDITION_ST:		return "Plus";
+        case SUBTRACT_ST:		return "Minus";
+        case ASTERISK_ST:		return "Times";
+		case COLON_T:			return "Colon";	//debugging purpose, cmt out when parse
+        case SEMICOLON_T:		return "Semi";	//debugging purpose, cmt out when parse
+		case COMMA_T:			return "Comma";	//debugging purpose, cmt out when parse
+        case PERIOD_T:			return "Period";//debugging purpose, cmt out when parse
+		case STRINGCONST_T:		return "StringItem";
+		case LEFTPARENTH_T:		return "LeftParenthesis";
+		case RIGHTPARENTH_T:	return "RightParenthesis";
+        case EOF_T:				return "EOF";
+			
+			
         // Still leave error cases here although next()
         // will have already checked to help future debugging
-        case SLASHERROR_T:
-            return "(!) Missing a second slash '/'";
+		case CRERRORCONST_T:	return "(!) Cannot insert new line in a string";
+		case EOFERRORCONST_T:	return "(!) Found end-of-file while scanning a string";
+        case SLASHERROR_T:		return "(!) Missing a second slash '/'";
+        case BRACKETERROR_T:	return "(!) Missing a closing bracket '}'";
+        case OTHERERROR:		return "(!) Unrecognized character";
             
-        case BRACKETERROR_T:
-            return "(!) Missing a closing bracket '}'";
-            
-        case OTHERERROR:
-            return "(!) Unrecognized character";
-            
-        default:
-            return "";
+        default:				return "";
     }
 }
 
 
 ostream& operator << ( ostream& out, const Token& token )
 {
-    if ( token.type == IDENT_T || token.type == SINGLE0_T || token.type == INTEGER_T || token.type == OTHERERROR )
+    if ( token.type == IDENT_T || token.type == SINGLE0_T || token.type == INTEGER_T || token.type == STRINGCONST_T || token.type == OTHERERROR )
         out << nameOf( token.type ) << " " << token.lexeme << " " << token.line << ":" << token.column;
     else
         out << nameOf( token.type ) << " " << token.line << ":" << token.column;
@@ -471,6 +460,76 @@ Token Scanner::next()
 				return token;
 			}
 			
+			else if ( strcasecmp( current_lexeme.c_str(), "if" ) == 0 )
+			{
+				token.setToken( token_line, token_column, IF_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "else" ) == 0 )
+			{
+				token.setToken( token_line, token_column, ELSE_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "while" ) == 0 )
+			{
+				token.setToken( token_line, token_column, WHILE_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "do" ) == 0 )
+			{
+				token.setToken( token_line, token_column, DO_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "prompt" ) == 0 )
+			{
+				token.setToken( token_line, token_column, PROMPT_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "and" ) == 0 )
+			{
+				token.setToken( token_line, token_column, AND_ST, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "or" ) == 0 )
+			{
+				token.setToken( token_line, token_column, OR_ST, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "not" ) == 0 )
+			{
+				token.setToken( token_line, token_column, NOT_ST, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "true" ) == 0 )
+			{
+				token.setToken( token_line, token_column, TRUE_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "false" ) == 0 )
+			{
+				token.setToken( token_line, token_column, FALSE_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+
             else
             {
                 token.setToken( token_line, token_column, IDENT_T, current_lexeme );
@@ -505,7 +564,45 @@ Token Scanner::next()
             token.setToken( token_line, token_column, SETEQUAL_T, current_lexeme );
             current_lexeme = "";
             return token;
-            
+			
+		case ISEQUAL_ST:
+			token.setToken( token_line, token_column, ISEQUAL_ST, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case LESSER_ST:
+			if ( column_number > 1 )
+				--column_number;
+
+			current_lexeme.erase( current_lexeme.length() - 1, 1 );
+			token.setToken( token_line, token_column, LESSER_ST, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case LESSEQUAL_ST:
+			token.setToken( token_line, token_column, LESSEQUAL_ST, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case NOTEQUAL_ST:
+			token.setToken( token_line, token_column, NOTEQUAL_ST, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case GREATER_ST:
+			if ( column_number > 1 )
+				--column_number;
+			
+			current_lexeme.erase( current_lexeme.length() - 1, 1 );
+			token.setToken( token_line, token_column, GREATER_ST, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case GREQUAL_ST:
+			token.setToken( token_line, token_column, GREQUAL_ST, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
         case ADDITION_ST:
             token.setToken( token_line, token_column, ADDITION_ST, current_lexeme );
             current_lexeme = "";
@@ -520,17 +617,58 @@ Token Scanner::next()
             token.setToken( token_line, token_column, ASTERISK_ST, current_lexeme );
             current_lexeme = "";
             return token;
-            
+			
+		case COLON_T:
+			token.setToken( token_line, token_column, COLON_T, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
         case SEMICOLON_T:
             token.setToken( token_line, token_column, SEMICOLON_T, current_lexeme );
             current_lexeme = "";
             return token;
-            
-        case PERIOD_T:
-            token.setToken( token_line, token_column, PERIOD_T, current_lexeme );
-            current_lexeme = "";
-            return token;
-            
+
+		case COMMA_T:
+			token.setToken( token_line, token_column, COMMA_T, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case PERIOD_T:
+			token.setToken( token_line, token_column, PERIOD_T, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case STRINGCONST_T:
+			if ( column_number > 1 )
+				--column_number;
+			
+			current_lexeme.erase( current_lexeme.length() - 1, 1 ); //erase the last char and the last quotation mark
+			token.setToken( token_line, token_column, STRINGCONST_T, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case CRERRORCONST_T:
+			token.setToken( token_line, token_column, CRERRORCONST_T, current_lexeme );
+			current_lexeme = "";
+			cout << "(!) Cannot insert new line in a string " << token.line << ":" << token.column << endl;
+			exit( 1 );
+			
+		case EOFERRORCONST_T:
+			token.setToken( token_line, token_column, EOFERRORCONST_T, current_lexeme );
+			current_lexeme = "";
+			cout << "(!) Cannot end file while scanning a string " << token.line << ":" << token.column << endl;
+			exit( 1 );
+			
+		case LEFTPARENTH_T:
+			token.setToken( token_line, token_column, LEFTPARENTH_T, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
+		case RIGHTPARENTH_T:
+			token.setToken( token_line, token_column, RIGHTPARENTH_T, current_lexeme );
+			current_lexeme = "";
+			return token;
+			
         case EOF_T:
             token.setToken( token_line, token_column, EOF_T, current_lexeme );
             current_lexeme = "";

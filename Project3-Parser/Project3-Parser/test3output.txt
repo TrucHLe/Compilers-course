@@ -83,5 +83,5 @@ Program demo3
             UnOp Neg
               Id z
           Id c1
-      StringItem ""!"
+      StringItem """!"
     Prompt "Hit any key to end"
