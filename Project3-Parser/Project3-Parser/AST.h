@@ -49,6 +49,7 @@ struct Num;
 struct Id;
 struct True;
 struct False;
+/*
 static bool deleteAllConstDecl( ConstDecl* c );
 static bool deleteAllVarDecl( VarDecl* v );
 static bool deleteAllProcDecl( ProcDecl* v );
@@ -56,6 +57,7 @@ static bool deleteAllParam( Param* p );
 static bool deleteAllStmt( Stmt* s );
 static bool deleteAllExpr( Expr* e );
 static bool deleteAllItem( Item* i );
+*/
 
 enum ASTNodeType
 {
@@ -118,9 +120,9 @@ enum Op2
 	Or
 };
 
-string nameOf( Type type );
-string nameOf( Op1 op1 );
-string nameOf( Op2 op2 );
+//string nameOfType( Type type );
+//string nameOfOp1( Op1 op1 );
+//string nameOfOp2( Op2 op2 );
 
 
 #endif /* defined(__Project3_Parser__AST__) */

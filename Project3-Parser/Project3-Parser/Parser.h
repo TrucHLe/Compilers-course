@@ -33,8 +33,35 @@ public:
     Token advance();
     Token match( int tokenType );
     bool check( int tokenType );
-    
+	
+	
     // Baby parsers
+	ASTNode* parseProgram();
+	Block* parseBlock();
+	ConstDecl* parseConstDecl();
+	VarDecl* parseVarDecl();
+	ProcDecl* parseProcDecl();
+	Stmt* parseStmt();
+	Stmt* parseStmtID( string i, int lin, int col ); //return terminal ID Stmt here
+	Stmt* parseStmtIf( Expr* t, Stmt* tr, int lin, int col ); //return terminal If Stmt here
+	Stmt* parseStmtPrompt( string m, int lin, int col ); //return terminal Prompt Stmt here
+	Param* parseParam();
+	Expr* parseExpr();
+	Expr* parseExprRest( Expr* e, int lin, int col ); //return terminal Expr here
+	Expr* parseSimpleExpr();
+	Expr* parseSimpleExprRest( Expr* e, int lin, int col ); //return terminal Expr here
+	Expr* parseTerm();
+	Expr* parseTermRest( Expr* e, int lin, int col ); //return terminal Expr here
+	Expr* parseFactor();
+	Item* parseItem();
+	
+	Op2 parseRelOp();
+	Op2 parseAddOp();
+	Op2 parseMulOp();
+	
+	string parseSign();
+	Type parseType();
+	
 	list<ConstDecl*> parseConstDecls();
 	list<VarDecl*> parseVarDecls();
 	list<ProcDecl*> parseProcDecls();
@@ -47,32 +74,6 @@ public:
 	list<Expr*> parseArgsRest();
 	list<Item*> parseItems();
 	list<Item*> parseItemsRest();
-	
-	ASTNode* parseProgram();//✔︎
-	Block* parseBlock();//✔︎
-	ConstDecl* parseConstDecl();//✔︎
-	VarDecl* parseVarDecl();//✔︎
-	ProcDecl* parseProcDecl();//✔︎
-	Stmt* parseStmt();//✔︎
-	Stmt* parseStmtID( string i, int lin, int col ); //✔︎return terminal ID Stmt here
-	Stmt* parseStmtIf( Expr* t, Stmt* tr, int lin, int col ); //✔︎return terminal If Stmt here
-	Stmt* parseStmtPrompt( string m, int lin, int col ); //✔︎return terminal Prompt Stmt here
-	Param* parseParam();//✔︎
-	Expr* parseExpr();
-	Expr* parseSimpleExpr();
-	Expr* parseExprRest( Expr* e, int lin, int col ); //return terminal Expr here
-	Expr* parseTerm();
-	Expr* parseSimpleExprRest( Expr* e, int lin, int col ); //return terminal Expr here
-	Expr* parseFactor();
-	Expr* parseTermRest( Expr* e, int lin, int col ); //return terminal Expr here
-	Item* parseItem();
-	
-	Op2 parseRelOp();
-	Op2 parseAddOp();
-	Op2 parseMulOp();
-	
-	string parseSign();
-	Type parseType();
 };
 
 

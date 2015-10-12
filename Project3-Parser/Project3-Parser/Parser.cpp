@@ -7,7 +7,7 @@
 //
 
 #include "Parser.h"
-#include "AST.h"
+
 
 //===----------------------------------------------------------------------===//
 // Parser constructor:
@@ -74,13 +74,13 @@ bool Parser::check( int tokenType )
 //
 ASTNode* Parser::parseProgram()
 {
-    match( PRGRM_T );
-    Token token = match( IDENT_T );
+    Token program = match( PRGRM_T );
+    Token ID = match( IDENT_T );
     match( SEMICOLON_T );
     Block* block = parseBlock();
     match( PERIOD_T );
 	
-	Program* node = new Program( token.lexeme, block, token.line, token.column );
+	Program* node = new Program( ID.lexeme, block, program.line, program.column );
 	return node;
 }
 
@@ -113,9 +113,7 @@ ConstDecl* Parser::parseConstDecl()
 	
 	int val = stoi( value.lexeme );
 	if ( sign.compare("-") == 0 )
-	{
 		val = -val;
-	}
 	
 	ConstDecl* node = new ConstDecl( ID.lexeme, val, constant.line, constant.column );
 	return node;
@@ -159,7 +157,6 @@ Stmt* Parser::parseStmt()
 		Token ID = match( IDENT_T );
 		Stmt* node = parseStmtID( ID.lexeme, ID.line, ID.column );
 		match( SEMICOLON_T );
-		
 		return node;
 	}
 	else if ( check( BEGIN_T ) )
@@ -168,7 +165,6 @@ Stmt* Parser::parseStmt()
 		list<Stmt*> body = parseStmts();
 		match( END_T );
 		match( SEMICOLON_T );
-		
 		Sequence* node = new Sequence( body, begin.line, begin.column );
 		return node;
 	}
@@ -179,7 +175,6 @@ Stmt* Parser::parseStmt()
 		match( THEN_T );
 		Stmt* trueClause = parseStmt();
 		Stmt* node = parseStmtIf( test, trueClause, ifToken.line, ifToken.column );
-		
 		return node;
 	}
 	else if ( check( WHILE_T ) )
@@ -188,7 +183,6 @@ Stmt* Parser::parseStmt()
 		Expr* test = parseExpr();
 		match( DO_T );
 		Stmt* body = parseStmt();
-		
 		While* node = new While( test, body, whileToken.line, whileToken.column );
 		return node;
 	}
@@ -198,20 +192,16 @@ Stmt* Parser::parseStmt()
 		Token message = match( STRINGCONST_T );
 		Stmt* node = parseStmtPrompt( message.lexeme, prompt.line, prompt.column );
 		match( SEMICOLON_T );
-		
 		return node;
 	}
-	else if ( check( PRINT_ST )	)
+	else
 	{
 		Token print = match( PRINT_ST );
 		list<Item*> items = parseItems();
 		match( SEMICOLON_T );
-		
 		Print* node = new Print( items, print.line, print.column );
 		return node;
 	}
-	
-	return NULL;
 }
 
 
@@ -231,8 +221,6 @@ Stmt* Parser::parseStmtID( string i, int lin, int col )
 		Call* node = new Call( i, args, lin, col );
 		return node;
 	}
-	
-	return NULL;
 }
 
 
@@ -251,8 +239,6 @@ Stmt* Parser::parseStmtIf( Expr* t, Stmt* tr, int lin, int col )
 		IfThen* node = new IfThen( t, tr, lin, col );
 		return node;
 	}
-	
-	return NULL;
 }
 
 
@@ -271,8 +257,6 @@ Stmt* Parser::parseStmtPrompt( string m, int lin, int col )
 		Prompt* node = new Prompt( m, lin, col );
 		return node;
 	}
-	
-	return NULL;
 }
 
 
@@ -292,135 +276,430 @@ Param* Parser::parseParam()
 		Token ID = match( IDENT_T );
 		match( COLON_T );
 		Type type = parseType();
-		VarParam* node = new VarParam( ID.lexeme, type, ID.line, ID.column );
+		VarParam* node = new VarParam( ID.lexeme, type, var.line, var.column );
 		return node;
 	}
-	
-	return NULL;
 }
 
 
 
-ConstDecl* Parser::parseConstDecl()
+Expr* Parser::parseExpr()
 {
-    if ( check( CONST_T ) )
-    {
-		
-        parseConstantDeclaration(); //return list
-        parseConstantDeclarations();
-    }
-    else {} //return list
+	Expr* simpleExpr = parseSimpleExpr();
+	Expr* node = parseExprRest( simpleExpr, simpleExpr->line, simpleExpr->column );
+	return node;
 }
 
 
 
-//===---------------------------------------===//
-// Add the matched constant to constants hash map
-//
-
-
-
-
-void Parser::parseExpression()
+Expr* Parser::parseExprRest( Expr* e, int lin, int col )
 {
-    parseTerm();
-    parseExpressionRest();
+	if ( check( ISEQUAL_ST ) || check( NOTEQUAL_ST ) || check( LESSER_ST ) || check( GREATER_ST ) || check( LESSEQUAL_ST ) || check( GREQUAL_ST ) )
+	{
+		Op2 relOp = parseRelOp();
+		Expr* simpleExpr = parseSimpleExpr();
+		BinOp* node = new BinOp( e, relOp, simpleExpr, lin, col );
+		return node;
+	}
+	else
+	{
+		return e;
+	}
 }
 
 
 
-void Parser::parseExpressionRest()
+Expr* Parser::parseSimpleExpr()
 {
-    if ( check( ADDITION_ST ) )
-    {
-        Token add = match( ADDITION_ST );
-        parseTerm();
-        cout << add.lexeme << endl; //this one stays here. Check Grammar.txt if confused.
-        parseExpressionRest();
-    }
-    else if ( check( SUBTRACT_ST ) )
-    {
-        Token subtract = match( SUBTRACT_ST );
-        parseTerm();
-        cout << subtract.lexeme << endl;
-        parseExpressionRest();
-    }
-    else {}
-    
+	Expr* term = parseTerm();
+	Expr* node = parseSimpleExprRest( term, term->line, term->column );
+	return node;
 }
 
 
 
-void Parser::parseTerm()
+Expr* Parser::parseSimpleExprRest( Expr* e, int lin, int col )
 {
-    parseFactor();
-    parseTermRest();
+	if ( check( ADDITION_ST ) || check( SUBTRACT_ST ) || check( OR_ST ) )
+	{
+		Op2 addOp = parseAddOp();
+		Expr* term = parseTerm();
+		Expr* simpleExprRest = parseSimpleExprRest( term, term->line, term->column );
+		BinOp* node = new BinOp( e, addOp, simpleExprRest, lin, col );
+		return node;
+	}
+	else
+		return e;
 }
 
 
 
-void Parser::parseTermRest()
+Expr* Parser::parseTerm()
 {
-    if ( check( ASTERISK_ST ) )
-    {
-        Token star = match( ASTERISK_ST );
-        parseFactor();
-        cout << star.lexeme << endl;
-        parseTermRest();
-    }
-    else if ( check( DIV_ST ) )
-    {
-        Token div = match( DIV_ST );
-        parseFactor();
-        cout << nameOf( div.type ) << endl;
-        parseTermRest();
-    }
-    else if ( check( MOD_ST ) )
-    {
-        Token mod = match( MOD_ST );
-        parseFactor();
-        cout << nameOf( mod.type ) << endl;
-        parseTermRest();
-    }
-    else {}
+	Expr* factor = parseFactor();
+	Expr* node = parseTermRest( factor, factor->line, factor->column );
+	return node;
 }
 
 
 
-void Parser::parseFactor()
+Expr* Parser::parseTermRest( Expr* e, int lin, int col )
 {
-    if ( check( SINGLE0_T ) )
-    {
-        Token num = match( SINGLE0_T );
-        cout << num.lexeme << endl;
-    }
-    else if ( check( INTEGER_T ) )
-    {
-        Token num = match( INTEGER_T );
-        cout << num.lexeme << endl;
-    }
-    else if ( check( IDENT_T ) )
-    {
-        Token id = match( IDENT_T );
-		unordered_map<string, int>::const_iterator isDelcared = constants.find(id.lexeme);
-
-		if (isDelcared == constants.end())
-		{
-			cout << "(!) Constant " << id.lexeme << " at " << token.line << ":" << token.column << " was not declared" << endl;
-			exit( 1 );
-		}
-		else
-		{
-			int value = constants.at( id.lexeme );
-			cout << value << endl;
-		}
-    }
-    else
-    {
-        cout << "(!) Expected either NUM or ID at " << token.line << ":" << token.column << endl;
-        exit( 1 );
-    }
+	if ( check( ASTERISK_ST ) || check( DIV_ST ) || check( MOD_ST ) || check( AND_ST ) )
+	{
+		Op2 mulOp = parseMulOp();
+		Expr* factor = parseFactor();
+		Expr* termRest = parseTermRest( factor, factor->line, factor->column );
+		BinOp* node = new BinOp( e, mulOp, termRest, lin, col );
+		return node;
+	}
+	else
+		return e;
 }
+
+
+
+Expr* Parser::parseFactor()
+{
+	if ( check( INTEGER_T ) )
+	{
+		Token num = match( INTEGER_T );
+		Num* node = new Num( stoi( num.lexeme ), num.line, num.column );
+		return node;
+	}
+	else if ( check( IDENT_T ) )
+	{
+		Token ID = match( IDENT_T );
+		Id* node = new Id( ID.lexeme, ID.line, ID.column );
+		return node;
+	}
+	else if ( check( TRUE_T ) )
+	{
+		Token trueToken = match( TRUE_T );
+		True* node = new True( trueToken.line, trueToken.column );
+		return node;
+	}
+	else if ( check( FALSE_T ) )
+	{
+		Token falseToken = match( FALSE_T );
+		False* node = new False( falseToken.line, falseToken.column );
+		return node;
+	}
+	else if ( check( SUBTRACT_ST ) )
+	{
+		Token unOp = match( SUBTRACT_ST );
+		Expr* factor = parseFactor();
+		UnOp* node = new UnOp( Neg, factor, unOp.line, unOp.column );
+		return node;
+	}
+	else if ( check( NOT_ST ) )
+	{
+		Token unOp = match( NOT_ST );
+		Expr* factor = parseFactor();
+		UnOp* node = new UnOp( Not, factor, unOp.line, unOp.column );
+		return node;
+	}
+	else
+	{
+		Token leftParen = match( LEFTPARENTH_T );
+		Expr* node = parseExpr();
+		match( RIGHTPARENTH_T );
+		return node;
+	}
+}
+
+
+
+Item* Parser::parseItem()
+{
+	if ( check( STRINGCONST_T ) )
+	{
+		Token stringToken = match( STRINGCONST_T );
+		StringItem* node = new StringItem( stringToken.lexeme, stringToken.line, stringToken.column );
+		return node;
+	}
+	else
+	{
+		Expr* expr = parseExpr();
+		ExprItem* node = new ExprItem( expr, expr->line, expr->column );
+		return node;
+	}
+}
+
+
+
+Op2 Parser::parseRelOp()
+{
+	if ( check( ISEQUAL_ST ) )
+	{
+		match( ISEQUAL_ST );
+		return EQ;
+	}
+	else if ( check( NOTEQUAL_ST ) )
+	{
+		match( NOTEQUAL_ST );
+		return NE;
+	}
+	else if ( check( LESSER_ST ) )
+	{
+		match( LESSER_ST );
+		return LT;
+	}
+	else if ( check( GREATER_ST ) )
+	{
+		match( GREATER_ST );
+		return GT;
+	}
+	else if ( check( LESSEQUAL_ST ) )
+	{
+		match( LESSEQUAL_ST );
+		return LE;
+	}
+	else
+	{
+		match( GREQUAL_ST );
+		return GE;
+	}
+}
+
+
+
+Op2 Parser::parseAddOp()
+{
+	if ( check( ADDITION_ST ) )
+	{
+		match( ADDITION_ST );
+		return Plus;
+	}
+	else if ( check( SUBTRACT_ST ) )
+	{
+		match( SUBTRACT_ST );
+		return Minus;
+	}
+	else
+	{
+		match( OR_ST );
+		return Or;
+	}
+}
+
+
+
+Op2 Parser::parseMulOp()
+{
+	if ( check( ASTERISK_ST ) )
+	{
+		match( ASTERISK_ST );
+		return Times;
+	}
+	else if ( check( DIV_ST ) )
+	{
+		match( DIV_ST );
+		return Div;
+	}
+	else if ( check( MOD_ST ) )
+	{
+		match( MOD_ST );
+		return Mod;
+	}
+	else
+	{
+		match( AND_ST );
+		return And;
+	}
+}
+
+
+
+string Parser::parseSign()
+{
+	if ( check( SUBTRACT_ST ) )
+	{
+		match( SUBTRACT_ST );
+		return "-";
+	}
+	else
+		return "";
+}
+
+
+
+Type Parser::parseType()
+{
+	if ( check( INT_T ) )
+	{
+		match( INT_T );
+		return IntType;
+	}
+	else
+	{
+		match( BOOLEAN_T );
+		return BoolType;
+	}
+}
+
+
+
+list<ConstDecl*> Parser::parseConstDecls()
+{
+	if ( check( CONST_T ) )
+	{
+		ConstDecl* constDecl = parseConstDecl();
+		list<ConstDecl*> constDecls = parseConstDecls();
+		constDecls.push_front( constDecl );
+		return constDecls;
+	}
+	else
+		return list<ConstDecl*>();
+}
+
+
+
+list<VarDecl*> Parser::parseVarDecls()
+{
+	if ( check( VAR_ID ) )
+	{
+		VarDecl* varDecl = parseVarDecl();
+		list<VarDecl*> varDecls = parseVarDecls();
+		varDecls.push_front( varDecl );
+		return varDecls;
+	}
+	else
+		return list<VarDecl*>();
+}
+
+
+
+list<ProcDecl*> Parser::parseProcDecls()
+{
+	if ( check( PROC_T ) )
+	{
+		ProcDecl* procDecl = parseProcDecl();
+		list<ProcDecl*> procDecls = parseProcDecls();
+		procDecls.push_front( procDecl );
+		return procDecls;
+	}
+	else
+		return list<ProcDecl*>();
+}
+
+
+
+list<Stmt*> Parser::parseStmts()
+{
+	if ( check( IDENT_T ) || check( BEGIN_T ) || check( IF_T ) || check( WHILE_T ) || check( PROMPT_T ) || check( PRINT_ST ) )
+	{
+		Stmt* stmt = parseStmt();
+		list<Stmt*> stmts = parseStmts();
+		stmts.push_front( stmt );
+		return stmts;
+	}
+	else
+		return list<Stmt*>();
+}
+
+
+
+list<Param*> Parser::parseParamList()
+{
+	if ( check( LEFTPARENTH_T ) )
+	{
+		match( LEFTPARENTH_T );
+		list<Param*> params = parseParams();
+		match( RIGHTPARENTH_T );
+		return params;
+	}
+	else
+		return list<Param*>();
+}
+
+
+
+list<Param*> Parser::parseParams()
+{
+	Param* param = parseParam();
+	list<Param*> paramRest = parseParamRest();
+	paramRest.push_front( param );
+	return paramRest;
+}
+
+
+
+list<Param*> Parser::parseParamRest()
+{
+	if ( check( COMMA_T ) )
+	{
+		match( COMMA_T );
+		list<Param*> params = parseParams();
+		return params;
+	}
+	else
+		return list<Param*>();
+}
+
+
+
+list<Expr*> Parser::parseArgList()
+{
+	if ( check( LEFTPARENTH_T ) )
+	{
+		match( LEFTPARENTH_T );
+		list<Expr*> args = parseArgs();
+		match( RIGHTPARENTH_T );
+		return args;
+	}
+	else
+		return list<Expr*>();
+}
+
+
+
+list<Expr*> Parser::parseArgs()
+{
+	Expr* expr = parseExpr();
+	list<Expr*> argsRest = parseArgsRest();
+	argsRest.push_front( expr );
+	return argsRest;
+}
+
+
+
+list<Expr*> Parser::parseArgsRest()
+{
+	if ( check( COMMA_T ) )
+	{
+		match( COMMA_T );
+		list<Expr*> args = parseArgs();
+		return args;
+	}
+	else
+		return list<Expr*>();
+}
+
+
+
+list<Item*> Parser::parseItems()
+{
+	Item* item = parseItem();
+	list<Item*> itemRest = parseItemsRest();
+	itemRest.push_front( item );
+	return itemRest;
+}
+
+
+
+list<Item*> Parser::parseItemsRest()
+{
+	if ( check( COMMA_T ) )
+	{
+		match( COMMA_T );
+		list<Item*> items = parseItems();
+		return items;
+	}
+	else
+		return list<Item*>();
+}
+
 //
 // !Baby parsers
 //===----------------------------------------------------------------------===//

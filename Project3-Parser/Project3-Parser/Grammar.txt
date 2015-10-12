@@ -115,8 +115,8 @@
 
 
 <Item> -->
-	<Expr>
-	| STRING
+	STRING
+	| <Expr>
 
 
 <Expr> -->
