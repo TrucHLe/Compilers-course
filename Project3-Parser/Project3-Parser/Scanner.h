@@ -72,4 +72,4 @@ public:
 };
 
 
-#endif /* defined(__Project1_Scanner__Scanner__) */
+#endif /* defined(__Project3_Scanner__Scanner__) */

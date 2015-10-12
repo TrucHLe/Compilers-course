@@ -6,15 +6,15 @@
 //  Copyright (c) 2015 Truc Le. All rights reserved.
 //
 
-#ifndef __Project2_Parser__Parser__
-#define __Project2_Parser__Parser__
+#ifndef __Project3_Parser__Parser__
+#define __Project3_Parser__Parser__
 
 #include <stdio.h>  
 #include <fstream>          //ifstream
 #include <unordered_map>    //unordered_map, aka hashmap
 #include "Constants.h"
 #include "Scanner.h"
-#include "AST.h"
+//#include "AST.h"
 #include "AST.cpp"
 
 class Parser
@@ -77,4 +77,4 @@ public:
 };
 
 
-#endif /* defined(__Project2_Parser__Parser__) */
+#endif /* defined(__Project3_Parser__Parser__) */

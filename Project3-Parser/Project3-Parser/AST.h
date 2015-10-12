@@ -120,9 +120,9 @@ enum Op2
 	Or
 };
 
-//string nameOfType( Type type );
-//string nameOfOp1( Op1 op1 );
-//string nameOfOp2( Op2 op2 );
+//string nameOf( Type type );
+//string nameOf( Op1 op1 );
+//string nameOf( Op2 op2 );
 
 
 #endif /* defined(__Project3_Parser__AST__) */

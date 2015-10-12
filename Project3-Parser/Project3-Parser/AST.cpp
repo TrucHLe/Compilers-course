@@ -9,7 +9,6 @@
 #include "AST.h"
 
 
-
 //===----------------------------------------------------------------------===//
 // AST abstract base class
 //===----------------------------------------------------------------------===//
@@ -50,10 +49,10 @@ struct Program : ASTNode
 		node_type	= Node_Program;
 	}
 	
-//	~Program()
-//	{
-//		delete block;
-//	}
+	//	~Program()
+	//	{
+	//		delete block;
+	//	}
 	
 	string toString( string indent )
 	{
@@ -84,13 +83,13 @@ struct Block : ASTNode
 		node_type	= Node_Block;
 	}
 	
-//	~Block()
-//	{
-//		consts.remove_if( deleteAllConstDecl );
-//		vars.remove_if( deleteAllVarDecl );
-//		procs.remove_if( deleteAllProcDecl );
-//		body.remove_if( deleteAllStmt );
-//	}
+	//	~Block()
+	//	{
+	//		consts.remove_if( deleteAllConstDecl );
+	//		vars.remove_if( deleteAllVarDecl );
+	//		procs.remove_if( deleteAllProcDecl );
+	//		body.remove_if( deleteAllStmt );
+	//	}
 	
 	string toString( string indent )
 	{
@@ -117,7 +116,7 @@ struct ConstDecl : ASTNode
 		node_type	= Node_ConstDecl;
 	}
 	
-//	~ConstDecl() {}
+	//	~ConstDecl() {}
 	
 	string toString( string indent )
 	{
@@ -145,13 +144,27 @@ struct VarDecl : ASTNode
 		node_type	= Node_VarDecl;
 	}
 	
-//	~VarDecl() {}
+	//	~VarDecl() {}
 	
 	string toString( string indent )
 	{
-		//return "Var " + ID + " : " + nameOfType( type ) + "\n";
-		return "Var " + ID + " :\n";
-
+		string typeString;
+		switch ( type )
+		{
+			case IntType:
+				typeString = "Int";
+				break;
+				
+			case BoolType:
+				typeString = "Bool";
+				break;
+				
+			default:
+				typeString = "";
+				break;
+		}
+		
+		return "Var " + ID + " : " + typeString + "\n";
 	}
 };
 
@@ -176,11 +189,11 @@ struct ProcDecl : ASTNode
 		node_type	= Node_ProcDecl;
 	}
 	
-//	~ProcDecl()
-//	{
-//		params.remove_if( deleteAllParam );
-//		delete block;
-//	}
+	//	~ProcDecl()
+	//	{
+	//		params.remove_if( deleteAllParam );
+	//		delete block;
+	//	}
 	
 	string toString( string indent )
 	{
@@ -215,12 +228,27 @@ struct ValParam : Param
 		node_type	= Node_ValParam;
 	}
 	
-//	~ValParam() {}
+	//	~ValParam() {}
 	
 	string toString( string indent )
 	{
-//		return indent + "Val " + ID + " : " + nameOfType( type ) + "\n";
-		return indent + "Val " + ID + " :\n";
+		string typeString;
+		switch ( type )
+		{
+			case IntType:
+				typeString = "Int";
+				break;
+				
+			case BoolType:
+				typeString = "Bool";
+				break;
+				
+			default:
+				typeString = "";
+				break;
+		}
+		
+		return indent + "Val " + ID + " : " + typeString + "\n";
 	}
 };
 
@@ -240,13 +268,27 @@ struct VarParam : Param
 		node_type	= Node_VarParam;
 	}
 	
-//	~VarParam() {}
+	//	~VarParam() {}
 	
 	string toString( string indent )
 	{
-//		return indent + "Var " + ID + " : " + nameOfType( type ) + "\n";
-		return indent + "Var " + ID + " :\n";
-
+		string typeString;
+		switch ( type )
+		{
+			case IntType:
+				typeString = "Int";
+				break;
+				
+			case BoolType:
+				typeString = "Bool";
+				break;
+				
+			default:
+				typeString = "";
+				break;
+		}
+		
+		return indent + "Var " + ID + " : " + typeString + "\n";
 	}
 };
 
@@ -277,10 +319,10 @@ struct Assign : Stmt
 		node_type	= Node_Assign;
 	}
 	
-//	~Assign()
-//	{
-//		delete expr;
-//	}
+	//	~Assign()
+	//	{
+	//		delete expr;
+	//	}
 	
 	string toString( string indent )
 	{
@@ -304,10 +346,10 @@ struct Call : Stmt
 		node_type	= Node_Call;
 	}
 	
-//	~Call()
-//	{
-//		args.remove_if( deleteAllExpr );
-//	}
+	//	~Call()
+	//	{
+	//		args.remove_if( deleteAllExpr );
+	//	}
 	
 	string toString( string indent )
 	{
@@ -329,10 +371,10 @@ struct Sequence : Stmt
 		node_type	= Node_Sequence;
 	}
 	
-//	~Sequence()
-//	{
-//		body.remove_if( deleteAllStmt );
-//	}
+	//	~Sequence()
+	//	{
+	//		body.remove_if( deleteAllStmt );
+	//	}
 	
 	string toString( string indent )
 	{
@@ -356,11 +398,11 @@ struct IfThen : Stmt
 		node_type	= Node_IfThen;
 	}
 	
-//	~IfThen()
-//	{
-//		delete test;
-//		delete trueClause;
-//	}
+	//	~IfThen()
+	//	{
+	//		delete test;
+	//		delete trueClause;
+	//	}
 	
 	string toString( string indent )
 	{
@@ -386,12 +428,12 @@ struct IfThenElse : Stmt
 		node_type	= Node_IfThenElse;
 	}
 	
-//	~IfThenElse()
-//	{
-//		delete test;
-//		delete trueClause;
-//		delete falseClause;
-//	}
+	//	~IfThenElse()
+	//	{
+	//		delete test;
+	//		delete trueClause;
+	//		delete falseClause;
+	//	}
 	
 	string toString( string indent )
 	{
@@ -415,11 +457,11 @@ struct While : Stmt
 		node_type	= Node_While;
 	}
 	
-//	~While()
-//	{
-//		delete test;
-//		delete body;
-//	}
+	//	~While()
+	//	{
+	//		delete test;
+	//		delete body;
+	//	}
 	
 	string toString( string indent )
 	{
@@ -441,7 +483,7 @@ struct Prompt : Stmt
 		node_type	= Node_Prompt;
 	}
 	
-//	~Prompt() {}
+	//	~Prompt() {}
 	
 	string toString( string indent )
 	{
@@ -465,7 +507,7 @@ struct Prompt2 : Stmt
 		node_type		= Node_Prompt2;
 	}
 	
-//	~Prompt2() {}
+	//	~Prompt2() {}
 	
 	string toString( string indent )
 	{
@@ -488,10 +530,10 @@ struct Print : Stmt
 		node_type		= Node_Print;
 	}
 	
-//	~Print()
-//	{
-//		items.remove_if( deleteAllItem );
-//	}
+	//	~Print()
+	//	{
+	//		items.remove_if( deleteAllItem );
+	//	}
 	
 	string toString( string indent )
 	{
@@ -524,10 +566,10 @@ struct ExprItem : Item
 		node_type	= Node_ExprItem;
 	}
 	
-//	~ExprItem()
-//	{
-//		delete expr;
-//	}
+	//	~ExprItem()
+	//	{
+	//		delete expr;
+	//	}
 	
 	string toString( string indent )
 	{
@@ -549,7 +591,7 @@ struct StringItem : Item
 		node_type	= Node_StringItem;
 	}
 	
-//	~StringItem() {}
+	//	~StringItem() {}
 	
 	string toString( string indent )
 	{
@@ -565,7 +607,7 @@ struct StringItem : Item
 struct Expr : ASTNode
 {
 	Expr() {}
-//	virtual ~Expr() {}
+	//	virtual ~Expr() {}
 };
 
 
@@ -586,16 +628,75 @@ struct BinOp : Expr
 		node_type	= Node_BinOp;
 	}
 	
-//	~BinOp()
-//	{
-//		delete left;
-//		delete right;
-//	}
+	//	~BinOp()
+	//	{
+	//		delete left;
+	//		delete right;
+	//	}
 	
 	string toString( string indent )
 	{
-//		return indent + "BinOp " + nameOfOp2( op )+ "\n";
-		return indent + "BinOp\n";
+		string opString;
+		switch ( op )
+		{
+			case EQ:
+				opString = "EQ";
+				break;
+				
+			case NE:
+				opString = "NE";
+				break;
+				
+			case LE:
+				opString = "LE";
+				break;
+				
+			case GE:
+				opString = "GE";
+				break;
+				
+			case LT:
+				opString = "LT";
+				break;
+				
+			case GT:
+				opString = "GT";
+				break;
+				
+			case Plus:
+				opString = "Plus";
+				break;
+				
+			case Minus:
+				opString = "Minus";
+				break;
+				
+			case Times:
+				opString = "Times";
+				break;
+				
+			case Div:
+				opString = "Div";
+				break;
+				
+			case Mod:
+				opString = "Mod";
+				break;
+				
+			case And:
+				opString = "And";
+				break;
+				
+			case Or:
+				opString = "Or";
+				break;
+				
+			default:
+				opString = "";
+				break;
+		}
+		
+		return indent + "BinOp " + opString + "\n";
 	}
 };
 
@@ -615,15 +716,30 @@ struct UnOp : Expr
 		node_type	= Node_UnOp;
 	}
 	
-//	~UnOp()
-//	{
-//		delete expr;
-//	}
+	//	~UnOp()
+	//	{
+	//		delete expr;
+	//	}
 	
 	string toString( string indent )
 	{
-//		return indent + "BinOp " + nameOfOp2( op )+ "\n";
-		return indent + "BinOp\n";
+		string opString;
+		switch ( op )
+		{
+			case Neg:
+				opString = "Neg";
+				break;
+				
+			case Not:
+				opString = "Not";
+				break;
+			
+			default:
+				opString = "";
+				break;
+		}
+
+		return indent + "BinOp " + opString + "\n";
 	}
 };
 
@@ -641,7 +757,7 @@ struct Num : Expr
 		node_type	= Node_Num;
 	}
 	
-//	~Num() {}
+	//	~Num() {}
 	
 	string toString( string indent )
 	{
@@ -663,7 +779,7 @@ struct Id : Expr
 		node_type	= Node_Id;
 	}
 	
-//	~Id() {}
+	//	~Id() {}
 	
 	string toString( string indent )
 	{
@@ -684,7 +800,7 @@ struct True : Expr
 		column		= col;
 	}
 	
-//	~True() {}
+	//	~True() {}
 	
 	string toString( string indent )
 	{
@@ -705,7 +821,7 @@ struct False : Expr
 		column		= col;
 	}
 	
-//	~False() {}
+	//	~False() {}
 	
 	string toString( string indent )
 	{
@@ -719,87 +835,92 @@ struct False : Expr
 // Delete all pointers from list of pointers
 //===----------------------------------------------------------------------===//
 /*
-static bool deleteAllConstDecl( ConstDecl* c )
-{
+ static bool deleteAllConstDecl( ConstDecl* c )
+ {
 	delete c;
 	return true;
-};
-
-static bool deleteAllVarDecl( VarDecl* v )
-{
+ };
+ 
+ static bool deleteAllVarDecl( VarDecl* v )
+ {
 	delete v;
 	return true;
-}
-
-static bool deleteAllProcDecl( ProcDecl* v )
-{
+ }
+ 
+ static bool deleteAllProcDecl( ProcDecl* v )
+ {
 	delete v;
 	return true;
-}
-
-static bool deleteAllStmt( Stmt* s )
-{
+ }
+ 
+ static bool deleteAllStmt( Stmt* s )
+ {
 	delete s;
 	return true;
-}
-
-static bool deleteAllParam( Param* p )
-{
+ }
+ 
+ static bool deleteAllParam( Param* p )
+ {
 	delete p;
 	return true;
-}
-
-static bool deleteAllExpr( Expr* e )
-{
+ }
+ 
+ static bool deleteAllExpr( Expr* e )
+ {
 	delete e;
 	return true;
-}
-
-static bool deleteAllItem( Item* i )
-{
+ }
+ 
+ static bool deleteAllItem( Item* i )
+ {
 	delete i;
 	return true;
-}
-*/
+ }
+ */
 
 
 //===----------------------------------------------------------------------===//
 // Returns name of Type, Op1, Op2
 //===----------------------------------------------------------------------===//
-//string nameOfType( Type type )
-//{
-//	switch ( type )
-//	{
-//		case IntType:		return "Int";
-//		case BoolType:	return "Bool";
-//	}
-//}
-//
-//string nameOfOp1( Op1 op1 )
-//{
-//	switch ( op1 )
-//	{
-//		case Neg:	return "Neg";
-//		case Not:	return "Not";
-//	}
-//}
-//
-//string nameOfOp2( Op2 op2 )
-//{
-//	switch ( op2 )
-//	{
-//		case EQ:	return "EQ";
-//		case NE:	return "NE";
-//		case LE:	return "LE";
-//		case GE:	return "GE";
-//		case LT:	return "LT";
-//		case GT:	return "GT";
-//		case Plus:	return "Plus";
-//		case Minus:	return "Minus";
-//		case Times:	return "Times";
-//		case Div:	return "Div";
-//		case Mod:	return "Mod";
-//		case And:	return "And";
-//		case Or:	return "Or";
-//	}
-//}
+/*
+string nameOf( Type type )
+{
+	switch ( type )
+	{
+		case IntType:	return "Int";
+		case BoolType:	return "Bool";
+		default:		return "";
+	}
+}
+
+string nameOf( Op1 op1 )
+{
+	switch ( op1 )
+	{
+		case Neg:	return "Neg";
+		case Not:	return "Not";
+		default:	return "";
+	}
+}
+
+string nameOf( Op2 op2 )
+{
+	switch ( op2 )
+	{
+		case EQ:	return "EQ";
+		case NE:	return "NE";
+		case LE:	return "LE";
+		case GE:	return "GE";
+		case LT:	return "LT";
+		case GT:	return "GT";
+		case Plus:	return "Plus";
+		case Minus:	return "Minus";
+		case Times:	return "Times";
+		case Div:	return "Div";
+		case Mod:	return "Mod";
+		case And:	return "And";
+		case Or:	return "Or";
+		default:	return "";
+	}
+}
+*/
