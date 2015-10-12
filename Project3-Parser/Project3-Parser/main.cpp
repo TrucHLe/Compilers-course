@@ -11,6 +11,7 @@
 #include "Constants.h"
 #include "Scanner.h"
 #include "Parser.h"
+#include "AST.h"
 
 using namespace std;
 using std::ifstream;
@@ -36,7 +37,9 @@ int main(int argc, const char * argv[])
 	filename = argv[1];
 	*/
 	
-	cout << "Enter file name: "; // /Users/Bamboo/Developer/Compilers-course/Project3-Parser/Project3-Parser/test3.txt
+	
+	// Run in Xcode
+	cout << "Enter file name: ";
 	cin >> filename;
 	
 	input.open( filename );
@@ -47,13 +50,14 @@ int main(int argc, const char * argv[])
 		cout << endl;
 		return 0;
 	}
+	//
+	
 	
 	
 	Parser parser( input );
 	//ASTNode* node = parser.parseProgram();
 	//cout << node->toString() //toString takes indentation //look at Exam1 on I Drive
 	//ask Program Node to print here
-	//delete node //make destructor in AST.h
 	
 	
 	
@@ -68,6 +72,9 @@ int main(int argc, const char * argv[])
 	} while ( token.type != EOF_T );
 	cout << endl;
 	// !Test scanner
+	
+	
+	
 	
 	//
 	// !Open text file and pass it to Scanner object
