@@ -15,7 +15,7 @@
 #include "Constants.h"
 #include "Scanner.h"
 #include "AST.h"
-
+#include "AST.cpp"
 
 class Parser
 {
@@ -48,23 +48,23 @@ public:
 	list<Item*> parseItems();
 	list<Item*> parseItemsRest();
 	
-    ASTNode* parseProgram();
-	Block* parseBlock();
-	ConstDecl* parseConstDecl();
-	VarDecl* parseVarDecl();
-	ProcDecl* parseProcDecl();
-	Stmt* parseStmt();
-	Stmt* parseStmtID( Token t ); //return terminal ID Stmt here
-	Stmt* parseStmtIf( Expr* e, Stmt* tr ); //return terminal If Stmt here
-	Stmt* parseStmtPrompt( string m ); //return terminal Prompt Stmt here
-	Param* parseParam();
+	ASTNode* parseProgram();//✔︎
+	Block* parseBlock();//✔︎
+	ConstDecl* parseConstDecl();//✔︎
+	VarDecl* parseVarDecl();//✔︎
+	ProcDecl* parseProcDecl();//✔︎
+	Stmt* parseStmt();//✔︎
+	Stmt* parseStmtID( string i, int lin, int col ); //✔︎return terminal ID Stmt here
+	Stmt* parseStmtIf( Expr* t, Stmt* tr, int lin, int col ); //✔︎return terminal If Stmt here
+	Stmt* parseStmtPrompt( string m, int lin, int col ); //✔︎return terminal Prompt Stmt here
+	Param* parseParam();//✔︎
 	Expr* parseExpr();
 	Expr* parseSimpleExpr();
-	Expr* parseExprRest( Expr* e ); //return terminal Expr here
+	Expr* parseExprRest( Expr* e, int lin, int col ); //return terminal Expr here
 	Expr* parseTerm();
-	Expr* parseSimpleExprRest( Expr* e ); //return terminal Expr here
+	Expr* parseSimpleExprRest( Expr* e, int lin, int col ); //return terminal Expr here
 	Expr* parseFactor();
-	Expr* parseTermRest( Expr* e ); //return terminal Expr here
+	Expr* parseTermRest( Expr* e, int lin, int col ); //return terminal Expr here
 	Item* parseItem();
 	
 	Op2 parseRelOp();

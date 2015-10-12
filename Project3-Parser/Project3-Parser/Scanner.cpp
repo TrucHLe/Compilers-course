@@ -29,8 +29,9 @@ string nameOf( int tokenType )
 		case INT_T:				return "INT";
 		case BOOLEAN_T:			return "BOOL";
 		case PROC_T:			return "PROC";
-		case IF_T:				return "IF-THEN";
-		case ELSE_T:			return "IF-THEN-ELSE";
+		case IF_T:				return "IF";
+		case THEN_T:			return "THEN";
+		case ELSE_T:			return "ELSE";
 		case WHILE_T:			return "WHILE";
 		case DO_T:				return "DO";
 		case PROMPT_T:			return "PROMPT";
@@ -463,6 +464,13 @@ Token Scanner::next()
 			else if ( strcasecmp( current_lexeme.c_str(), "if" ) == 0 )
 			{
 				token.setToken( token_line, token_column, IF_T, current_lexeme );
+				current_lexeme = "";
+				return token;
+			}
+			
+			else if ( strcasecmp( current_lexeme.c_str(), "then" ) == 0 )
+			{
+				token.setToken( token_line, token_column, THEN_T, current_lexeme );
 				current_lexeme = "";
 				return token;
 			}
