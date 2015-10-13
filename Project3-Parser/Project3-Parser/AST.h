@@ -50,8 +50,6 @@ struct Id;
 struct True;
 struct False;
 
-
-/*
 static bool deleteAllConstDecl( ConstDecl* c );
 static bool deleteAllVarDecl( VarDecl* v );
 static bool deleteAllProcDecl( ProcDecl* v );
@@ -59,7 +57,7 @@ static bool deleteAllParam( Param* p );
 static bool deleteAllStmt( Stmt* s );
 static bool deleteAllExpr( Expr* e );
 static bool deleteAllItem( Item* i );
-*/
+
 
 enum ASTNodeType
 {
@@ -145,6 +143,8 @@ struct ASTNode
 		node_type	= Node_Undefined;
 	}
 	
+	virtual ~ASTNode() {}
+	
 	virtual string toString( string indent ) = 0;
 };
 
@@ -167,10 +167,7 @@ struct Program : ASTNode
 		node_type	= Node_Program;
 	}
 	
-//	~Program()
-//	{
-//		delete block;
-//	}
+	~Program();
 	
 	string toString( string indent );
 };
@@ -198,13 +195,7 @@ struct Block : ASTNode
 		node_type	= Node_Block;
 	}
 	
-	//	~Block()
-	//	{
-	//		consts.remove_if( deleteAllConstDecl );
-	//		vars.remove_if( deleteAllVarDecl );
-	//		procs.remove_if( deleteAllProcDecl );
-	//		body.remove_if( deleteAllStmt );
-	//	}
+	~Block();
 	
 	string toString( string indent );
 };
@@ -228,7 +219,7 @@ struct ConstDecl : ASTNode
 		node_type	= Node_ConstDecl;
 	}
 	
-	//	~ConstDecl() {}
+	~ConstDecl() {}
 	
 	string toString( string indent );
 };
@@ -252,7 +243,7 @@ struct VarDecl : ASTNode
 		node_type	= Node_VarDecl;
 	}
 	
-	//	~VarDecl() {}
+	~VarDecl() {}
 	
 	string toString( string indent );
 };
@@ -278,11 +269,7 @@ struct ProcDecl : ASTNode
 		node_type	= Node_ProcDecl;
 	}
 	
-	//	~ProcDecl()
-	//	{
-	//		params.remove_if( deleteAllParam );
-	//		delete block;
-	//	}
+	~ProcDecl();
 	
 	string toString( string indent );
 };
@@ -314,7 +301,7 @@ struct ValParam : Param
 		node_type	= Node_ValParam;
 	}
 	
-	//	~ValParam() {}
+	~ValParam() {}
 	
 	string toString( string indent );
 };
@@ -335,7 +322,7 @@ struct VarParam : Param
 		node_type	= Node_VarParam;
 	}
 	
-	//	~VarParam() {}
+	~VarParam() {}
 	
 	string toString( string indent );
 };
@@ -367,10 +354,7 @@ struct Assign : Stmt
 		node_type	= Node_Assign;
 	}
 	
-	//	~Assign()
-	//	{
-	//		delete expr;
-	//	}
+	~Assign();
 	
 	string toString( string indent );
 };
@@ -391,10 +375,7 @@ struct Call : Stmt
 		node_type	= Node_Call;
 	}
 	
-	//	~Call()
-	//	{
-	//		args.remove_if( deleteAllExpr );
-	//	}
+	~Call();
 	
 	string toString( string indent );
 };
@@ -413,10 +394,7 @@ struct Sequence : Stmt
 		node_type	= Node_Sequence;
 	}
 	
-	//	~Sequence()
-	//	{
-	//		body.remove_if( deleteAllStmt );
-	//	}
+	~Sequence();
 	
 	string toString( string indent );
 };
@@ -437,11 +415,7 @@ struct IfThen : Stmt
 		node_type	= Node_IfThen;
 	}
 	
-	//	~IfThen()
-	//	{
-	//		delete test;
-	//		delete trueClause;
-	//	}
+	~IfThen();
 	
 	string toString( string indent );
 };
@@ -464,12 +438,7 @@ struct IfThenElse : Stmt
 		node_type	= Node_IfThenElse;
 	}
 	
-	//	~IfThenElse()
-	//	{
-	//		delete test;
-	//		delete trueClause;
-	//		delete falseClause;
-	//	}
+	~IfThenElse();
 	
 	string toString( string indent );
 };
@@ -490,11 +459,7 @@ struct While : Stmt
 		node_type	= Node_While;
 	}
 	
-	//	~While()
-	//	{
-	//		delete test;
-	//		delete body;
-	//	}
+	~While();
 	
 	string toString( string indent );
 };
@@ -513,7 +478,7 @@ struct Prompt : Stmt
 		node_type	= Node_Prompt;
 	}
 	
-	//	~Prompt() {}
+	~Prompt() {}
 	
 	string toString( string indent );
 };
@@ -534,7 +499,7 @@ struct Prompt2 : Stmt
 		node_type		= Node_Prompt2;
 	}
 	
-	//	~Prompt2() {}
+	~Prompt2() {}
 	
 	string toString( string indent );
 };
@@ -553,10 +518,7 @@ struct Print : Stmt
 		node_type		= Node_Print;
 	}
 	
-	//	~Print()
-	//	{
-	//		items.remove_if( deleteAllItem );
-	//	}
+	~Print();
 	
 	string toString( string indent );
 };
@@ -586,10 +548,7 @@ struct ExprItem : Item
 		node_type	= Node_ExprItem;
 	}
 	
-	//	~ExprItem()
-	//	{
-	//		delete expr;
-	//	}
+	~ExprItem();
 	
 	string toString( string indent );
 };
@@ -608,7 +567,7 @@ struct StringItem : Item
 		node_type	= Node_StringItem;
 	}
 	
-	//	~StringItem() {}
+	~StringItem() {}
 	
 	string toString( string indent );
 };
@@ -621,7 +580,7 @@ struct StringItem : Item
 struct Expr : ASTNode
 {
 	Expr() {}
-	//	virtual ~Expr() {}
+	virtual ~Expr() {}
 };
 
 
@@ -642,11 +601,7 @@ struct BinOp : Expr
 		node_type	= Node_BinOp;
 	}
 	
-	//	~BinOp()
-	//	{
-	//		delete left;
-	//		delete right;
-	//	}
+	~BinOp();
 	
 	string toString( string indent );
 };
@@ -667,10 +622,7 @@ struct UnOp : Expr
 		node_type	= Node_UnOp;
 	}
 	
-	//	~UnOp()
-	//	{
-	//		delete expr;
-	//	}
+	~UnOp();
 	
 	string toString( string indent );
 };
@@ -689,7 +641,7 @@ struct Num : Expr
 		node_type	= Node_Num;
 	}
 	
-	//	~Num() {}
+	~Num() {}
 	
 	string toString( string indent );
 };
@@ -708,7 +660,7 @@ struct Id : Expr
 		node_type	= Node_Id;
 	}
 	
-	//	~Id() {}
+	~Id() {}
 	
 	string toString( string indent );
 };
@@ -726,7 +678,7 @@ struct True : Expr
 		column		= col;
 	}
 	
-	//	~True() {}
+	~True() {}
 	
 	string toString( string indent );
 };
@@ -744,7 +696,7 @@ struct False : Expr
 		column		= col;
 	}
 	
-	//	~False() {}
+	~False() {}
 	
 	string toString( string indent );
 };

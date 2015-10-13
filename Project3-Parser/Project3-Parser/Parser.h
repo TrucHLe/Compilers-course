@@ -24,7 +24,6 @@ private:
     Scanner scanner;
     Token token;
     unordered_map<string, int> constants;
-	bool ASTtoString;
     
 public:
     Parser( ifstream& i );

@@ -17,14 +17,12 @@ using std::ifstream;
 
 int main(int argc, const char * argv[])
 {
-	
-	//---------------------------------------------
-	// Open text file and pass it to Scanner object
-	//
 	string filename;
 	ifstream input;
 	
-	/* CLI running, uncomment when turn in
+	
+	// CLI
+	
 	if ( argc != 2 )
 	{
 		cout << "(!) Fail to run program. Please enter a filename." << endl;
@@ -34,10 +32,19 @@ int main(int argc, const char * argv[])
 	}
 	
 	filename = argv[1];
-	*/
+	 
+	input.open( filename );
+	 
+	if ( input.fail() )
+	{
+		cout << "(!) Cannot find " << filename << endl;
+		cout << endl;
+		return 0;
+	}
 	
 	
-	// Run in Xcode
+	// Xcode
+	/*
 	cout << "Enter file name: ";
 	cin >> filename;
 	
@@ -49,21 +56,18 @@ int main(int argc, const char * argv[])
 		cout << endl;
 		return 0;
 	}
-	//
+	*/
 	
 	
-	//	Run this
 	
 	Parser parser( input );
 	ASTNode* node = parser.parse();
 	cout << node->toString("");
+	delete node;
 	
-	//! Run this
 	
 	
-//	/Users/Bamboo/Developer/Compilers-course/Project3-Parser/Project3-Parser/test3.txt
-	
-	//Test scanner
+	// Scan
 	/*
 	Scanner scanner( input );
 	Token token;
@@ -75,15 +79,6 @@ int main(int argc, const char * argv[])
 	} while ( token.type != EOF_T );
 	cout << endl;
 	*/
-	// !Test scanner
-	
-	
-	
-	
-	//
-	// !Open text file and pass it to Scanner object
-	//---------------------------------------------
-	
 	
 	
 	return 0;

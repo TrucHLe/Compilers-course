@@ -11,55 +11,6 @@
 
 
 
-
-//===----------------------------------------------------------------------===//
-// Delete all pointers from list of pointers
-//===----------------------------------------------------------------------===//
-/*
- static bool deleteAllConstDecl( ConstDecl* c )
- {
-	delete c;
-	return true;
- };
- 
- static bool deleteAllVarDecl( VarDecl* v )
- {
-	delete v;
-	return true;
- }
- 
- static bool deleteAllProcDecl( ProcDecl* v )
- {
-	delete v;
-	return true;
- }
- 
- static bool deleteAllStmt( Stmt* s )
- {
-	delete s;
-	return true;
- }
- 
- static bool deleteAllParam( Param* p )
- {
-	delete p;
-	return true;
- }
- 
- static bool deleteAllExpr( Expr* e )
- {
-	delete e;
-	return true;
- }
- 
- static bool deleteAllItem( Item* i )
- {
-	delete i;
-	return true;
- }
- */
-
-
 //===----------------------------------------------------------------------===//
 // Returns name of Type, Op1, Op2
 //===----------------------------------------------------------------------===//
@@ -305,4 +256,130 @@ string False::toString( string indent )
 {
 	string result = indent + "False\n";
 	return result;
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// Destructors
+//===----------------------------------------------------------------------===//
+Program::~Program()
+{
+	delete block;
+}
+
+Block::~Block()
+{
+	consts.remove_if( deleteAllConstDecl );
+	vars.remove_if( deleteAllVarDecl );
+	procs.remove_if( deleteAllProcDecl );
+	body.remove_if( deleteAllStmt );
+}
+
+ProcDecl::~ProcDecl()
+{
+	params.remove_if( deleteAllParam );
+	delete block;
+}
+
+Assign::~Assign()
+{
+	delete expr;
+}
+
+Call::~Call()
+{
+	args.remove_if( deleteAllExpr );
+}
+
+Sequence::~Sequence()
+{
+	body.remove_if( deleteAllStmt );
+}
+
+IfThen::~IfThen()
+{
+	delete test;
+	delete trueClause;
+}
+
+IfThenElse::~IfThenElse()
+{
+	delete test;
+	delete trueClause;
+	delete falseClause;
+}
+
+While::~While()
+{
+	delete test;
+	delete body;
+}
+
+Print::~Print()
+{
+	items.remove_if( deleteAllItem );
+}
+
+ExprItem::~ExprItem()
+{
+	delete expr;
+}
+
+BinOp::~BinOp()
+{
+	delete left;
+	delete right;
+}
+
+UnOp::~UnOp()
+{
+	delete expr;
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// Delete all pointers from list of pointers
+//===----------------------------------------------------------------------===//
+static bool deleteAllConstDecl( ConstDecl* c )
+{
+	delete c;
+	return true;
+};
+
+static bool deleteAllVarDecl( VarDecl* v )
+{
+	delete v;
+	return true;
+}
+
+static bool deleteAllProcDecl( ProcDecl* v )
+{
+	delete v;
+	return true;
+}
+
+static bool deleteAllStmt( Stmt* s )
+{
+	delete s;
+	return true;
+}
+
+static bool deleteAllParam( Param* p )
+{
+	delete p;
+	return true;
+}
+
+static bool deleteAllExpr( Expr* e )
+{
+	delete e;
+	return true;
+}
+
+static bool deleteAllItem( Item* i )
+{
+	delete i;
+	return true;
 }
