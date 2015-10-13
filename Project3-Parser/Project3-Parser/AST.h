@@ -145,8 +145,6 @@ struct ASTNode
 		node_type	= Node_Undefined;
 	}
 	
-	//virtual ~ASTNode() {}
-	
 	virtual string toString( string indent ) = 0;
 };
 

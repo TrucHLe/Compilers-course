@@ -124,11 +124,11 @@ string Block::toString( string indent )
 	for ( ConstDecl* c : consts )
 		result += c->toString( indent + "  " );
 	for ( VarDecl* v : vars )
-		result += v->toString( indent + " " );
+		result += v->toString( indent + "  " );
 	for ( ProcDecl* p : procs )
-		result += p->toString( indent + " " );
+		result += p->toString( indent + "  " );
 	for ( Stmt* b : body )
-		result += b->toString( indent + " " );
+		result += b->toString( indent + "  " );
 	return result;
 }
 
@@ -142,7 +142,7 @@ string ConstDecl::toString( string indent )
 
 string VarDecl::toString( string indent )
 {
-	string result = "Var " + ID + " : " + nameOf( type ) + "\n";
+	string result = indent + "Var " + ID + " : " + nameOf( type ) + "\n";
 	return result;
 }
 
@@ -151,7 +151,8 @@ string ProcDecl::toString( string indent )
 {
 	string result = indent + "Proc " + ID + "\n";
 	for ( Param* p : params )
-		result += p->toString( indent + " " );
+		result += p->toString( indent + "  " );
+	result += block->toString( indent + "  " );
 	return result;
 }
 
@@ -172,7 +173,7 @@ string VarParam::toString( string indent )
 
 string Assign::toString( string indent )
 {
-	string result = "Assign " + ID + "\n";
+	string result = indent + "Assign " + ID + "\n";
 	result += expr->toString( indent + "  " );
 	return result;
 }
@@ -273,7 +274,7 @@ string BinOp::toString( string indent )
 
 string UnOp::toString( string indent )
 {
-	string result = indent + "BinOp " + nameOf( op ) + "\n";
+	string result = indent + "UnOp " + nameOf( op ) + "\n";
 	result += expr->toString( indent + "  " );
 	return result;
 }
