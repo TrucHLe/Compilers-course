@@ -14,8 +14,8 @@
 #include <unordered_map>    //unordered_map, aka hashmap
 #include "Constants.h"
 #include "Scanner.h"
-//#include "AST.h"
-#include "AST.cpp"
+#include "AST.h"
+//#include "AST.cpp"
 
 class Parser
 {
@@ -24,19 +24,19 @@ private:
     Scanner scanner;
     Token token;
     unordered_map<string, int> constants;
-
+	bool ASTtoString;
     
 public:
     Parser( ifstream& i );
     
-    void parse(); //main
+    ASTNode* parse(); //main
     Token advance();
     Token match( int tokenType );
     bool check( int tokenType );
 	
 	
     // Baby parsers
-	ASTNode* parseProgram();
+	Program* parseProgram();
 	Block* parseBlock();
 	ConstDecl* parseConstDecl();
 	VarDecl* parseVarDecl();

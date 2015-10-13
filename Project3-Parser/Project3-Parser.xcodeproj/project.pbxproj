@@ -41,6 +41,8 @@
 		4D64F5FA1BC9BDB600355E36 /* StateTransitionTable.tsv */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateTransitionTable.tsv; sourceTree = "<group>"; };
 		4D64F5FB1BCA0EAB00355E36 /* AST.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST.cpp; sourceTree = "<group>"; };
 		4D64F5FC1BCA0EAB00355E36 /* AST.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AST.h; sourceTree = "<group>"; };
+		4D88CB231BCD502200A7539E /* test3output.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test3output.txt; sourceTree = "<group>"; };
+		4D88CB241BCD502900A7539E /* test3.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test3.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,8 @@
 				4D64F5F31BC993D700355E36 /* test0.txt */,
 				4D64F5F41BC993D700355E36 /* test1.txt */,
 				4D64F5F51BC993D700355E36 /* test2.txt */,
+				4D88CB241BCD502900A7539E /* test3.txt */,
+				4D88CB231BCD502200A7539E /* test3output.txt */,
 			);
 			path = "Project3-Parser";
 			sourceTree = "<group>";

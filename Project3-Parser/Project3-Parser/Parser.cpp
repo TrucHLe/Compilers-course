@@ -18,8 +18,8 @@
 //===----------------------------------------------------------------------===//
 Parser::Parser( ifstream& i ) : scanner( i )
 {
+	ASTtoString = false;
     token = scanner.next();
-    parse();
 }
 
 
@@ -47,6 +47,8 @@ Token Parser::match( int tokenType )
     else
     {
         cout << "(!) Expected " << nameOf( tokenType ) << " at " << token.line << ":" << token.column << endl;
+		//Token t = *new Token();
+		//return t;
         exit( 1 );
     }
 }
@@ -72,15 +74,18 @@ bool Parser::check( int tokenType )
 //===----------------------------------------------------------------------===//
 // Parsers based on grammar in Grammar.txt
 //
-ASTNode* Parser::parseProgram()
+Program* Parser::parseProgram()
 {
     Token program = match( PRGRM_T );
     Token ID = match( IDENT_T );
     match( SEMICOLON_T );
     Block* block = parseBlock();
     match( PERIOD_T );
-	
 	Program* node = new Program( ID.lexeme, block, program.line, program.column );
+	
+	if ( ASTtoString )
+		cout << node->toString("");
+	
 	return node;
 }
 
@@ -91,12 +96,15 @@ Block* Parser::parseBlock()
 	list<ConstDecl*> constDecls = parseConstDecls();
 	list<VarDecl*> varDecls = parseVarDecls();
 	list<ProcDecl*> procDecls = parseProcDecls();
-    match( BEGIN_T );
+    Token begin = match( BEGIN_T );
 	list<Stmt*> stmts = parseStmts();
     match( END_T );
+
+	Block* node = new Block( constDecls, varDecls, procDecls, stmts, begin.line, begin.column );
 	
-	ConstDecl* first = constDecls.front();
-	Block* node = new Block( constDecls, varDecls, procDecls, stmts, first->line, first->column );
+	if ( ASTtoString )
+		cout << node->toString("");
+
 	return node;
 }
 
@@ -116,6 +124,10 @@ ConstDecl* Parser::parseConstDecl()
 		val = -val;
 	
 	ConstDecl* node = new ConstDecl( ID.lexeme, val, constant.line, constant.column );
+	
+	if ( ASTtoString )
+		cout << node->toString("");
+
 	return node;
 }
 
@@ -130,6 +142,10 @@ VarDecl* Parser::parseVarDecl()
 	match( SEMICOLON_T );
 	
 	VarDecl* node = new VarDecl( ID.lexeme, type, var.line, var.column );
+	
+	if ( ASTtoString )
+		cout << node->toString("");
+
 	return node;
 }
 
@@ -145,6 +161,10 @@ ProcDecl* Parser::parseProcDecl()
 	match( SEMICOLON_T );
 	
 	ProcDecl* node = new ProcDecl( ID.lexeme, params, block, procedure.line, procedure.column );
+	
+	if ( ASTtoString )
+		cout << node->toString("");
+
 	return node;
 }
 
@@ -157,6 +177,10 @@ Stmt* Parser::parseStmt()
 		Token ID = match( IDENT_T );
 		Stmt* node = parseStmtID( ID.lexeme, ID.line, ID.column );
 		match( SEMICOLON_T );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( BEGIN_T ) )
@@ -166,6 +190,10 @@ Stmt* Parser::parseStmt()
 		match( END_T );
 		match( SEMICOLON_T );
 		Sequence* node = new Sequence( body, begin.line, begin.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+		
 		return node;
 	}
 	else if ( check( IF_T ) )
@@ -175,6 +203,10 @@ Stmt* Parser::parseStmt()
 		match( THEN_T );
 		Stmt* trueClause = parseStmt();
 		Stmt* node = parseStmtIf( test, trueClause, ifToken.line, ifToken.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( WHILE_T ) )
@@ -184,6 +216,10 @@ Stmt* Parser::parseStmt()
 		match( DO_T );
 		Stmt* body = parseStmt();
 		While* node = new While( test, body, whileToken.line, whileToken.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( PROMPT_T ) )
@@ -192,6 +228,10 @@ Stmt* Parser::parseStmt()
 		Token message = match( STRINGCONST_T );
 		Stmt* node = parseStmtPrompt( message.lexeme, prompt.line, prompt.column );
 		match( SEMICOLON_T );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
@@ -200,6 +240,10 @@ Stmt* Parser::parseStmt()
 		list<Item*> items = parseItems();
 		match( SEMICOLON_T );
 		Print* node = new Print( items, print.line, print.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 }
@@ -213,12 +257,20 @@ Stmt* Parser::parseStmtID( string i, int lin, int col )
 		match( SETEQUAL_T );
 		Expr* expr = parseExpr();
 		Assign* node = new Assign( i, expr, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
 	{
 		list<Expr*> args = parseArgList();
 		Call* node = new Call( i, args, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 }
@@ -232,11 +284,19 @@ Stmt* Parser::parseStmtIf( Expr* t, Stmt* tr, int lin, int col )
 		match( ELSE_T );
 		Stmt* falseClause = parseStmt();
 		IfThenElse* node = new IfThenElse( t, tr, falseClause, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
 	{
 		IfThen* node = new IfThen( t, tr, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 }
@@ -250,11 +310,19 @@ Stmt* Parser::parseStmtPrompt( string m, int lin, int col )
 		match( COMMA_T );
 		Token ID = match( IDENT_T );
 		Prompt2* node = new Prompt2( m, ID.lexeme, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
 	{
 		Prompt* node = new Prompt( m, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 }
@@ -268,6 +336,10 @@ Param* Parser::parseParam()
 		match( COLON_T );
 		Type type = parseType();
 		ValParam* node = new ValParam( ID.lexeme, type, ID.line, ID.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
@@ -277,6 +349,10 @@ Param* Parser::parseParam()
 		match( COLON_T );
 		Type type = parseType();
 		VarParam* node = new VarParam( ID.lexeme, type, var.line, var.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 }
@@ -287,6 +363,10 @@ Expr* Parser::parseExpr()
 {
 	Expr* simpleExpr = parseSimpleExpr();
 	Expr* node = parseExprRest( simpleExpr, simpleExpr->line, simpleExpr->column );
+	
+	if ( ASTtoString )
+		cout << node->toString("");
+
 	return node;
 }
 
@@ -299,10 +379,17 @@ Expr* Parser::parseExprRest( Expr* e, int lin, int col )
 		Op2 relOp = parseRelOp();
 		Expr* simpleExpr = parseSimpleExpr();
 		BinOp* node = new BinOp( e, relOp, simpleExpr, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
 	{
+		if ( ASTtoString )
+			cout << e->toString("");
+
 		return e;
 	}
 }
@@ -313,6 +400,10 @@ Expr* Parser::parseSimpleExpr()
 {
 	Expr* term = parseTerm();
 	Expr* node = parseSimpleExprRest( term, term->line, term->column );
+	
+	if ( ASTtoString )
+		cout << node->toString("");
+
 	return node;
 }
 
@@ -326,10 +417,19 @@ Expr* Parser::parseSimpleExprRest( Expr* e, int lin, int col )
 		Expr* term = parseTerm();
 		Expr* simpleExprRest = parseSimpleExprRest( term, term->line, term->column );
 		BinOp* node = new BinOp( e, addOp, simpleExprRest, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
+	{
+		if ( ASTtoString )
+			cout << e->toString("");
+		
 		return e;
+	}
 }
 
 
@@ -338,6 +438,10 @@ Expr* Parser::parseTerm()
 {
 	Expr* factor = parseFactor();
 	Expr* node = parseTermRest( factor, factor->line, factor->column );
+	
+	if ( ASTtoString )
+		cout << node->toString("");
+
 	return node;
 }
 
@@ -351,10 +455,19 @@ Expr* Parser::parseTermRest( Expr* e, int lin, int col )
 		Expr* factor = parseFactor();
 		Expr* termRest = parseTermRest( factor, factor->line, factor->column );
 		BinOp* node = new BinOp( e, mulOp, termRest, lin, col );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
+	{
+		if ( ASTtoString )
+			cout << e->toString("");
+
 		return e;
+	}
 }
 
 
@@ -365,24 +478,40 @@ Expr* Parser::parseFactor()
 	{
 		Token num = match( INTEGER_T );
 		Num* node = new Num( stoi( num.lexeme ), num.line, num.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( IDENT_T ) )
 	{
 		Token ID = match( IDENT_T );
 		Id* node = new Id( ID.lexeme, ID.line, ID.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( TRUE_T ) )
 	{
 		Token trueToken = match( TRUE_T );
 		True* node = new True( trueToken.line, trueToken.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( FALSE_T ) )
 	{
 		Token falseToken = match( FALSE_T );
 		False* node = new False( falseToken.line, falseToken.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( SUBTRACT_ST ) )
@@ -390,6 +519,10 @@ Expr* Parser::parseFactor()
 		Token unOp = match( SUBTRACT_ST );
 		Expr* factor = parseFactor();
 		UnOp* node = new UnOp( Neg, factor, unOp.line, unOp.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else if ( check( NOT_ST ) )
@@ -397,6 +530,10 @@ Expr* Parser::parseFactor()
 		Token unOp = match( NOT_ST );
 		Expr* factor = parseFactor();
 		UnOp* node = new UnOp( Not, factor, unOp.line, unOp.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
@@ -404,6 +541,10 @@ Expr* Parser::parseFactor()
 		Token leftParen = match( LEFTPARENTH_T );
 		Expr* node = parseExpr();
 		match( RIGHTPARENTH_T );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 }
@@ -416,12 +557,20 @@ Item* Parser::parseItem()
 	{
 		Token stringToken = match( STRINGCONST_T );
 		StringItem* node = new StringItem( stringToken.lexeme, stringToken.line, stringToken.column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 	else
 	{
 		Expr* expr = parseExpr();
 		ExprItem* node = new ExprItem( expr, expr->line, expr->column );
+		
+		if ( ASTtoString )
+			cout << node->toString("");
+
 		return node;
 	}
 }
@@ -709,8 +858,9 @@ list<Item*> Parser::parseItemsRest()
 //===----------------------------------------------------------------------===//
 // The main Parser
 //===----------------------------------------------------------------------===//
-void Parser::parse()
+ASTNode* Parser::parse()
 {
-    parseProgram();
+    ASTNode* node = parseProgram();
     match( EOF_T );
+	return node;
 }

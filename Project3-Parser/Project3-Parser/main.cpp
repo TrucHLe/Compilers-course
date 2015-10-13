@@ -11,7 +11,6 @@
 #include "Constants.h"
 #include "Scanner.h"
 #include "Parser.h"
-#include "AST.h"
 
 using namespace std;
 using std::ifstream;
@@ -53,15 +52,19 @@ int main(int argc, const char * argv[])
 	//
 	
 	
+	//	Run this
 	
-	//Parser parser( input );
-	//ASTNode* node = parser.parseProgram();
-	//cout << node->toString() //toString takes indentation //look at Exam1 on I Drive
-	//ask Program Node to print here
+	Parser parser( input );
+	ASTNode* node = parser.parse();
+	cout << node->toString("");
+	
+	//! Run this
 	
 	
+//	/Users/Bamboo/Developer/Compilers-course/Project3-Parser/Project3-Parser/test3.txt
 	
 	//Test scanner
+	/*
 	Scanner scanner( input );
 	Token token;
 	do
@@ -71,6 +74,7 @@ int main(int argc, const char * argv[])
 		
 	} while ( token.type != EOF_T );
 	cout << endl;
+	*/
 	// !Test scanner
 	
 	

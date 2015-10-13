@@ -49,6 +49,8 @@ struct Num;
 struct Id;
 struct True;
 struct False;
+
+
 /*
 static bool deleteAllConstDecl( ConstDecl* c );
 static bool deleteAllVarDecl( VarDecl* v );
@@ -120,9 +122,635 @@ enum Op2
 	Or
 };
 
-//string nameOf( Type type );
-//string nameOf( Op1 op1 );
-//string nameOf( Op2 op2 );
+string nameOf( Type type );
+string nameOf( Op1 op1 );
+string nameOf( Op2 op2 );
+
+
+
+
+//===----------------------------------------------------------------------===//
+// AST abstract base class
+//===----------------------------------------------------------------------===//
+struct ASTNode
+{
+	int column;
+	int line;
+	ASTNodeType node_type;
+	
+	ASTNode()
+	{
+		column		= 1;
+		line		= 1;
+		node_type	= Node_Undefined;
+	}
+	
+	//virtual ~ASTNode() {}
+	
+	virtual string toString( string indent ) = 0;
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Program Node
+//===----------------------------------------------------------------------===//
+struct Program : ASTNode
+{
+	string name;
+	Block* block;
+	
+	Program( string n, Block* b, int lin, int col )
+	{
+		name		= n;
+		block		= b;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Program;
+	}
+	
+//	~Program()
+//	{
+//		delete block;
+//	}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Block Node
+//===----------------------------------------------------------------------===//
+struct Block : ASTNode
+{
+	list<ConstDecl*> consts;
+	list<VarDecl*> vars;
+	list<ProcDecl*> procs;
+	list<Stmt*> body;
+	
+	Block( list<ConstDecl*> c, list<VarDecl*> v, list<ProcDecl*> p, list<Stmt*> b, int lin, int col )
+	{
+		consts		= c;
+		vars		= v;
+		procs		= p;
+		body		= b;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Block;
+	}
+	
+	//	~Block()
+	//	{
+	//		consts.remove_if( deleteAllConstDecl );
+	//		vars.remove_if( deleteAllVarDecl );
+	//		procs.remove_if( deleteAllProcDecl );
+	//		body.remove_if( deleteAllStmt );
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Constant Declaration Node
+//===----------------------------------------------------------------------===//
+struct ConstDecl : ASTNode
+{
+	string ID;
+	int value;
+	
+	ConstDecl( string i, int v, int lin, int col )
+	{
+		ID			= i;
+		value		= v;
+		line		= lin;
+		column		= col;
+		node_type	= Node_ConstDecl;
+	}
+	
+	//	~ConstDecl() {}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Variable Declaration Node
+//===----------------------------------------------------------------------===//
+struct VarDecl : ASTNode
+{
+	string ID;
+	Type type;
+	
+	VarDecl( string i, Type t, int lin, int col )
+	{
+		ID			= i;
+		type		= t;
+		line		= lin;
+		column		= col;
+		node_type	= Node_VarDecl;
+	}
+	
+	//	~VarDecl() {}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Procedure Declaration Node
+//===----------------------------------------------------------------------===//
+struct ProcDecl : ASTNode
+{
+	string ID;
+	list<Param*> params;
+	Block* block;
+	
+	ProcDecl( string i, list<Param*> p, Block* b, int lin, int col )
+	{
+		ID			= i;
+		params		= p;
+		block		= b;
+		line		= lin;
+		column		= col;
+		node_type	= Node_ProcDecl;
+	}
+	
+	//	~ProcDecl()
+	//	{
+	//		params.remove_if( deleteAllParam );
+	//		delete block;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Parameter Node
+//===----------------------------------------------------------------------===//
+struct Param : ASTNode
+{
+	Param()	{}
+	virtual ~Param() {}
+};
+
+
+
+struct ValParam : Param
+{
+	string ID;
+	Type type;
+	
+	ValParam( string i, Type t, int lin, int col )
+	{
+		ID			= i;
+		type		= t;
+		line		= lin;
+		column		= col;
+		node_type	= Node_ValParam;
+	}
+	
+	//	~ValParam() {}
+	
+	string toString( string indent );
+};
+
+
+
+struct VarParam : Param
+{
+	string ID;
+	Type type;
+	
+	VarParam( string i, Type t, int lin, int col )
+	{
+		ID			= i;
+		type		= t;
+		line		= lin;
+		column		= col;
+		node_type	= Node_VarParam;
+	}
+	
+	//	~VarParam() {}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Statement Node
+//===----------------------------------------------------------------------===//
+struct Stmt : ASTNode
+{
+	Stmt() {}
+	virtual ~Stmt() {}
+};
+
+
+
+struct Assign : Stmt
+{
+	string ID;
+	Expr* expr;
+	
+	Assign( string i, Expr* e, int lin, int col )
+	{
+		ID			= i;
+		expr		= e;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Assign;
+	}
+	
+	//	~Assign()
+	//	{
+	//		delete expr;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct Call : Stmt
+{
+	string ID;
+	list<Expr*> args;
+	
+	Call( string i, list<Expr*> a, int lin, int col )
+	{
+		ID			= i;
+		args		= a;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Call;
+	}
+	
+	//	~Call()
+	//	{
+	//		args.remove_if( deleteAllExpr );
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct Sequence : Stmt
+{
+	list<Stmt*> body;
+	
+	Sequence( list<Stmt*> b, int lin, int col )
+	{
+		body		= b;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Sequence;
+	}
+	
+	//	~Sequence()
+	//	{
+	//		body.remove_if( deleteAllStmt );
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct IfThen : Stmt
+{
+	Expr* test;
+	Stmt* trueClause;
+	
+	IfThen( Expr* t, Stmt* tr, int lin, int col )
+	{
+		test		= t;
+		trueClause	= tr;
+		line		= lin;
+		column		= col;
+		node_type	= Node_IfThen;
+	}
+	
+	//	~IfThen()
+	//	{
+	//		delete test;
+	//		delete trueClause;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct IfThenElse : Stmt
+{
+	Expr* test;
+	Stmt* trueClause;
+	Stmt* falseClause;
+	
+	IfThenElse( Expr* t, Stmt* tr, Stmt* fa, int lin, int col )
+	{
+		test		= t;
+		trueClause	= tr;
+		falseClause	= fa;
+		line		= lin;
+		column		= col;
+		node_type	= Node_IfThenElse;
+	}
+	
+	//	~IfThenElse()
+	//	{
+	//		delete test;
+	//		delete trueClause;
+	//		delete falseClause;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct While : Stmt
+{
+	Expr* test;
+	Stmt* body;
+	
+	While( Expr* t, Stmt* b, int lin, int col )
+	{
+		test		= t;
+		body		= b;
+		line		= lin;
+		column		= col;
+		node_type	= Node_While;
+	}
+	
+	//	~While()
+	//	{
+	//		delete test;
+	//		delete body;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct Prompt : Stmt
+{
+	string message;
+	
+	Prompt( string m, int lin, int col )
+	{
+		message		= m;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Prompt;
+	}
+	
+	//	~Prompt() {}
+	
+	string toString( string indent );
+};
+
+
+
+struct Prompt2 : Stmt
+{
+	string message;
+	string ID;
+	
+	Prompt2( string m, string i, int lin, int col )
+	{
+		message			= m;
+		ID				= i;
+		line			= lin;
+		column			= col;
+		node_type		= Node_Prompt2;
+	}
+	
+	//	~Prompt2() {}
+	
+	string toString( string indent );
+};
+
+
+
+struct Print : Stmt
+{
+	list<Item*> items;
+	
+	Print( list<Item*> i, int lin, int col )
+	{
+		items			= i;
+		line			= lin;
+		column			= col;
+		node_type		= Node_Print;
+	}
+	
+	//	~Print()
+	//	{
+	//		items.remove_if( deleteAllItem );
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Item Node
+//===----------------------------------------------------------------------===//
+struct Item : ASTNode
+{
+	Item() {}
+	virtual ~Item() {}
+};
+
+
+
+struct ExprItem : Item
+{
+	Expr* expr;
+	
+	ExprItem( Expr* e, int lin, int col )
+	{
+		expr		= e;
+		line		= lin;
+		column		= col;
+		node_type	= Node_ExprItem;
+	}
+	
+	//	~ExprItem()
+	//	{
+	//		delete expr;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct StringItem : Item
+{
+	string message;
+	
+	StringItem( string m, int lin, int col )
+	{
+		message		= m;
+		line		= lin;
+		column		= col;
+		node_type	= Node_StringItem;
+	}
+	
+	//	~StringItem() {}
+	
+	string toString( string indent );
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Expression Node
+//===----------------------------------------------------------------------===//
+struct Expr : ASTNode
+{
+	Expr() {}
+	//	virtual ~Expr() {}
+};
+
+
+
+struct BinOp : Expr
+{
+	Op2 op;
+	Expr* left;
+	Expr* right;
+	
+	BinOp( Expr* l, Op2 o, Expr* r, int lin, int col )
+	{
+		op			= o;
+		left		= l;
+		right		= r;
+		line		= lin;
+		column		= col;
+		node_type	= Node_BinOp;
+	}
+	
+	//	~BinOp()
+	//	{
+	//		delete left;
+	//		delete right;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct UnOp : Expr
+{
+	Op1 op;
+	Expr* expr;
+	
+	UnOp( Op1 o, Expr* e, int lin, int col )
+	{
+		op			= o;
+		expr		= e;
+		line		= lin;
+		column		= col;
+		node_type	= Node_UnOp;
+	}
+	
+	//	~UnOp()
+	//	{
+	//		delete expr;
+	//	}
+	
+	string toString( string indent );
+};
+
+
+
+struct Num : Expr
+{
+	int value;
+	
+	Num( int v, int lin, int col )
+	{
+		value		= v;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Num;
+	}
+	
+	//	~Num() {}
+	
+	string toString( string indent );
+};
+
+
+
+struct Id : Expr
+{
+	string ID;
+	
+	Id( string i, int lin, int col )
+	{
+		ID			= i;
+		line		= lin;
+		column		= col;
+		node_type	= Node_Id;
+	}
+	
+	//	~Id() {}
+	
+	string toString( string indent );
+};
+
+
+
+struct True : Expr
+{
+	bool boolean;
+	
+	True( int lin, int col )
+	{
+		boolean		= true;
+		line		= lin;
+		column		= col;
+	}
+	
+	//	~True() {}
+	
+	string toString( string indent );
+};
+
+
+
+struct False : Expr
+{
+	bool boolean;
+	
+	False( int lin, int col )
+	{
+		boolean		= false;
+		line		= lin;
+		column		= col;
+	}
+	
+	//	~False() {}
+	
+	string toString( string indent );
+};
+
 
 
 #endif /* defined(__Project3_Parser__AST__) */

@@ -9,825 +9,6 @@
 #include "AST.h"
 
 
-//===----------------------------------------------------------------------===//
-// AST abstract base class
-//===----------------------------------------------------------------------===//
-struct ASTNode
-{
-	int column;
-	int line;
-	ASTNodeType node_type;
-	
-	ASTNode()
-	{
-		column		= 1;
-		line		= 1;
-		node_type	= Node_Undefined;
-	}
-	
-	//virtual ~ASTNode() {}
-	
-	virtual string toString( string indent ) = 0;
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Program Node
-//===----------------------------------------------------------------------===//
-struct Program : ASTNode
-{
-	string name;
-	Block* block;
-	
-	Program( string n, Block* b, int lin, int col )
-	{
-		name		= n;
-		block		= b;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Program;
-	}
-	
-	//	~Program()
-	//	{
-	//		delete block;
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "Program " + name + "\n";
-	}
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Block Node
-//===----------------------------------------------------------------------===//
-struct Block : ASTNode
-{
-	list<ConstDecl*> consts;
-	list<VarDecl*> vars;
-	list<ProcDecl*> procs;
-	list<Stmt*> body;
-	
-	Block( list<ConstDecl*> c, list<VarDecl*> v, list<ProcDecl*> p, list<Stmt*> b, int lin, int col )
-	{
-		consts		= c;
-		vars		= v;
-		procs		= p;
-		body		= b;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Block;
-	}
-	
-	//	~Block()
-	//	{
-	//		consts.remove_if( deleteAllConstDecl );
-	//		vars.remove_if( deleteAllVarDecl );
-	//		procs.remove_if( deleteAllProcDecl );
-	//		body.remove_if( deleteAllStmt );
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "Block\n";
-	}
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Constant Declaration Node
-//===----------------------------------------------------------------------===//
-struct ConstDecl : ASTNode
-{
-	string ID;
-	int value;
-	
-	ConstDecl( string i, int v, int lin, int col )
-	{
-		ID			= i;
-		value		= v;
-		line		= lin;
-		column		= col;
-		node_type	= Node_ConstDecl;
-	}
-	
-	//	~ConstDecl() {}
-	
-	string toString( string indent )
-	{
-		return indent + "Const " + ID + " = " + to_string( value ) + "\n";
-	}
-	
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Variable Declaration Node
-//===----------------------------------------------------------------------===//
-struct VarDecl : ASTNode
-{
-	string ID;
-	Type type;
-	
-	VarDecl( string i, Type t, int lin, int col )
-	{
-		ID			= i;
-		type		= t;
-		line		= lin;
-		column		= col;
-		node_type	= Node_VarDecl;
-	}
-	
-	//	~VarDecl() {}
-	
-	string toString( string indent )
-	{
-		string typeString;
-		switch ( type )
-		{
-			case IntType:
-				typeString = "Int";
-				break;
-				
-			case BoolType:
-				typeString = "Bool";
-				break;
-				
-			default:
-				typeString = "";
-				break;
-		}
-		
-		return "Var " + ID + " : " + typeString + "\n";
-	}
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Procedure Declaration Node
-//===----------------------------------------------------------------------===//
-struct ProcDecl : ASTNode
-{
-	string ID;
-	list<Param*> params;
-	Block* block;
-	
-	ProcDecl( string i, list<Param*> p, Block* b, int lin, int col )
-	{
-		ID			= i;
-		params		= p;
-		block		= b;
-		line		= lin;
-		column		= col;
-		node_type	= Node_ProcDecl;
-	}
-	
-	//	~ProcDecl()
-	//	{
-	//		params.remove_if( deleteAllParam );
-	//		delete block;
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "Proc " + ID + "\n";
-	}
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Parameter Node
-//===----------------------------------------------------------------------===//
-struct Param : ASTNode
-{
-	Param()	{}
-	virtual ~Param() {}
-};
-
-
-
-struct ValParam : Param
-{
-	string ID;
-	Type type;
-	
-	ValParam( string i, Type t, int lin, int col )
-	{
-		ID			= i;
-		type		= t;
-		line		= lin;
-		column		= col;
-		node_type	= Node_ValParam;
-	}
-	
-	//	~ValParam() {}
-	
-	string toString( string indent )
-	{
-		string typeString;
-		switch ( type )
-		{
-			case IntType:
-				typeString = "Int";
-				break;
-				
-			case BoolType:
-				typeString = "Bool";
-				break;
-				
-			default:
-				typeString = "";
-				break;
-		}
-		
-		return indent + "Val " + ID + " : " + typeString + "\n";
-	}
-};
-
-
-
-struct VarParam : Param
-{
-	string ID;
-	Type type;
-	
-	VarParam( string i, Type t, int lin, int col )
-	{
-		ID			= i;
-		type		= t;
-		line		= lin;
-		column		= col;
-		node_type	= Node_VarParam;
-	}
-	
-	//	~VarParam() {}
-	
-	string toString( string indent )
-	{
-		string typeString;
-		switch ( type )
-		{
-			case IntType:
-				typeString = "Int";
-				break;
-				
-			case BoolType:
-				typeString = "Bool";
-				break;
-				
-			default:
-				typeString = "";
-				break;
-		}
-		
-		return indent + "Var " + ID + " : " + typeString + "\n";
-	}
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Statement Node
-//===----------------------------------------------------------------------===//
-struct Stmt : ASTNode
-{
-	Stmt() {}
-	virtual ~Stmt() {}
-};
-
-
-
-struct Assign : Stmt
-{
-	string ID;
-	Expr* expr;
-	
-	Assign( string i, Expr* e, int lin, int col )
-	{
-		ID			= i;
-		expr		= e;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Assign;
-	}
-	
-	//	~Assign()
-	//	{
-	//		delete expr;
-	//	}
-	
-	string toString( string indent )
-	{
-		return "Assign " + ID + "\n";
-	}
-};
-
-
-
-struct Call : Stmt
-{
-	string ID;
-	list<Expr*> args;
-	
-	Call( string i, list<Expr*> a, int lin, int col )
-	{
-		ID			= i;
-		args		= a;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Call;
-	}
-	
-	//	~Call()
-	//	{
-	//		args.remove_if( deleteAllExpr );
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "Call " + ID + "\n";
-	}
-};
-
-
-
-struct Sequence : Stmt
-{
-	list<Stmt*> body;
-	
-	Sequence( list<Stmt*> b, int lin, int col )
-	{
-		body		= b;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Sequence;
-	}
-	
-	//	~Sequence()
-	//	{
-	//		body.remove_if( deleteAllStmt );
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "Sequence\n";
-	}
-};
-
-
-
-struct IfThen : Stmt
-{
-	Expr* test;
-	Stmt* trueClause;
-	
-	IfThen( Expr* t, Stmt* tr, int lin, int col )
-	{
-		test		= t;
-		trueClause	= tr;
-		line		= lin;
-		column		= col;
-		node_type	= Node_IfThen;
-	}
-	
-	//	~IfThen()
-	//	{
-	//		delete test;
-	//		delete trueClause;
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "IfThen\n";
-	}
-};
-
-
-
-struct IfThenElse : Stmt
-{
-	Expr* test;
-	Stmt* trueClause;
-	Stmt* falseClause;
-	
-	IfThenElse( Expr* t, Stmt* tr, Stmt* fa, int lin, int col )
-	{
-		test		= t;
-		trueClause	= tr;
-		falseClause	= fa;
-		line		= lin;
-		column		= col;
-		node_type	= Node_IfThenElse;
-	}
-	
-	//	~IfThenElse()
-	//	{
-	//		delete test;
-	//		delete trueClause;
-	//		delete falseClause;
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "IfThenElse\n";
-	}
-};
-
-
-
-struct While : Stmt
-{
-	Expr* test;
-	Stmt* body;
-	
-	While( Expr* t, Stmt* b, int lin, int col )
-	{
-		test		= t;
-		body		= b;
-		line		= lin;
-		column		= col;
-		node_type	= Node_While;
-	}
-	
-	//	~While()
-	//	{
-	//		delete test;
-	//		delete body;
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "While\n";
-	}
-};
-
-
-
-struct Prompt : Stmt
-{
-	string message;
-	
-	Prompt( string m, int lin, int col )
-	{
-		message		= m;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Prompt;
-	}
-	
-	//	~Prompt() {}
-	
-	string toString( string indent )
-	{
-		return indent + "Prompt " + message + "\n";
-	}
-};
-
-
-
-struct Prompt2 : Stmt
-{
-	string message;
-	string ID;
-	
-	Prompt2( string m, string i, int lin, int col )
-	{
-		message			= m;
-		ID				= i;
-		line			= lin;
-		column			= col;
-		node_type		= Node_Prompt2;
-	}
-	
-	//	~Prompt2() {}
-	
-	string toString( string indent )
-	{
-		return indent + "Prompt2 " + message + ", " + ID + "\n";
-	}
-	
-};
-
-
-
-struct Print : Stmt
-{
-	list<Item*> items;
-	
-	Print( list<Item*> i, int lin, int col )
-	{
-		items			= i;
-		line			= lin;
-		column			= col;
-		node_type		= Node_Print;
-	}
-	
-	//	~Print()
-	//	{
-	//		items.remove_if( deleteAllItem );
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "Print\n";
-	}
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Item Node
-//===----------------------------------------------------------------------===//
-struct Item : ASTNode
-{
-	Item() {}
-	virtual ~Item() {}
-};
-
-
-
-struct ExprItem : Item
-{
-	Expr* expr;
-	
-	ExprItem( Expr* e, int lin, int col )
-	{
-		expr		= e;
-		line		= lin;
-		column		= col;
-		node_type	= Node_ExprItem;
-	}
-	
-	//	~ExprItem()
-	//	{
-	//		delete expr;
-	//	}
-	
-	string toString( string indent )
-	{
-		return indent + "ExprItem\n";
-	}
-};
-
-
-
-struct StringItem : Item
-{
-	string message;
-	
-	StringItem( string m, int lin, int col )
-	{
-		message		= m;
-		line		= lin;
-		column		= col;
-		node_type	= Node_StringItem;
-	}
-	
-	//	~StringItem() {}
-	
-	string toString( string indent )
-	{
-		return indent + "StringItem " + message + "\n";
-	}
-};
-
-
-
-//===----------------------------------------------------------------------===//
-// Expression Node
-//===----------------------------------------------------------------------===//
-struct Expr : ASTNode
-{
-	Expr() {}
-	//	virtual ~Expr() {}
-};
-
-
-
-struct BinOp : Expr
-{
-	Op2 op;
-	Expr* left;
-	Expr* right;
-	
-	BinOp( Expr* l, Op2 o, Expr* r, int lin, int col )
-	{
-		op			= o;
-		left		= l;
-		right		= r;
-		line		= lin;
-		column		= col;
-		node_type	= Node_BinOp;
-	}
-	
-	//	~BinOp()
-	//	{
-	//		delete left;
-	//		delete right;
-	//	}
-	
-	string toString( string indent )
-	{
-		string opString;
-		switch ( op )
-		{
-			case EQ:
-				opString = "EQ";
-				break;
-				
-			case NE:
-				opString = "NE";
-				break;
-				
-			case LE:
-				opString = "LE";
-				break;
-				
-			case GE:
-				opString = "GE";
-				break;
-				
-			case LT:
-				opString = "LT";
-				break;
-				
-			case GT:
-				opString = "GT";
-				break;
-				
-			case Plus:
-				opString = "Plus";
-				break;
-				
-			case Minus:
-				opString = "Minus";
-				break;
-				
-			case Times:
-				opString = "Times";
-				break;
-				
-			case Div:
-				opString = "Div";
-				break;
-				
-			case Mod:
-				opString = "Mod";
-				break;
-				
-			case And:
-				opString = "And";
-				break;
-				
-			case Or:
-				opString = "Or";
-				break;
-				
-			default:
-				opString = "";
-				break;
-		}
-		
-		return indent + "BinOp " + opString + "\n";
-	}
-};
-
-
-
-struct UnOp : Expr
-{
-	Op1 op;
-	Expr* expr;
-	
-	UnOp( Op1 o, Expr* e, int lin, int col )
-	{
-		op			= o;
-		expr		= e;
-		line		= lin;
-		column		= col;
-		node_type	= Node_UnOp;
-	}
-	
-	//	~UnOp()
-	//	{
-	//		delete expr;
-	//	}
-	
-	string toString( string indent )
-	{
-		string opString;
-		switch ( op )
-		{
-			case Neg:
-				opString = "Neg";
-				break;
-				
-			case Not:
-				opString = "Not";
-				break;
-			
-			default:
-				opString = "";
-				break;
-		}
-
-		return indent + "BinOp " + opString + "\n";
-	}
-};
-
-
-
-struct Num : Expr
-{
-	int value;
-	
-	Num( int v, int lin, int col )
-	{
-		value		= v;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Num;
-	}
-	
-	//	~Num() {}
-	
-	string toString( string indent )
-	{
-		return indent + "Num " + to_string( value ) + "\n";
-	}
-};
-
-
-
-struct Id : Expr
-{
-	string ID;
-	
-	Id( string i, int lin, int col )
-	{
-		ID			= i;
-		line		= lin;
-		column		= col;
-		node_type	= Node_Id;
-	}
-	
-	//	~Id() {}
-	
-	string toString( string indent )
-	{
-		return indent + "Id " + ID + "\n";
-	}
-};
-
-
-
-struct True : Expr
-{
-	bool boolean;
-	
-	True( int lin, int col )
-	{
-		boolean		= true;
-		line		= lin;
-		column		= col;
-	}
-	
-	//	~True() {}
-	
-	string toString( string indent )
-	{
-		return indent + "True\n";
-	}
-};
-
-
-
-struct False : Expr
-{
-	bool boolean;
-	
-	False( int lin, int col )
-	{
-		boolean		= false;
-		line		= lin;
-		column		= col;
-	}
-	
-	//	~False() {}
-	
-	string toString( string indent )
-	{
-		return indent + "False\n";
-	}
-};
 
 
 
@@ -882,7 +63,7 @@ struct False : Expr
 //===----------------------------------------------------------------------===//
 // Returns name of Type, Op1, Op2
 //===----------------------------------------------------------------------===//
-/*
+
 string nameOf( Type type )
 {
 	switch ( type )
@@ -923,4 +104,204 @@ string nameOf( Op2 op2 )
 		default:	return "";
 	}
 }
-*/
+ 
+
+ 
+//===----------------------------------------------------------------------===//
+// toString()
+//===----------------------------------------------------------------------===//
+string Program::toString( string indent )
+{
+	string result = indent + "Program " + name + "\n";
+	result += block->toString( indent + "  " );
+	return result;
+}
+
+
+string Block::toString( string indent )
+{
+	string result = indent + "Block\n";
+	for ( ConstDecl* c : consts )
+		result += c->toString( indent + "  " );
+	for ( VarDecl* v : vars )
+		result += v->toString( indent + " " );
+	for ( ProcDecl* p : procs )
+		result += p->toString( indent + " " );
+	for ( Stmt* b : body )
+		result += b->toString( indent + " " );
+	return result;
+}
+
+
+string ConstDecl::toString( string indent )
+{
+	string result = indent + "Const " + ID + " = " + to_string( value ) + "\n";
+	return result;
+}
+
+
+string VarDecl::toString( string indent )
+{
+	string result = "Var " + ID + " : " + nameOf( type ) + "\n";
+	return result;
+}
+
+
+string ProcDecl::toString( string indent )
+{
+	string result = indent + "Proc " + ID + "\n";
+	for ( Param* p : params )
+		result += p->toString( indent + " " );
+	return result;
+}
+
+
+string ValParam::toString( string indent )
+{
+	string result = indent + "Val " + ID + " : " + nameOf( type ) + "\n";
+	return result;
+}
+
+
+string VarParam::toString( string indent )
+{
+	string result = indent + "Var " + ID + " : " + nameOf( type ) + "\n";
+	return result;
+}
+
+
+string Assign::toString( string indent )
+{
+	string result = "Assign " + ID + "\n";
+	result += expr->toString( indent + "  " );
+	return result;
+}
+
+
+string Call::toString( string indent )
+{
+	string result = indent + "Call " + ID + "\n";
+	for ( Expr* a : args )
+		result += a->toString( indent + "  " );
+	return result;
+}
+
+
+string Sequence::toString( string indent )
+{
+	string result = indent + "Sequence\n";
+	for ( Stmt* b : body )
+		result += b->toString( indent + "  " );
+	return result;
+}
+
+
+string IfThen::toString( string indent )
+{
+	string result = indent + "IfThen\n";
+	result += test->toString( indent + "  " );
+	result += trueClause->toString( indent + "  " );
+	return result;
+}
+
+
+string IfThenElse::toString( string indent )
+{
+	string result = indent + "IfThenElse\n";
+	result += test->toString( indent + "  " );
+	result += trueClause->toString( indent + "  " );
+	result += falseClause->toString( indent + "  " );
+	return result;
+}
+
+
+string While::toString( string indent )
+{
+	string result = indent + "While\n";
+	result += test->toString( indent + "  " );
+	result += body->toString( indent + "  " );
+	return result;
+}
+
+
+string Prompt::toString( string indent )
+{
+	string result = indent + "Prompt " + message + "\n";
+	return result;
+}
+
+
+string Prompt2::toString( string indent )
+{
+	string result = indent + "Prompt2 " + message + ", " + ID + "\n";
+	return result;
+}
+
+
+string Print::toString( string indent )
+{
+	string result = indent + "Print\n";
+	for ( Item* i : items )
+		result += i->toString( indent + "  " );
+	return result;
+}
+
+
+string ExprItem::toString( string indent )
+{
+	string result = indent + "ExprItem\n";
+	result += expr->toString( indent + "  " );
+	return result;
+}
+
+
+string StringItem::toString( string indent )
+{
+	string result = indent + "StringItem " + message + "\n";
+	return result;
+}
+
+
+string BinOp::toString( string indent )
+{
+	string result = indent + "BinOp " + nameOf( op ) + "\n";
+	result += left->toString( indent + "  " );
+	result += right->toString( indent + "  " );
+	return result;
+}
+
+
+string UnOp::toString( string indent )
+{
+	string result = indent + "BinOp " + nameOf( op ) + "\n";
+	result += expr->toString( indent + "  " );
+	return result;
+}
+
+
+string Num::toString( string indent )
+{
+	string result = indent + "Num " + to_string( value ) + "\n";
+	return result;
+}
+
+
+string Id::toString( string indent )
+{
+	string result = indent + "Id " + ID + "\n";
+	return result;
+}
+
+
+string True::toString( string indent )
+{
+	string result = indent + "True\n";
+	return result;
+}
+
+
+string False::toString( string indent )
+{
+	string result = indent + "False\n";
+	return result;
+}
