@@ -15,9 +15,6 @@
 #include <iostream>     // cin, cout
 #include <fstream>      // ifstream
 #include "Constants.h"
-
-
-
 using namespace std;
 
 
