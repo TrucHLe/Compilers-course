@@ -1,13 +1,13 @@
 //
 //  AST.h -- Abstract Syntax Tree
-//  Project3-Parser
+//	Project4-Interpreter
 //
-//  Created by Truc Le on 10/10/15.
+//  Created by Truc Le on 10/31/15.
 //  Copyright (c) 2015 Truc Le. All rights reserved.
 //
 
-#ifndef __Project3_Parser__AST__
-#define __Project3_Parser__AST__
+#ifndef __Project4_Interpreter__AST__
+#define __Project4_Interpreter__AST__
 
 #include <stdio.h>
 #include <string>
@@ -704,4 +704,4 @@ struct False : Expr
 
 
 
-#endif /* defined(__Project3_Parser__AST__) */
+#endif /* defined(__Project4_Interpreter__AST__) */
