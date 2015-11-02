@@ -18,7 +18,7 @@
 //===----------------------------------------------------------------------===//
 Parser::Parser( ifstream& i ) : scanner( i )
 {
-    token = scanner.next();
+	token = scanner.next();
 }
 
 
@@ -28,9 +28,9 @@ Parser::Parser( ifstream& i ) : scanner( i )
 //===----------------------------------------------------------------------===//
 Token Parser::advance()
 {
-    Token current_token = token;
-    token = scanner.next();
-    return current_token;
+	Token current_token = token;
+	token = scanner.next();
+	return current_token;
 }
 
 
@@ -41,19 +41,19 @@ Token Parser::advance()
 //===----------------------------------------------------------------------===//
 Token Parser::match( int tokenType )
 {
-    if ( check( tokenType ) )
-        return advance();
-    else
-    {
+	if ( check( tokenType ) )
+		return advance();
+	else
+	{
 		//Strategy 1: print error and end -- used
 		//Strategy 2: ptint error and return the expected Token with empty lexeme
 		//Strategy 3: keep skipping over the rest of the Tokens until found the expected Token
 		
-        cout << "(!) Expected " << nameOf( tokenType ) << " at " << token.line << ":" << token.column << endl;
+		cout << "(!) Expected " << nameOf( tokenType ) << " at " << token.line << ":" << token.column << endl;
 		//Token t = *new Token();
 		//return t;
-        exit( 1 );
-    }
+		exit( 1 );
+	}
 }
 
 
@@ -63,13 +63,13 @@ Token Parser::match( int tokenType )
 //===----------------------------------------------------------------------===//
 bool Parser::check( int tokenType )
 {
-    // NUM case to match both SINGLE0_T and INTEGER_T
-    if ( nameOf( tokenType ) == "NUM" && nameOf( token.type ) == "NUM" )
-        return true;
-    else if ( token.type == tokenType )
-        return true;
-    else
-        return false;
+	// NUM case to match both SINGLE0_T and INTEGER_T
+	if ( nameOf( tokenType ) == "NUM" && nameOf( token.type ) == "NUM" )
+		return true;
+	else if ( token.type == tokenType )
+		return true;
+	else
+		return false;
 }
 
 
@@ -79,11 +79,11 @@ bool Parser::check( int tokenType )
 //
 Program* Parser::parseProgram()
 {
-    Token program = match( PRGRM_T );
-    Token ID = match( IDENT_T );
-    match( SEMICOLON_T );
-    Block* block = parseBlock();
-    match( PERIOD_T );
+	Token program = match( PRGRM_T );
+	Token ID = match( IDENT_T );
+	match( SEMICOLON_T );
+	Block* block = parseBlock();
+	match( PERIOD_T );
 	
 	Program* node = new Program( ID.lexeme, block, program.line, program.column );
 	return node;
@@ -96,10 +96,10 @@ Block* Parser::parseBlock()
 	list<ConstDecl*> constDecls = parseConstDecls();
 	list<VarDecl*> varDecls = parseVarDecls();
 	list<ProcDecl*> procDecls = parseProcDecls();
-    Token begin = match( BEGIN_T );
+	Token begin = match( BEGIN_T );
 	list<Stmt*> stmts = parseStmts();
-    match( END_T );
-
+	match( END_T );
+	
 	Block* node = new Block( constDecls, varDecls, procDecls, stmts, begin.line, begin.column );
 	return node;
 }
@@ -130,7 +130,7 @@ VarDecl* Parser::parseVarDecl()
 	Token var = match( VAR_ID );
 	Token ID = match( IDENT_T );
 	match( COLON_T );
-	Type type = parseType();
+	DataType type = parseType();
 	match( SEMICOLON_T );
 	
 	VarDecl* node = new VarDecl( ID.lexeme, type, var.line, var.column );
@@ -191,7 +191,7 @@ Stmt* Parser::parseStmt()
 		match( DO_T );
 		Stmt* body = parseStmt();
 		While* node = new While( test, body, whileToken.line, whileToken.column );
-
+		
 		return node;
 	}
 	else if ( check( PROMPT_T ) )
@@ -200,7 +200,7 @@ Stmt* Parser::parseStmt()
 		Token message = match( STRINGCONST_T );
 		Stmt* node = parseStmtPrompt( message.lexeme, prompt.line, prompt.column );
 		match( SEMICOLON_T );
-
+		
 		return node;
 	}
 	else
@@ -209,7 +209,7 @@ Stmt* Parser::parseStmt()
 		list<Item*> items = parseItems();
 		match( SEMICOLON_T );
 		Print* node = new Print( items, print.line, print.column );
-
+		
 		return node;
 	}
 }
@@ -223,7 +223,7 @@ Stmt* Parser::parseStmtID( string i, int lin, int col )
 		match( SETEQUAL_T );
 		Expr* expr = parseExpr();
 		Assign* node = new Assign( i, expr, lin, col );
-
+		
 		return node;
 	}
 	else
@@ -278,7 +278,7 @@ Param* Parser::parseParam()
 	{
 		Token ID = match( IDENT_T );
 		match( COLON_T );
-		Type type = parseType();
+		DataType type = parseType();
 		ValParam* node = new ValParam( ID.lexeme, type, ID.line, ID.column );
 		return node;
 	}
@@ -287,7 +287,7 @@ Param* Parser::parseParam()
 		Token var = match( VAR_ID );
 		Token ID = match( IDENT_T );
 		match( COLON_T );
-		Type type = parseType();
+		DataType type = parseType();
 		VarParam* node = new VarParam( ID.lexeme, type, var.line, var.column );
 		return node;
 	}
@@ -338,7 +338,7 @@ Expr* Parser::parseSimpleExprRest( Expr* e, int lin, int col )
 		Expr* term = parseTerm();
 		BinOp* binOp = new BinOp( e, addOp, term, lin, col );
 		Expr* node = parseSimpleExprRest( binOp, binOp->line, binOp->column );
-
+		
 		return node;
 	}
 	else
@@ -351,7 +351,7 @@ Expr* Parser::parseTerm()
 {
 	Expr* factor = parseFactor();
 	Expr* node = parseTermRest( factor, factor->line, factor->column );
-
+	
 	return node;
 }
 
@@ -380,14 +380,14 @@ Expr* Parser::parseFactor()
 	{
 		Token num = match( INTEGER_T );
 		Num* node = new Num( stoi( num.lexeme ), num.line, num.column );
-
+		
 		return node;
 	}
 	else if ( check( IDENT_T ) )
 	{
 		Token ID = match( IDENT_T );
 		Id* node = new Id( ID.lexeme, ID.line, ID.column );
-
+		
 		return node;
 	}
 	else if ( check( TRUE_T ) )
@@ -401,7 +401,7 @@ Expr* Parser::parseFactor()
 	{
 		Token falseToken = match( FALSE_T );
 		False* node = new False( falseToken.line, falseToken.column );
-	
+		
 		return node;
 	}
 	else if ( check( SUBTRACT_ST ) )
@@ -409,7 +409,7 @@ Expr* Parser::parseFactor()
 		Token unOp = match( SUBTRACT_ST );
 		Expr* factor = parseFactor();
 		UnOp* node = new UnOp( Neg, factor, unOp.line, unOp.column );
-	
+		
 		return node;
 	}
 	else if ( check( NOT_ST ) )
@@ -548,7 +548,7 @@ string Parser::parseSign()
 
 
 
-Type Parser::parseType()
+DataType Parser::parseType()
 {
 	if ( check( INT_T ) )
 	{
@@ -735,7 +735,7 @@ list<Item*> Parser::parseItemsRest()
 //===----------------------------------------------------------------------===//
 ASTNode* Parser::parse()
 {
-    ASTNode* node = parseProgram();
-    match( EOF_T );
+	ASTNode* node = parseProgram();
+	match( EOF_T );
 	return node;
 }

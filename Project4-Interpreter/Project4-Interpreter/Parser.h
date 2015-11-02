@@ -9,7 +9,7 @@
 #ifndef __Project4_Interpreter__Parser__
 #define __Project4_Interpreter__Parser__
 
-#include <stdio.h>  
+#include <stdio.h>
 #include <fstream>          //ifstream
 #include <unordered_map>    //unordered_map, aka hashmap
 #include "Constants.h"
@@ -18,22 +18,22 @@
 
 class Parser
 {
-    
+	
 private:
-    Scanner scanner;
-    Token token;
-    unordered_map<string, int> constants;
-    
+	Scanner scanner;
+	Token token;
+	unordered_map<string, int> constants;
+	
 public:
-    Parser( ifstream& i );
-    
-    ASTNode* parse(); //main
-    Token advance();
-    Token match( int tokenType );
-    bool check( int tokenType );
+	Parser( ifstream& i );
+	
+	ASTNode* parse(); //main
+	Token advance();
+	Token match( int tokenType );
+	bool check( int tokenType );
 	
 	
-    // Baby parsers
+	// Baby parsers
 	Program* parseProgram();
 	Block* parseBlock();
 	ConstDecl* parseConstDecl();
@@ -58,7 +58,7 @@ public:
 	Op2 parseMulOp();
 	
 	string parseSign();
-	Type parseType();
+	DataType parseType();
 	
 	list<ConstDecl*> parseConstDecls();
 	list<VarDecl*> parseVarDecls();

@@ -10,15 +10,16 @@
 #define __Project4_Interpreter__AST__
 
 #include <stdio.h>
+#include <iostream>
 #include <string>
 #include <stack>
 #include <list>
-//#include "SymbolTable.h"
+#include <map>
 using namespace std;
 
 
 //===----------------------------------------------------------------------===//
-// AST's struct, enum, and functions declarations
+// AST's struct, enum, and functions declarations for tree-parsing
 //===----------------------------------------------------------------------===//
 struct ASTNode;
 struct Program;
@@ -89,7 +90,7 @@ enum ASTNodeType
 };
 
 
-enum Type
+enum DataType
 {
 	IntType,
 	BoolType
@@ -120,10 +121,36 @@ enum Op2
 	Or
 };
 
-string nameOf( Type type );
+
+
+//===----------------------------------------------------------------------===//
+// SymbolTable, Value struct, and enum for tree-interpreting
+//===----------------------------------------------------------------------===//
+struct SymbolTable;
+struct Value;
+struct IntValue;
+struct BoolValue;
+struct IntCell;
+struct BoolCell;
+struct ProcValue;
+
+
+enum ValueType
+{
+	Value_Undefined,
+	Value_IntValue,
+	Value_BoolValue,
+	Value_IntCell,
+	Value_BoolCell,
+	Value_ProcValue
+};
+
+
+
+string nameOf( DataType type );
+string nameOf( DataType type );
 string nameOf( Op1 op1 );
 string nameOf( Op2 op2 );
-
 
 
 
@@ -233,9 +260,9 @@ struct ConstDecl : ASTNode
 struct VarDecl : ASTNode
 {
 	string ID;
-	Type type;
+	DataType type;
 	
-	VarDecl( string i, Type t, int lin, int col )
+	VarDecl( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
 		type		= t;
@@ -291,9 +318,9 @@ struct Param : ASTNode
 struct ValParam : Param
 {
 	string ID;
-	Type type;
+	DataType type;
 	
-	ValParam( string i, Type t, int lin, int col )
+	ValParam( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
 		type		= t;
@@ -312,9 +339,9 @@ struct ValParam : Param
 struct VarParam : Param
 {
 	string ID;
-	Type type;
+	DataType type;
 	
-	VarParam( string i, Type t, int lin, int col )
+	VarParam( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
 		type		= t;
@@ -702,6 +729,120 @@ struct False : Expr
 	string toString( string indent );
 };
 
+
+
+//===----------------------------------------------------------------------===//
+// Value astract base class and its 5 subclasses
+//===----------------------------------------------------------------------===//
+struct Value
+{
+	int line;	// for error
+	int column;	// message
+	ValueType value_type;
+	
+	Value( int lin, int col )
+	{
+		line		= lin;
+		column		= col;
+		value_type	= Value_Undefined;
+	}
+	
+	virtual ~Value() {}
+};
+
+
+struct IntValue : Value
+{
+	int int_value;
+	
+	IntValue( int i, int line, int column ) : Value( line, column )
+	{
+		int_value	= i;
+		value_type	= Value_IntValue;
+	}
+	
+	~IntValue() {}
+};
+
+
+struct BoolValue : Value
+{
+	bool bool_value;
+	
+	BoolValue( bool b, int line, int column ) : Value( line, column )
+	{
+		bool_value	= b;
+		value_type	= Value_BoolValue;
+	}
+	
+	~BoolValue() {}
+};
+
+
+struct IntCell : Value
+{
+	int int_value;
+	
+	IntCell( int i, int line, int column ) : Value( line, column )
+	{
+		int_value	= i;
+		value_type	= Value_IntCell;
+	}
+	
+	~IntCell() {}
+	void set( int i );
+};
+
+
+struct BoolCell : Value
+{
+	bool bool_value;
+	
+	BoolCell( bool b, int line, int column ) : Value( line, column )
+	{
+		bool_value	= b;
+		value_type	= Value_BoolCell;
+	}
+	
+	~BoolCell() {}
+	void set( bool b );
+};
+
+
+struct ProcValue : Value
+{
+	list<Param*> params; //can point to but cannot own a Param because it's an abstract class
+	Block* block;
+	
+	ProcValue( list<Param*> p, Block* b, int line, int column ) : Value( line, column )
+	{
+		params		= p;
+		block		= b;
+		value_type	= Value_ProcValue;
+	}
+	
+	~ProcValue();
+};
+
+
+
+//===----------------------------------------------------------------------===//
+// Symbol Table
+//===----------------------------------------------------------------------===//
+struct SymbolTable
+{
+	stack<pair<string, map<string, Value> > > symbol_table;
+	
+	SymbolTable()
+	{
+		symbol_table = stack<pair<string, map<string, Value> > >();
+	}
+	
+	void enterTable( string ID, int line, int column );
+	void exitTable();
+	void bind( string ID, int line, int column, Value v );
+	Value lookUp( string ID, int line, int column );
+};
 
 
 #endif /* defined(__Project4_Interpreter__AST__) */

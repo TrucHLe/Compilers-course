@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D2B96C81BE6A91C009CE82F /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2B96C61BE6A91C009CE82F /* SymbolTable.cpp */; };
 		4DE1188F1BE548A300720FE3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE1188E1BE548A300720FE3 /* main.cpp */; };
 		4DE118991BE548C500720FE3 /* AST.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE118951BE548C500720FE3 /* AST.cpp */; };
 		4DE1189F1BE548D400720FE3 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE1189A1BE548D400720FE3 /* Parser.cpp */; };
@@ -27,8 +26,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4D2B96C61BE6A91C009CE82F /* SymbolTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SymbolTable.cpp; sourceTree = "<group>"; };
-		4D2B96C71BE6A91C009CE82F /* SymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SymbolTable.h; sourceTree = "<group>"; };
 		4DE1188B1BE548A300720FE3 /* Project4-Interpreter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Project4-Interpreter"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE1188E1BE548A300720FE3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4DE118951BE548C500720FE3 /* AST.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST.cpp; sourceTree = "<group>"; };
@@ -75,8 +72,6 @@
 				4DE1188E1BE548A300720FE3 /* main.cpp */,
 				4DE118951BE548C500720FE3 /* AST.cpp */,
 				4DE118961BE548C500720FE3 /* AST.h */,
-				4D2B96C61BE6A91C009CE82F /* SymbolTable.cpp */,
-				4D2B96C71BE6A91C009CE82F /* SymbolTable.h */,
 				4DE1189A1BE548D400720FE3 /* Parser.cpp */,
 				4DE1189B1BE548D400720FE3 /* Parser.h */,
 				4DE1189C1BE548D400720FE3 /* Scanner.cpp */,
@@ -148,7 +143,6 @@
 				4DE1189F1BE548D400720FE3 /* Parser.cpp in Sources */,
 				4DE118A01BE548D400720FE3 /* Scanner.cpp in Sources */,
 				4DE1188F1BE548A300720FE3 /* main.cpp in Sources */,
-				4D2B96C81BE6A91C009CE82F /* SymbolTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

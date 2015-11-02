@@ -12,10 +12,10 @@
 
 
 //===----------------------------------------------------------------------===//
-// Returns name of Type, Op1, Op2
+// Returns name of DataType, Op1, Op2
 //===----------------------------------------------------------------------===//
 
-string nameOf( Type type )
+string nameOf( DataType type )
 {
 	switch ( type )
 	{
@@ -55,9 +55,21 @@ string nameOf( Op2 op2 )
 		default:	return "";
 	}
 }
- 
 
- 
+string nameOf( ValueType type )
+{
+	switch ( type )
+	{
+		case Value_Undefined:	return "an undefined value";
+		case Value_IntValue:	return "an integer value";
+		case Value_BoolValue:	return "a boolean value";
+		case Value_IntCell:		return "an integer cell";
+		case Value_BoolCell:	return "a boolean cell";
+		case Value_ProcValue:	return "a procedure value";
+	}
+}
+
+
 //===----------------------------------------------------------------------===//
 // toString()
 //===----------------------------------------------------------------------===//
@@ -382,4 +394,87 @@ static bool deleteAllItem( Item* i )
 {
 	delete i;
 	return true;
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// Value setters and destructor
+//===----------------------------------------------------------------------===//
+void IntCell::set( int i )
+{
+	int_value = i;
+}
+
+void BoolCell::set( bool b )
+{
+	bool_value = b;
+}
+
+ProcValue::~ProcValue()
+{
+	params.remove_if( deleteAllParam );
+	delete block;
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// SymbolTable
+// Push a new pair of a program's ID and its corresponding map
+// of value declerations and values to the symbol table
+// Only called by Program and Call nodes
+//===----------------------------------------------------------------------===//
+void SymbolTable::enterTable( string ID, int line, int column )
+{
+	pair<string, map<string, Value> > symbol = make_pair( ID, map<string, Value>() );
+	symbol_table.push( symbol );
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// SymbolTable
+// Pop the top element of the symbol table
+//===----------------------------------------------------------------------===//
+void SymbolTable::exitTable()
+{
+	symbol_table.pop();
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// SymbolTable
+// Create a new pair of value decleration and value,
+// and push it to the symbol table's top map
+//===----------------------------------------------------------------------===//
+void SymbolTable::bind( string ID, int line, int column, Value v )
+{
+	Value value = lookUp( ID, line, column );
+	if ( value.value_type == Value_Undefined )
+	{
+		pair<string, Value> new_value = make_pair( ID, v );
+		get<1>(symbol_table.top()).insert( new_value );
+	}
+	else
+	{
+		cout << "(!) " << ID << " is defined at " << value.line << ":" << value.column << " and should not be re-defined at " << line << ":" << column << endl;
+		exit( 1 );
+	}
+	
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// SymbolTable
+// Look up ID in the symbol table's top map
+//===----------------------------------------------------------------------===//
+Value SymbolTable::lookUp( string ID, int line, int column )
+{
+	map<string, Value> map = get<1>(symbol_table.top());
+	if ( map.find( ID ) != map.end() )
+		return map.at( ID );
+	return Value( line, column );
 }
