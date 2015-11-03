@@ -171,9 +171,8 @@ struct ASTNode
 	
 	virtual ~ASTNode() {}
 	virtual string toString( string indent ) = 0;
-	virtual void interpret() = 0;
-	virtual void interpret( SymbolTable t ) = 0;
-	virtual Value* interpretValue( SymbolTable t ) = 0;
+	virtual Value* interpret() = 0;
+	virtual Value* interpret( SymbolTable t ) = 0;
 };
 
 
@@ -198,9 +197,8 @@ struct Program : ASTNode
 	~Program();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -229,9 +227,8 @@ struct Block : ASTNode
 	~Block();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -256,9 +253,8 @@ struct ConstDecl : ASTNode
 	~ConstDecl() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );};
+	Value* interpret();
+	Value* interpret( SymbolTable t );};
 
 
 
@@ -282,9 +278,8 @@ struct VarDecl : ASTNode
 	~VarDecl() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -311,9 +306,8 @@ struct ProcDecl : ASTNode
 	~ProcDecl();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -340,9 +334,8 @@ struct ValParam : Param
 	~ValParam() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -364,9 +357,8 @@ struct VarParam : Param
 	~VarParam() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -393,9 +385,8 @@ struct Assign : Stmt
 	~Assign();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -417,9 +408,8 @@ struct Call : Stmt
 	~Call();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 	void call( list<Param*> params, Block* block, list<Value*> args, SymbolTable	t );
 };
 
@@ -440,9 +430,8 @@ struct Sequence : Stmt
 	~Sequence();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -464,9 +453,8 @@ struct IfThen : Stmt
 	~IfThen();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -490,9 +478,8 @@ struct IfThenElse : Stmt
 	~IfThenElse();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -514,9 +501,8 @@ struct While : Stmt
 	~While();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -536,9 +522,8 @@ struct Prompt : Stmt
 	~Prompt() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -560,9 +545,8 @@ struct Prompt2 : Stmt
 	~Prompt2() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -582,9 +566,8 @@ struct Print : Stmt
 	~Print();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -609,9 +592,8 @@ struct ExprItem : Item
 	~ExprItem();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -631,9 +613,8 @@ struct StringItem : Item
 	~StringItem() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -662,9 +643,8 @@ struct BinOp : Expr
 	~BinOp();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -686,9 +666,8 @@ struct UnOp : Expr
 	~UnOp();
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -708,9 +687,8 @@ struct Num : Expr
 	~Num() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -730,9 +708,8 @@ struct Id : Expr
 	~Id() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -751,9 +728,8 @@ struct True : Expr
 	~True() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -772,9 +748,8 @@ struct False : Expr
 	~False() {}
 	
 	string toString( string indent );
-	void interpret();
-	void interpret( SymbolTable t );
-	Value* interpretValue( SymbolTable t );
+	Value* interpret();
+	Value* interpret( SymbolTable t );
 };
 
 
@@ -808,11 +783,11 @@ struct Value
 
 struct IntValue : Value
 {
-	int int_value;
+	int integer;
 	
 	IntValue( int i, int line, int column ) : Value( line, column )
 	{
-		int_value	= i;
+		integer		= i;
 		value_type	= Value_IntValue;
 	}
 	
@@ -822,11 +797,11 @@ struct IntValue : Value
 
 struct BoolValue : Value
 {
-	bool bool_value;
+	bool boolean;
 	
 	BoolValue( bool b, int line, int column ) : Value( line, column )
 	{
-		bool_value	= b;
+		boolean		= b;
 		value_type	= Value_BoolValue;
 	}
 	
@@ -836,11 +811,11 @@ struct BoolValue : Value
 
 struct IntCell : Value
 {
-	int int_value;
+	int integer;
 	
 	IntCell( int i, int line, int column ) : Value( line, column )
 	{
-		int_value	= i;
+		integer		= i;
 		value_type	= Value_IntCell;
 	}
 	
@@ -851,11 +826,11 @@ struct IntCell : Value
 
 struct BoolCell : Value
 {
-	bool bool_value;
+	bool boolean;
 	
 	BoolCell( bool b, int line, int column ) : Value( line, column )
 	{
-		bool_value	= b;
+		boolean		= b;
 		value_type	= Value_BoolCell;
 	}
 	
