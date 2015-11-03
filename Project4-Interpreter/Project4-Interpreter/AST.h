@@ -173,7 +173,7 @@ struct ASTNode
 	virtual string toString( string indent ) = 0;
 	virtual void interpret() = 0;
 	virtual void interpret( SymbolTable t ) = 0;
-	virtual Value interpretValue( SymbolTable t ) = 0;
+	virtual Value* interpretValue( SymbolTable t ) = 0;
 };
 
 
@@ -200,7 +200,7 @@ struct Program : ASTNode
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -231,7 +231,7 @@ struct Block : ASTNode
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -258,7 +258,7 @@ struct ConstDecl : ASTNode
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );};
+	Value* interpretValue( SymbolTable t );};
 
 
 
@@ -284,7 +284,7 @@ struct VarDecl : ASTNode
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -313,7 +313,7 @@ struct ProcDecl : ASTNode
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -342,7 +342,7 @@ struct ValParam : Param
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -366,7 +366,7 @@ struct VarParam : Param
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -395,7 +395,7 @@ struct Assign : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -419,8 +419,8 @@ struct Call : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
-	void call( list<Param*> params, Block* block, list<Value> args, SymbolTable	t );
+	Value* interpretValue( SymbolTable t );
+	void call( list<Param*> params, Block* block, list<Value*> args, SymbolTable	t );
 };
 
 
@@ -442,7 +442,7 @@ struct Sequence : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -466,7 +466,7 @@ struct IfThen : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -492,7 +492,7 @@ struct IfThenElse : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -516,7 +516,7 @@ struct While : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -538,7 +538,7 @@ struct Prompt : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -562,7 +562,7 @@ struct Prompt2 : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -584,7 +584,7 @@ struct Print : Stmt
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -611,7 +611,7 @@ struct ExprItem : Item
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -633,7 +633,7 @@ struct StringItem : Item
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -664,7 +664,7 @@ struct BinOp : Expr
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -688,7 +688,7 @@ struct UnOp : Expr
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -710,7 +710,7 @@ struct Num : Expr
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -732,7 +732,7 @@ struct Id : Expr
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -753,7 +753,7 @@ struct True : Expr
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -774,7 +774,7 @@ struct False : Expr
 	string toString( string indent );
 	void interpret();
 	void interpret( SymbolTable t );
-	Value interpretValue( SymbolTable t );
+	Value* interpretValue( SymbolTable t );
 };
 
 
@@ -895,8 +895,8 @@ struct SymbolTable
 	
 	void enterTable( string ID, int line, int column );
 	void exitTable();
-	void bind( string ID, int line, int column, Value v );
-	Value lookUp( string ID, int line, int column );
+	void bind( string ID, int line, int column, Value* v );
+	Value* lookUp( string ID, int line, int column );
 };
 
 
