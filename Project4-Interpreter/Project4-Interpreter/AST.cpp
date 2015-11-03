@@ -335,32 +335,6 @@ string False::toString( string indent )
 
 
 
-//===---------------------------------===//
-// Dummy interpreters
-//===---------------------------------===//
-void Block::interpret() {}
-void ConstDecl::interpret() {}
-void VarDecl::interpret() {}
-void ProcDecl::interpret() {}
-void ValParam::interpret() {}
-void VarParam::interpret() {}
-void Assign::interpret() {}
-void Call::interpret() {}
-
-void ValParam::interpret( SymbolTable t ) {}
-void VarParam::interpret( SymbolTable t ) {}
-void Program::interpret( SymbolTable t ) {}
-
-Value Program::interpretValue( SymbolTable t ) { return Value(); }
-Value Block::interpretValue( SymbolTable t ) { return Value(); }
-Value ConstDecl::interpretValue( SymbolTable t ) { return Value(); }
-Value VarDecl::interpretValue( SymbolTable t ) { return Value(); }
-Value ProcDecl::interpretValue( SymbolTable t ) { return Value(); }
-Value ValParam::interpretValue( SymbolTable t ) { return Value(); }
-Value VarParam::interpretValue( SymbolTable t ) { return Value(); }
-Value Assign::interpretValue( SymbolTable t ) { return Value(); }
-Value Call::interpretValue( SymbolTable t ) { return Value(); }
-
 //===----------------------------------------------------------------------===//
 // Interpret nodes and call functions
 //===----------------------------------------------------------------------===//
@@ -414,20 +388,24 @@ void Assign::interpret( SymbolTable t )
 	if ( lhs.value_type == Value_IntCell || lhs.value_type == Value_BoolCell )
 	{
 		Value rhs = expr->interpretValue( t );
-		Value* lhs_ptr = &lhs;
-		Value* rhs_ptr = &rhs;
 		
 		if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntValue )
 		{
-			IntCell* cell = dynamic_cast<IntCell*>( lhs_ptr );
-			IntValue* value = dynamic_cast<IntValue*>( rhs_ptr );
+			IntCell* cell = dynamic_cast<IntCell*>( &lhs );
+			IntValue* value = dynamic_cast<IntValue*>( &rhs );
 			cell->set( value->int_value );
+			
+			delete cell;
+			delete value;
 		}
 		else if ( lhs.value_type == Value_BoolCell && rhs.value_type == Value_BoolValue )
 		{
-			BoolCell* cell = dynamic_cast<BoolCell*>( lhs_ptr );
-			BoolValue* value = dynamic_cast<BoolValue*>( rhs_ptr );
+			BoolCell* cell = dynamic_cast<BoolCell*>( &lhs );
+			BoolValue* value = dynamic_cast<BoolValue*>( &rhs );
 			cell->set( value->bool_value );
+			
+			delete cell;
+			delete value;
 		}
 		else
 		{
@@ -451,8 +429,7 @@ void Assign::interpret( SymbolTable t )
 void Call::interpret( SymbolTable t )
 {
 	Value value = t.lookUp( ID, line, column );
-	Value* ptr = &value;
-	ProcValue* proc_value = dynamic_cast<ProcValue*>( ptr );
+	ProcValue* proc_value = dynamic_cast<ProcValue*>( &value );
 	list<Value> arguments;
 	
 	for ( Expr* arg : args )
@@ -471,6 +448,8 @@ void Call::interpret( SymbolTable t )
 	t.enterTable( ID, line, column );
 	call( proc_value->params, proc_value->block, arguments, t );
 	t.exitTable();
+	
+	delete proc_value;
 }
 
 
@@ -482,7 +461,6 @@ void Call::call( list<Param*> params, Block* block, list<Value> args, SymbolTabl
 	{
 		Param* param = params.front();
 		Value arg = args.front();
-		Value* ptr = &arg;
 		params.pop_front();
 		args.pop_front();
 		
@@ -492,10 +470,12 @@ void Call::call( list<Param*> params, Block* block, list<Value> args, SymbolTabl
 			
 			if ( val_param->data_type == IntType && arg.value_type == Value_IntValue )
 			{
-				IntValue* intValue = dynamic_cast<IntValue*>( ptr );
+				IntValue* intValue = dynamic_cast<IntValue*>( &arg );
 				IntCell cell = IntCell( intValue->int_value, arg.line, arg.column );
 				t.bind( val_param->ID, arg.line, arg.column, cell );
 				call( params, block, args, t );
+				
+				delete intValue;
 			}
 			else if ( val_param->data_type == IntType )
 			{
@@ -506,10 +486,12 @@ void Call::call( list<Param*> params, Block* block, list<Value> args, SymbolTabl
 			}
 			else if ( val_param->data_type == BoolType && arg.value_type == Value_BoolValue )
 			{
-				BoolValue* boolValue = dynamic_cast<BoolValue*>( ptr );
+				BoolValue* boolValue = dynamic_cast<BoolValue*>( &arg );
 				BoolCell cell = BoolCell( boolValue->bool_value, arg.line, arg.column );
 				t.bind( val_param->ID, arg.line, arg.column, cell );
 				call( params, block, args, t );
+				
+				delete boolValue;
 			}
 			else if ( val_param->data_type == BoolType )
 			{
@@ -518,6 +500,8 @@ void Call::call( list<Param*> params, Block* block, list<Value> args, SymbolTabl
 					 << " but found " << nameOf( arg.value_type ) << endl;
 				exit( 1 );
 			}
+			
+			delete val_param;
 		}
 		else
 		{
@@ -525,10 +509,12 @@ void Call::call( list<Param*> params, Block* block, list<Value> args, SymbolTabl
 			
 			if ( var_param->data_type == IntType && arg.value_type == Value_IntCell )
 			{
-				IntCell* cell_ptr = dynamic_cast<IntCell*>( ptr );
+				IntCell* cell_ptr = dynamic_cast<IntCell*>( &arg );
 				IntCell cell = *cell_ptr;
 				t.bind( var_param->ID, arg.line, arg.column, cell );
 				call( params, block, args, t );
+				
+				delete cell_ptr;
 			}
 			else if ( var_param->data_type == IntType )
 			{
@@ -539,10 +525,12 @@ void Call::call( list<Param*> params, Block* block, list<Value> args, SymbolTabl
 			}
 			else if ( var_param->data_type == BoolType && arg.value_type == Value_BoolCell )
 			{
-				BoolCell* cell_ptr = dynamic_cast<BoolCell*>( ptr );
+				BoolCell* cell_ptr = dynamic_cast<BoolCell*>( &arg );
 				BoolCell cell = *cell_ptr;
 				t.bind( var_param->ID, arg.line, arg.column, cell );
 				call( params, block, args, t );
+				
+				delete cell_ptr;
 			}
 			else if ( var_param->data_type == BoolType )
 			{
@@ -551,264 +539,546 @@ void Call::call( list<Param*> params, Block* block, list<Value> args, SymbolTabl
 					 << " but found " << nameOf( arg.value_type ) << endl;
 				exit( 1 );
 			}
+			
+			delete var_param;
+		}
+		
+		delete param;
+	}
+}
+
+
+void Sequence::interpret( SymbolTable t )
+{
+	for ( Stmt* b : body )
+		b->interpret( t );
+}
+
+
+void IfThen::interpret( SymbolTable t )
+{
+	Value value = test->interpretValue( t );
+	BoolValue* boolValue = dynamic_cast<BoolValue*>( &value );
+	if ( boolValue->bool_value )
+		trueClause->interpret( t );
+}
+
+
+void IfThenElse::interpret( SymbolTable t )
+{
+	Value value = test->interpretValue( t );
+	Value* ptr = &value;
+	BoolValue* boolValue = dynamic_cast<BoolValue*>( ptr );
+	if ( boolValue->bool_value )
+		trueClause->interpret( t );
+	else
+		falseClause->interpret( t );
+	delete ptr;
+	delete boolValue;
+}
+
+
+void While::interpret( SymbolTable t )
+{
+	Value value = test->interpretValue( t );
+	BoolValue* boolValue = dynamic_cast<BoolValue*>( &value );
+	while ( boolValue->bool_value )
+	{
+		body->interpret( t );
+		value = test->interpretValue( t );
+		boolValue = dynamic_cast<BoolValue*>( &value );
+	}
+	delete boolValue;
+}
+
+
+void Prompt::interpret( SymbolTable t )
+{
+	string input;
+	cout << message;
+	getline( cin, input );
+}
+
+
+void Prompt2::interpret( SymbolTable t )
+{
+	Value lhs = t.lookUp( ID, line, column );
+	
+	if ( lhs.value_type == Value_IntCell )
+	{
+		IntCell* int_cell = dynamic_cast<IntCell*>( &lhs );
+		int input;
+		
+		cout << message << " ";
+		cin >> input;
+		
+		while( cin.fail() )
+		{
+			cout << "(!) Input has to be an integer" << endl;
+			cout << message << " ";
+			cin.clear();
+			cin >> input;
+		}
+		
+		int_cell->set( input );
+		delete int_cell;
+	}
+	else
+	{
+		cout << "(!) Expected " << nameOf( Value_IntCell )
+			 << " at " << line << ":" << column
+			 << " but found " << nameOf( lhs.value_type ) << endl;
+		exit( 1 );
+	}
+	
+}
+
+
+void Print::interpret( SymbolTable t )
+{
+	for ( Item* i : items )
+	{
+		if ( i->node_type == Node_ExprItem )
+		{
+			ExprItem* expr_item = dynamic_cast<ExprItem*>( i );
+			Value value = expr_item->expr->interpretValue( t );
+			IntValue* intValue = dynamic_cast<IntValue*>( &value );
+			cout << intValue->int_value;
+			
+			delete expr_item;
+			delete intValue;
+		}
+		else
+		{
+			StringItem* string_item = dynamic_cast<StringItem*>( i );
+			cout << string_item->message;
+		}
+	}
+	cout << endl;
+}
+
+
+Value BinOp::interpretValue( SymbolTable t )
+{
+	Value lhs = left->interpretValue( t );
+	Value rhs = right->interpretValue( t );
+	
+	
+	// Using switch might be longer than using nested if,
+	// but it is the most modular and straight-fwd
+	switch ( op )
+	{
+		{case And:
+			if ( lhs.value_type == Value_BoolCell && rhs.value_type == Value_BoolCell )
+			{
+				BoolCell* lhs_cell = dynamic_cast<BoolCell*>( &lhs );
+				BoolCell* rhs_cell = dynamic_cast<BoolCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->bool_value && rhs_cell->bool_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform operation " << nameOf( And )
+					 << " on " << nameOf( lhs.value_type )
+					 << " at " << lhs.line << ":" << lhs.column
+					 << " and " << nameOf( rhs.value_type )
+					 << " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case Or:
+			if ( lhs.value_type == Value_BoolCell && rhs.value_type == Value_BoolCell )
+			{
+				BoolCell* lhs_cell = dynamic_cast<BoolCell*>( &lhs );
+				BoolCell* rhs_cell = dynamic_cast<BoolCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->bool_value || rhs_cell->bool_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform operation " << nameOf( Or )
+				<< " on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case EQ:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->int_value == rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '==' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case NE:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->int_value != rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '<>' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+		
+			
+		{case LE:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->int_value <= rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '<=' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case LT:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->int_value < rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '<' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case GE:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->int_value >= rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '>=' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case GT:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				BoolValue value = BoolValue( lhs_cell->int_value > rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '>' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case Plus:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				IntValue value = IntValue( lhs_cell->int_value + rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '+' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case Minus:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				IntValue value = IntValue( lhs_cell->int_value - rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '-' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case Times:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				IntValue value = IntValue( lhs_cell->int_value * rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform '*' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case Div:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				IntValue value = IntValue( lhs_cell->int_value / rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform 'div' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
+		}
+		
+		
+		{case Mod:
+			if ( lhs.value_type == Value_IntCell && rhs.value_type == Value_IntCell )
+			{
+				IntCell* lhs_cell = dynamic_cast<IntCell*>( &lhs );
+				IntCell* rhs_cell = dynamic_cast<IntCell*>( &rhs );
+				IntValue value = IntValue( lhs_cell->int_value % rhs_cell->int_value, line, column );
+				delete lhs_cell;
+				delete rhs_cell;
+				return value;
+			}
+			else
+			{
+				cout << "(!) Cannot perform 'mod' on " << nameOf( lhs.value_type )
+				<< " at " << lhs.line << ":" << lhs.column
+				<< " and " << nameOf( rhs.value_type )
+				<< " at " << rhs.line << ":" << rhs.column << endl;
+				exit( 1 );
+			}
 		}
 	}
 }
 
 
-
-void Sequence::interpret()
-{
-	
-}
-
-void Sequence::interpret( SymbolTable t )
-{
-	
-}
-
-Value Sequence::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void IfThen::interpret()
-{
-	
-}
-
-void IfThen::interpret( SymbolTable t )
-{
-	
-}
-
-Value IfThen::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void IfThenElse::interpret()
-{
-	
-}
-
-void IfThenElse::interpret( SymbolTable t )
-{
-	
-}
-
-Value IfThenElse::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void While::interpret()
-{
-	
-}
-
-void While::interpret( SymbolTable t )
-{
-	
-}
-
-Value While::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void Prompt::interpret()
-{
-	
-}
-
-void Prompt::interpret( SymbolTable t )
-{
-	
-}
-
-Value Prompt::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void Prompt2::interpret()
-{
-	
-}
-
-void Prompt2::interpret( SymbolTable t )
-{
-	
-}
-
-Value Prompt2::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void Print::interpret()
-{
-	
-}
-
-void Print::interpret( SymbolTable t )
-{
-	
-}
-
-Value Print::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void ExprItem::interpret()
-{
-	
-}
-
-void ExprItem::interpret( SymbolTable t )
-{
-	
-}
-
-Value ExprItem::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void StringItem::interpret()
-{
-	
-}
-
-void StringItem::interpret( SymbolTable t )
-{
-	
-}
-
-Value StringItem::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void BinOp::interpret()
-{
-	
-}
-
-void BinOp::interpret( SymbolTable t )
-{
-	
-}
-
-Value BinOp::interpretValue( SymbolTable t )
-{
-	
-}
-
-
-
-void UnOp::interpret()
-{
-	
-}
-
-void UnOp::interpret( SymbolTable t )
-{
-	
-}
-
 Value UnOp::interpretValue( SymbolTable t )
 {
+	Value value = expr->interpretValue( t );
 	
+	switch ( op )
+	{
+		{case Neg:
+			if ( value.value_type == Value_IntCell )
+			{
+				IntCell* int_cell = dynamic_cast<IntCell*>( &value );
+				IntValue int_value = IntValue( -int_cell->int_value, line, column );
+				delete int_cell;
+				return int_value;
+			}
+			else
+			{
+				cout << "(!) Expected a " << nameOf( Value_IntCell )
+					 << " at " << value.line << ":" << value.column
+					 << " but found " << nameOf( value.value_type ) << endl;
+				exit( 1 );
+			}
+		}
+			
+			
+		{case Not:
+			if ( value.value_type == Value_BoolCell )
+			{
+				BoolCell* bool_cell = dynamic_cast<BoolCell*>( &value );
+				BoolValue bool_value = BoolValue( !bool_cell->bool_value, line, column );
+				delete bool_cell;
+				return bool_value;
+			}
+			else
+			{
+				cout << "(!) Expected a " << nameOf( Value_BoolCell )
+				<< " at " << value.line << ":" << value.column
+				<< " but found " << nameOf( value.value_type ) << endl;
+				exit( 1 );
+
+			}
+		}
+	}
 }
 
-
-
-void Num::interpret()
-{
-	
-}
-
-void Num::interpret( SymbolTable t )
-{
-	
-}
 
 Value Num::interpretValue( SymbolTable t )
 {
-	
+	return IntValue( value, line, column );
 }
 
-
-
-void Id::interpret()
-{
-	
-}
-
-void Id::interpret( SymbolTable t )
-{
-	
-}
 
 Value Id::interpretValue( SymbolTable t )
 {
-	
+	Value value = t.lookUp( ID, line, column );
+	if ( value.value_type != Value_Undefined )
+		return value;
+	else
+	{
+		cout << "(!) Undefined " << ID << " at " << line << ":" << column << endl;
+		exit( 1 );
+	}
 }
 
-
-
-void True::interpret()
-{
-	
-}
-
-void True::interpret( SymbolTable t )
-{
-	
-}
 
 Value True::interpretValue( SymbolTable t )
 {
-	
+	return BoolValue( boolean, line, column );
 }
 
-
-
-void False::interpret()
-{
-	
-}
-
-void False::interpret( SymbolTable t )
-{
-	
-}
 
 Value False::interpretValue( SymbolTable t )
 {
-	
+	return BoolValue( boolean, line, column );
 }
+
+
+
+//===---------------------------------===//
+// Dummy interpreters
+//===---------------------------------===//
+void Block::interpret() {}
+void ConstDecl::interpret() {}
+void VarDecl::interpret() {}
+void ProcDecl::interpret() {}
+void ValParam::interpret() {}
+void VarParam::interpret() {}
+void Assign::interpret() {}
+void Call::interpret() {}
+void Sequence::interpret() {}
+void IfThen::interpret() {}
+void IfThenElse::interpret() {}
+void While::interpret() {}
+void Prompt::interpret() {}
+void Prompt2::interpret() {}
+void Print::interpret() {}
+void ExprItem::interpret() {}
+void StringItem::interpret() {}
+void BinOp::interpret() {}
+void UnOp::interpret() {}
+void Num::interpret() {}
+void Id::interpret() {}
+void True::interpret() {}
+void False::interpret() {}
+
+void ValParam::interpret( SymbolTable t ) {}
+void VarParam::interpret( SymbolTable t ) {}
+void Program::interpret( SymbolTable t ) {}
+void ExprItem::interpret( SymbolTable t ) {}
+void StringItem::interpret( SymbolTable t ) {}
+void BinOp::interpret( SymbolTable t ) {}
+void UnOp::interpret( SymbolTable t ) {}
+void Num::interpret( SymbolTable t ) {}
+void Id::interpret( SymbolTable t ) {}
+void True::interpret( SymbolTable t ) {}
+void False::interpret( SymbolTable t ) {}
+
+Value Program::interpretValue( SymbolTable t ) { return Value(); }
+Value Block::interpretValue( SymbolTable t ) { return Value(); }
+Value ConstDecl::interpretValue( SymbolTable t ) { return Value(); }
+Value VarDecl::interpretValue( SymbolTable t ) { return Value(); }
+Value ProcDecl::interpretValue( SymbolTable t ) { return Value(); }
+Value ValParam::interpretValue( SymbolTable t ) { return Value(); }
+Value VarParam::interpretValue( SymbolTable t ) { return Value(); }
+Value Assign::interpretValue( SymbolTable t ) { return Value(); }
+Value Call::interpretValue( SymbolTable t ) { return Value(); }
+Value Sequence::interpretValue( SymbolTable t ) { return Value(); }
+Value IfThen::interpretValue( SymbolTable t ) { return Value(); }
+Value IfThenElse::interpretValue( SymbolTable t ) { return Value(); }
+Value While::interpretValue( SymbolTable t ) { return Value(); }
+Value Prompt::interpretValue( SymbolTable t ) { return Value(); }
+Value Prompt2::interpretValue( SymbolTable t ) { return Value(); }
+Value Print::interpretValue( SymbolTable t ) { return Value(); }
+Value ExprItem::interpretValue( SymbolTable t ) { return Value(); }
+Value StringItem::interpretValue( SymbolTable t ) { return Value(); }
 
 
 
@@ -901,7 +1171,6 @@ string nameOf( DataType dataType )
 	{
 		case IntType:	return "Int";
 		case BoolType:	return "Bool";
-		default:		return "";
 	}
 }
 
@@ -911,7 +1180,6 @@ string nameOf( Op1 op1 )
 	{
 		case Neg:	return "Neg";
 		case Not:	return "Not";
-		default:	return "";
 	}
 }
 
@@ -932,7 +1200,6 @@ string nameOf( Op2 op2 )
 		case Mod:	return "Mod";
 		case And:	return "And";
 		case Or:	return "Or";
-		default:	return "";
 	}
 }
 

@@ -22,7 +22,7 @@ int main(int argc, const char * argv[])
 	
 	
 	// CLI
-	
+	/*
 	if ( argc != 2 )
 	{
 		cout << "(!) Fail to run program. Please enter a filename." << endl;
@@ -41,47 +41,54 @@ int main(int argc, const char * argv[])
 		cout << endl;
 		return 0;
 	}
-	
+	*/
 	
 	// Xcode
-	/*
-	 cout << "Enter file name: ";
-	 cin >> filename;
+	
+	cout << "Enter file name: ";
+	cin >> filename;
 	 
-	 input.open( filename );
+	input.open( filename );
 	 
-	 if ( input.fail() )
-	 {
+	if ( input.fail() )
+	{
 		cout << "(!) Cannot find " << filename << endl;
 		cout << endl;
 		return 0;
-	 }
-	 */
+	}
+	
+	
+	
+	// Interpret
+	// /Users/Bamboo/Developer/Compilers-course/Project4-Interpreter/Project4-Interpreter/test0.txt
+	Parser parser( input );
+	ASTNode* node = parser.parse();
+	node->interpret();
+	delete node;
 	
 	
 	
 	// Parse
-	
+	/*
 	Parser parser( input );
 	ASTNode* node = parser.parse();
 	cout << node->toString("");
 	delete node;
-	
+	*/
 	
 	
 	
 	// Scan
 	/*
-	 Scanner scanner( input );
-	 Token token;
-	 do
-	 {
+	Scanner scanner( input );
+	Token token;
+	do
+	{
 		token = scanner.next();
 		cout << token << endl;
-		
-	 } while ( token.type != EOF_T );
-	 cout << endl;
-	 */
+	} while ( token.type != EOF_T );
+	cout << endl;
+	*/
 	
 	
 	return 0;
