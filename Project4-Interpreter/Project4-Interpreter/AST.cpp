@@ -617,6 +617,7 @@ void Prompt2::interpret( SymbolTable t )
 			cout << "(!) Input has to be an integer" << endl;
 			cout << message << " ";
 			cin.clear();
+			cin.ignore( 256, '\n' );
 			cin >> input;
 		}
 		
@@ -1110,7 +1111,7 @@ ProcValue::~ProcValue()
 //===----------------------------------------------------------------------===//
 void SymbolTable::enterTable( string ID, int line, int column )
 {
-	pair<string, map<string, Value> > symbol = make_pair( ID, map<string, Value>() );
+	pair<string, map<string, Value>* > symbol = make_pair( ID, new map<string, Value>() );
 	symbol_table.push( symbol );
 }
 
@@ -1121,6 +1122,7 @@ void SymbolTable::enterTable( string ID, int line, int column )
 //===----------------------------------------------------------------------===//
 void SymbolTable::exitTable()
 {
+	delete symbol_table.top().second;
 	symbol_table.pop();
 }
 
@@ -1134,16 +1136,17 @@ void SymbolTable::bind( string ID, int line, int column, Value v )
 {
 	Value value = lookUp( ID, line, column );
 	if ( value.value_type == Value_Undefined )
-	{
-		pair<string, Value> new_value = make_pair( ID, v );
-		get<1>(symbol_table.top()).insert( new_value );
-	}
+		symbol_table.top().second->insert( map<string, Value>::value_type( ID, v ) );
 	else
 	{
 		cout << "(!) " << ID << " is defined at " << value.line << ":" << value.column << " and should not be re-defined at " << line << ":" << column << endl;
 		exit( 1 );
 	}
 	
+	
+	for ( pair<string, Value> p : *symbol_table.top().second )
+		cout << get<0>( p ) << ": " << nameOf( get<1>( p ).value_type ) << endl;
+	cout << "---" << endl;
 }
 
 
@@ -1153,9 +1156,9 @@ void SymbolTable::bind( string ID, int line, int column, Value v )
 //===----------------------------------------------------------------------===//
 Value SymbolTable::lookUp( string ID, int line, int column )
 {
-	map<string, Value> map = get<1>(symbol_table.top());
-	if ( map.find( ID ) != map.end() )
-		return map.at( ID );
+	map<string, Value>* map = symbol_table.top().second;
+	if ( map->find( ID ) != map->end() )
+		return map->at( ID );
 	return Value( line, column );
 }
 

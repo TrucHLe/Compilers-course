@@ -886,11 +886,11 @@ struct ProcValue : Value
 //===----------------------------------------------------------------------===//
 struct SymbolTable
 {
-	stack<pair<string, map<string, Value> > > symbol_table;
+	stack<pair<string, map<string, Value>* > > symbol_table;
 	
 	SymbolTable()
 	{
-		symbol_table = stack<pair<string, map<string, Value> > >();
+		symbol_table = stack<pair<string, map<string, Value>* > >();
 	}
 	
 	void enterTable( string ID, int line, int column );

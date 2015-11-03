@@ -64,7 +64,7 @@ int main(int argc, const char * argv[])
 	Parser parser( input );
 	ASTNode* node = parser.parse();
 	node->interpret();
-	delete node;
+	delete node; //check later
 	
 	
 	
