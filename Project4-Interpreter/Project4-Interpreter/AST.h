@@ -146,11 +146,10 @@ enum ValueType
 };
 
 
-
-string nameOf( DataType type );
-string nameOf( DataType type );
+string nameOf( DataType dataType );
 string nameOf( Op1 op1 );
 string nameOf( Op2 op2 );
+string nameOf( ValueType valueType );
 
 
 
@@ -171,8 +170,10 @@ struct ASTNode
 	}
 	
 	virtual ~ASTNode() {}
-	
 	virtual string toString( string indent ) = 0;
+	virtual void interpret() = 0;
+	virtual void interpret( SymbolTable t ) = 0;
+	virtual Value interpretValue( SymbolTable t ) = 0;
 };
 
 
@@ -193,11 +194,13 @@ struct Program : ASTNode
 		column		= col;
 		node_type	= Node_Program;
 	}
-	
+
 	~Program();
 	
 	string toString( string indent );
-	
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -226,6 +229,9 @@ struct Block : ASTNode
 	~Block();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -250,7 +256,9 @@ struct ConstDecl : ASTNode
 	~ConstDecl() {}
 	
 	string toString( string indent );
-};
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );};
 
 
 
@@ -260,12 +268,12 @@ struct ConstDecl : ASTNode
 struct VarDecl : ASTNode
 {
 	string ID;
-	DataType type;
+	DataType data_type;
 	
 	VarDecl( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
-		type		= t;
+		data_type	= t;
 		line		= lin;
 		column		= col;
 		node_type	= Node_VarDecl;
@@ -274,6 +282,9 @@ struct VarDecl : ASTNode
 	~VarDecl() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -300,6 +311,9 @@ struct ProcDecl : ASTNode
 	~ProcDecl();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -307,23 +321,17 @@ struct ProcDecl : ASTNode
 //===----------------------------------------------------------------------===//
 // Parameter Node
 //===----------------------------------------------------------------------===//
-struct Param : ASTNode
-{
-	Param()	{}
-	virtual ~Param() {}
-};
-
-
+struct Param : ASTNode {};
 
 struct ValParam : Param
 {
 	string ID;
-	DataType type;
+	DataType data_type;
 	
 	ValParam( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
-		type		= t;
+		data_type	= t;
 		line		= lin;
 		column		= col;
 		node_type	= Node_ValParam;
@@ -332,6 +340,9 @@ struct ValParam : Param
 	~ValParam() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -339,12 +350,12 @@ struct ValParam : Param
 struct VarParam : Param
 {
 	string ID;
-	DataType type;
+	DataType data_type;
 	
 	VarParam( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
-		type		= t;
+		data_type	= t;
 		line		= lin;
 		column		= col;
 		node_type	= Node_VarParam;
@@ -353,6 +364,9 @@ struct VarParam : Param
 	~VarParam() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -360,13 +374,7 @@ struct VarParam : Param
 //===----------------------------------------------------------------------===//
 // Statement Node
 //===----------------------------------------------------------------------===//
-struct Stmt : ASTNode
-{
-	Stmt() {}
-	virtual ~Stmt() {}
-};
-
-
+struct Stmt : ASTNode {};
 
 struct Assign : Stmt
 {
@@ -385,6 +393,9 @@ struct Assign : Stmt
 	~Assign();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -406,6 +417,10 @@ struct Call : Stmt
 	~Call();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
+	void call( list<Param*> params, Block* block, list<Value> args, SymbolTable	t );
 };
 
 
@@ -425,6 +440,9 @@ struct Sequence : Stmt
 	~Sequence();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -446,6 +464,9 @@ struct IfThen : Stmt
 	~IfThen();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -469,6 +490,9 @@ struct IfThenElse : Stmt
 	~IfThenElse();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -490,6 +514,9 @@ struct While : Stmt
 	~While();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -509,6 +536,9 @@ struct Prompt : Stmt
 	~Prompt() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -530,6 +560,9 @@ struct Prompt2 : Stmt
 	~Prompt2() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -549,6 +582,9 @@ struct Print : Stmt
 	~Print();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -556,13 +592,7 @@ struct Print : Stmt
 //===----------------------------------------------------------------------===//
 // Item Node
 //===----------------------------------------------------------------------===//
-struct Item : ASTNode
-{
-	Item() {}
-	virtual ~Item() {}
-};
-
-
+struct Item : ASTNode {};
 
 struct ExprItem : Item
 {
@@ -579,6 +609,9 @@ struct ExprItem : Item
 	~ExprItem();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -598,6 +631,9 @@ struct StringItem : Item
 	~StringItem() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -605,13 +641,7 @@ struct StringItem : Item
 //===----------------------------------------------------------------------===//
 // Expression Node
 //===----------------------------------------------------------------------===//
-struct Expr : ASTNode
-{
-	Expr() {}
-	virtual ~Expr() {}
-};
-
-
+struct Expr : ASTNode {};
 
 struct BinOp : Expr
 {
@@ -632,6 +662,9 @@ struct BinOp : Expr
 	~BinOp();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -653,6 +686,9 @@ struct UnOp : Expr
 	~UnOp();
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -672,6 +708,9 @@ struct Num : Expr
 	~Num() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -691,6 +730,9 @@ struct Id : Expr
 	~Id() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -709,6 +751,9 @@ struct True : Expr
 	~True() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -727,6 +772,9 @@ struct False : Expr
 	~False() {}
 	
 	string toString( string indent );
+	void interpret();
+	void interpret( SymbolTable t );
+	Value interpretValue( SymbolTable t );
 };
 
 
@@ -739,6 +787,13 @@ struct Value
 	int line;	// for error
 	int column;	// message
 	ValueType value_type;
+	
+	Value()
+	{
+		line		= 1;
+		column		= 1;
+		value_type	= Value_Undefined;
+	}
 	
 	Value( int lin, int col )
 	{
