@@ -194,9 +194,7 @@ int Scanner::getNextState( int currentState, char currentChar )
 		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		9,		10,		9,		9,		9,		9,		9,		121,	9,		122,	9,
 		120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	120,	9,		120,	120,	120,	120,	120,	120,	120,	120,	120
 	};
-    
-    
-    
+	
     if ( isalpha( currentChar ) )
         column = 0;
     else if ( currentChar == '0' )
@@ -243,11 +241,8 @@ int Scanner::getNextState( int currentState, char currentChar )
         column = 21;
     else
         column = 22;
-    
-    
-    
+	
     return state_transition_table[ currentState ][ column ];
-    
 }
 
 
@@ -264,8 +259,11 @@ int Scanner::getNextTerminalState()
     do
     {
         current_char    = getCurrentChar();
-        current_lexeme  = current_lexeme + current_char;
-        
+		
+		// Only add to lexeme one double quote that
+		// immediately follows a double quote
+		if ( current_char != '"' || current_state == 10 )
+			current_lexeme  = current_lexeme + current_char;
         
         
         // Check whether we found a comment
@@ -274,33 +272,13 @@ int Scanner::getNextTerminalState()
 		
         if ( ( bracket_comment == "{" && current_char == '}' ) || ( slash_comment == "//" && current_char == '\n' ) )
             current_lexeme = "";
-		
-
-		
-		
-		
-//	Revise later
-//		if ( current_lexeme.length() >= 3 )
-//		{
-//			string double_quotes	= current_lexeme.substr( current_lexeme.length() - 3, 2 );
-//			
-//			if ( double_quotes == "\"\"" && current_char == '"' )
-//				current_lexeme.erase( current_lexeme.length() - 1, 1 );
-//
-////				cout << current_lexeme << endl;
-//		}
-		
-		
-		
-		
         
-        
+	
         // Erase all whitespaces if the whitespace
         // is the only thing in current lexeme
         if ( isspace( current_char ) )
             if ( current_lexeme.length() == 1 )
                 current_lexeme.erase( current_lexeme.length() - 1, 1 );
-        
         
         
         // Mark beginning line and column of lexeme
@@ -309,18 +287,15 @@ int Scanner::getNextTerminalState()
             token_line      = line_number;
             token_column    = column_number;
         }
-        
-        
+		
         
         // Get the next state
         current_state = getNextState( current_state, current_char );
-        
-        
+		
         
         // Advance to the next character
         // for use in the subsequent loop
         advance();
-        
         
         
         switch ( current_state )

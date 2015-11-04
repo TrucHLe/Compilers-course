@@ -337,6 +337,8 @@ string False::toString( string indent )
 
 //===----------------------------------------------------------------------===//
 // Interpret nodes and call functions
+// Only delete pointers to Program, Block, ProcDecl, Assign, Call,
+// Sequence, IfThen, IfThenElse, While, Print, ExprItem, BinOp, UnOp
 //===----------------------------------------------------------------------===//
 Value* Program::interpret()
 {
@@ -399,16 +401,12 @@ Value* Assign::interpret( SymbolTable t )
 			IntCell* cell = dynamic_cast<IntCell*>( lhs );
 			IntValue* value = dynamic_cast<IntValue*>( rhs );
 			cell->set( value->integer );
-			delete cell;
-			delete value;
 		}
 		else if ( lhs->value_type == Value_BoolCell && rhs->value_type == Value_BoolValue )
 		{
 			BoolCell* cell = dynamic_cast<BoolCell*>( lhs );
 			BoolValue* value = dynamic_cast<BoolValue*>( rhs );
 			cell->set( value->boolean );
-			delete cell;
-			delete value;
 		}
 		else
 		{
@@ -418,7 +416,6 @@ Value* Assign::interpret( SymbolTable t )
 				 << ", which is " << nameOf( lhs->value_type ) << endl;
 			exit( 1 );
 		}
-		delete rhs;
 	}
 	else
 	{
@@ -427,13 +424,22 @@ Value* Assign::interpret( SymbolTable t )
 			 << ", which is " << nameOf( lhs->value_type ) << endl;
 		exit( 1 );
 	}
-	delete lhs;
 	return NULL;
 }
 
 
 Value* Call::interpret( SymbolTable t )
 {
+	Value* look_up = t.lookUp( ID, line, column );
+	if ( look_up->value_type != Value_ProcValue )
+	{
+		cout << "(!) Expected " << nameOf( Value_ProcValue )
+			 << " at " << line << ":" << column
+			 << " but found " << nameOf( look_up->value_type ) << endl;
+		exit( 1 );
+	}
+	
+	
 	ProcValue* value = dynamic_cast<ProcValue*>( t.lookUp( ID, line, column ) );
 	list<Value*> arguments;
 	
@@ -442,6 +448,7 @@ Value* Call::interpret( SymbolTable t )
 		Value* v = arg->interpret( t );
 		arguments.push_back( v );
 	}
+	
 	
 	if ( value->params.size() != arguments.size() )
 	{
@@ -453,8 +460,6 @@ Value* Call::interpret( SymbolTable t )
 	t.enterTable( ID, line, column );
 	call( value->params, value->block, arguments, t );
 	t.exitTable();
-	
-	delete value;
 	return NULL;
 }
 
@@ -465,85 +470,68 @@ void Call::call( list<Param*> params, Block* block, list<Value*> args, SymbolTab
 		block->interpret( t );
 	else
 	{
-		Param* param = params.front();
+		Param* par = params.front();
 		Value* arg = args.front();
 		params.pop_front();
 		args.pop_front();
 		
-		if ( param->node_type == Node_ValParam )
+		if ( par->node_type == Node_ValParam )
 		{
-			ValParam* val_param = dynamic_cast<ValParam*>( param );
+			ValParam* param = dynamic_cast<ValParam*>( par );
 			
-			if ( val_param->data_type == IntType && arg->value_type == Value_IntValue )
+			if ( param->data_type == IntType &&
+				( arg->value_type == Value_IntValue || arg->value_type == Value_IntCell ) )
 			{
-				IntValue* value = dynamic_cast<IntValue*>( arg );
-				IntCell* cell = new IntCell( value->integer, arg->line, arg->column );
-				t.bind( val_param->ID, arg->line, arg->column, cell );
-				call( params, block, args, t );
-				delete value;
-				delete cell;
+				int value;
+				
+				if ( arg->value_type == Value_IntValue )
+					value = dynamic_cast<IntValue*>( arg )->integer;
+				else
+					value = dynamic_cast<IntCell*>( arg )->integer;
+				
+				t.bind( param->ID, param->line, param->column,
+					    new IntCell( value, param->line, param->column ) );
 			}
-			else if ( val_param->data_type == IntType )
+			else if ( param->data_type == BoolType &&
+					  ( arg->value_type == Value_BoolValue || arg->value_type == Value_BoolCell ) )
 			{
-				cout << "(!) Expected " << nameOf( Value_IntValue )
-					 << " at " << arg->line << ":" << arg->column
-					 << " but found " << nameOf( arg->value_type ) << endl;
+				bool value;
+				
+				if ( arg->value_type == Value_BoolValue )
+					value = dynamic_cast<BoolValue*>( arg )->boolean;
+				else
+					value = dynamic_cast<BoolCell*>( arg )->boolean;
+				
+				t.bind( param->ID, param->line, param->column,
+					    new BoolCell( value, param->line, param->column ) );
+			}
+			else
+			{
+				cout << "(!) Cannot pass " << nameOf( arg->value_type )
+					 << " " << ID << " declared at " << arg->line << ":" << arg->column
+					 << " to a parameter of type " << nameOf( param->data_type )
+					 << " at " << param->line << ":" << param->column << endl;
 				exit( 1 );
 			}
-			else if ( val_param->data_type == BoolType && arg->value_type == Value_BoolValue )
-			{
-				BoolValue* value = dynamic_cast<BoolValue*>( arg );
-				BoolCell* cell = new BoolCell( value->boolean, arg->line, arg->column );
-				t.bind( val_param->ID, arg->line, arg->column, cell );
-				call( params, block, args, t );
-				delete value;
-				delete cell;
-			}
-			else if ( val_param->data_type == BoolType )
-			{
-				cout << "(!) Expected " << nameOf( Value_BoolValue )
-					 << " at " << arg->line << ":" << arg->column
-					 << " but found " << nameOf( arg->value_type ) << endl;
-				exit( 1 );
-			}
-			delete val_param;
 		}
 		else
 		{
-			VarParam* var_param = dynamic_cast<VarParam*>( param );
+			VarParam* param = dynamic_cast<VarParam*>( par );
 			
-			if ( var_param->data_type == IntType && arg->value_type == Value_IntCell )
+			if ( param->data_type == IntType && arg->value_type == Value_IntCell )
+				t.bind( param->ID, param->line, param->column, dynamic_cast<IntCell*>( arg ) );
+			else if ( param->data_type == BoolType && arg->value_type == Value_BoolCell )
+				t.bind( param->ID, param->line, param->column, dynamic_cast<BoolCell*>( arg ) );
+			else
 			{
-				IntCell* cell = dynamic_cast<IntCell*>( arg );
-				t.bind( var_param->ID, arg->line, arg->column, cell );
-				call( params, block, args, t );
-				delete cell;
-			}
-			else if ( var_param->data_type == IntType )
-			{
-				cout << "(!) Expected " << nameOf( Value_IntCell )
-					 << " at " << arg->line << ":" << arg->column
-					 << " but found " << nameOf( arg->value_type ) << endl;
+				cout << "(!) Cannot pass " << nameOf( arg->value_type )
+					 << " " << ID << " declared at " << arg->line << ":" << arg->column
+					 << " to a parameter of type " << nameOf( param->data_type )
+					 << " at " << param->line << ":" << param->column << endl;
 				exit( 1 );
 			}
-			else if ( var_param->data_type == BoolType && arg->value_type == Value_BoolCell )
-			{
-				BoolCell* cell = dynamic_cast<BoolCell*>( arg );
-				t.bind( var_param->ID, arg->line, arg->column, cell );
-				call( params, block, args, t );
-				delete cell;
-			}
-			else if ( var_param->data_type == BoolType )
-			{
-				cout << "(!) Expected " << nameOf( Value_BoolCell )
-					 << " at " << arg->line << ":" << arg->column
-					 << " but found " << nameOf( arg->value_type ) << endl;
-				exit( 1 );
-			}
-			delete var_param;
 		}
-		delete param;
-		delete arg;
+		call( params, block, args, t );
 	}
 }
 
@@ -561,7 +549,6 @@ Value* IfThen::interpret( SymbolTable t )
 	BoolValue* value = dynamic_cast<BoolValue*>( test->interpret( t ) );
 	if ( value->boolean )
 		trueClause->interpret( t );
-	delete value;
 	return NULL;
 }
 
@@ -573,20 +560,28 @@ Value* IfThenElse::interpret( SymbolTable t )
 		trueClause->interpret( t );
 	else
 		falseClause->interpret( t );
-	delete value;
 	return NULL;
 }
 
 
 Value* While::interpret( SymbolTable t )
 {
-	BoolValue* value = dynamic_cast<BoolValue*>( test->interpret( t ) );
-	while ( value->boolean )
+	bool boolean;
+	
+	if ( test->interpret( t )->value_type == Value_BoolValue )
+		boolean = dynamic_cast<BoolValue*>( test->interpret( t ) )->boolean;
+	else
+		boolean = dynamic_cast<BoolCell*>( test->interpret( t ) )->boolean;
+	
+	while ( boolean )
 	{
 		body->interpret( t );
-		value = dynamic_cast<BoolValue*>( test->interpret( t ) );
+		
+		if ( test->interpret( t )->value_type == Value_BoolValue )
+			boolean = dynamic_cast<BoolValue*>( test->interpret( t ) )->boolean;
+		else
+			boolean = dynamic_cast<BoolCell*>( test->interpret( t ) )->boolean;
 	}
-	delete value;
 	return NULL;
 }
 
@@ -606,7 +601,6 @@ Value* Prompt2::interpret( SymbolTable t )
 	
 	if ( lhs->value_type == Value_IntCell )
 	{
-		IntCell* cell = dynamic_cast<IntCell*>( lhs );
 		int input;
 		
 		cout << message << " ";
@@ -621,8 +615,7 @@ Value* Prompt2::interpret( SymbolTable t )
 			cin >> input;
 		}
 		
-		cell->set( input );
-		delete cell;
+		dynamic_cast<IntCell*>( lhs )->set( input );
 	}
 	else
 	{
@@ -631,7 +624,6 @@ Value* Prompt2::interpret( SymbolTable t )
 			 << " but found " << nameOf( lhs->value_type ) << endl;
 		exit( 1 );
 	}
-	//delete lhs; // debugging
 	return NULL;
 }
 
@@ -646,13 +638,11 @@ Value* Print::interpret( SymbolTable t )
 			IntValue* value = dynamic_cast<IntValue*>( item->expr->interpret( t ) );
 			cout << value->integer;
 			delete item;
-			delete value;
 		}
 		else
 		{
 			StringItem* item = dynamic_cast<StringItem*>( i );
 			cout << item->message;
-			delete item;
 		}
 	}
 	cout << endl;
@@ -721,10 +711,10 @@ Value* BinOp::interpret( SymbolTable t )
 	else
 	{
 		cout << "(!) Cannot perform operation " << nameOf( op )
-		<< " on " << nameOf( lhs->value_type )
-		<< " at " << lhs->line << ":" << lhs->column
-		<< " and " << nameOf( rhs->value_type )
-		<< " at " << rhs->line << ":" << rhs->column << endl;
+			 << " on " << nameOf( lhs->value_type )
+			 << " at " << lhs->line << ":" << lhs->column
+			 << " and " << nameOf( rhs->value_type )
+			 << " at " << rhs->line << ":" << rhs->column << endl;
 		exit( 1 );
 	}
 }
@@ -734,45 +724,34 @@ Value* UnOp::interpret( SymbolTable t )
 {
 	Value* v = expr->interpret( t );
 	
-	switch ( op )
+	if ( ( v->value_type == Value_IntValue || v->value_type == Value_IntCell ) && op == Neg )
 	{
-		{case Neg:
-			if ( v->value_type == Value_IntCell )
-			{
-				IntCell* cell = dynamic_cast<IntCell*>( v );
-				IntValue* value = new IntValue( -cell->integer, line, column );
-				delete cell;
-				delete v;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Expected a " << nameOf( Value_IntCell )
-					 << " at " << v->line << ":" << v->column
-					 << " but found " << nameOf( v->value_type ) << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case Not:
-			if ( v->value_type == Value_BoolCell )
-			{
-				BoolCell* cell = dynamic_cast<BoolCell*>( v );
-				BoolValue* value = new BoolValue( !cell->boolean, line, column );
-				delete cell;
-				delete v;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Expected a " << nameOf( Value_BoolCell )
-				<< " at " << v->line << ":" << v->column
-				<< " but found " << nameOf( v->value_type ) << endl;
-				exit( 1 );
+		int value;
 
-			}
-		}
+		if ( v->value_type == Value_IntValue )
+			value = dynamic_cast<IntValue*>( v )->integer;
+		else
+			value = dynamic_cast<IntCell*>( v )->integer;
+		
+		return new IntValue( -value, line, column );
+	}
+	else if ( ( v->value_type == Value_BoolValue || v->value_type == Value_BoolCell ) && op == Not )
+	{
+		bool value;
+		
+		if ( v->value_type == Value_BoolValue )
+			value = dynamic_cast<BoolValue*>( v )->boolean;
+		else
+			value = dynamic_cast<BoolCell*>( v )->boolean;
+
+		return new BoolValue( !value, line, column );
+	}
+	else
+	{
+		cout << "(!) Cannot perform operation " << nameOf( op )
+			 << " on " << nameOf( v->value_type )
+			 << " at " << v->line << ":" << v->column << endl;
+		exit( 1 );
 	}
 }
 
@@ -935,6 +914,11 @@ void SymbolTable::bind( string ID, int line, int column, Value* v )
 				cout << " = true";
 			else
 				cout << " = false";
+		}
+		else
+		{
+			ProcValue* c = dynamic_cast<ProcValue*>( get<1>( p ) );
+			cout << " = " << c->params.size();
 		}
 		cout << endl;
 		

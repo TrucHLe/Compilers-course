@@ -61,20 +61,21 @@ int main(int argc, const char * argv[])
 	
 	// Interpret
 	// /Users/Bamboo/Developer/Compilers-course/Project4-Interpreter/Project4-Interpreter/test0.txt
+	/*
 	Parser parser( input );
 	ASTNode* node = parser.parse();
 	node->interpret();
 	delete node; //check later
-	
+	*/
 	
 	
 	// Parse
-	/*
+	
 	Parser parser( input );
 	ASTNode* node = parser.parse();
 	cout << node->toString("");
 	delete node;
-	*/
+	
 	
 	
 	
