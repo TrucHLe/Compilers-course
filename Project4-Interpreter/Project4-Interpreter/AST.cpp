@@ -621,7 +621,6 @@ Value* Prompt2::interpret( SymbolTable t )
 			cin >> input;
 		}
 		
-		cout << cell->integer << endl;
 		cell->set( input );
 		delete cell;
 	}
@@ -632,7 +631,7 @@ Value* Prompt2::interpret( SymbolTable t )
 			 << " but found " << nameOf( lhs->value_type ) << endl;
 		exit( 1 );
 	}
-	delete lhs;
+	//delete lhs; // debugging
 	return NULL;
 }
 
@@ -672,13 +671,13 @@ Value* BinOp::interpret( SymbolTable t )
 	switch ( op )
 	{
 		{case And:
-			if ( lhs->value_type == Value_BoolCell && rhs->value_type == Value_BoolCell )
+			if ( lhs->value_type == Value_BoolValue && rhs->value_type == Value_BoolValue )
 			{
-				BoolCell* l_cell = dynamic_cast<BoolCell*>( lhs );
-				BoolCell* r_cell = dynamic_cast<BoolCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->boolean && r_cell->boolean, line, column );
-				delete l_cell;
-				delete r_cell;
+				BoolValue* l_bool = dynamic_cast<BoolValue*>( lhs );
+				BoolValue* r_bool = dynamic_cast<BoolValue*>( rhs );
+				BoolValue* value = new BoolValue( l_bool->boolean && r_bool->boolean, line, column );
+				delete l_bool;
+				delete r_bool;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -696,13 +695,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case Or:
-			if ( lhs->value_type == Value_BoolCell && rhs->value_type == Value_BoolCell )
+			if ( lhs->value_type == Value_BoolValue && rhs->value_type == Value_BoolValue )
 			{
-				BoolCell* l_cell = dynamic_cast<BoolCell*>( lhs );
-				BoolCell* r_cell = dynamic_cast<BoolCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->boolean || r_cell->boolean, line, column );
-				delete l_cell;
-				delete r_cell;
+				BoolValue* l_bool = dynamic_cast<BoolValue*>( lhs );
+				BoolValue* r_bool = dynamic_cast<BoolValue*>( rhs );
+				BoolValue* value = new BoolValue( l_bool->boolean || r_bool->boolean, line, column );
+				delete l_bool;
+				delete r_bool;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -720,13 +719,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case EQ:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->integer == r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				BoolValue* value = new BoolValue( l_int->integer == r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -743,13 +742,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case NE:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->integer != r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				BoolValue* value = new BoolValue( l_int->integer != r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -766,13 +765,13 @@ Value* BinOp::interpret( SymbolTable t )
 		
 			
 		{case LE:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->integer <= r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				BoolValue* value = new BoolValue( l_int->integer <= r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -789,13 +788,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case LT:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->integer < r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				BoolValue* value = new BoolValue( l_int->integer < r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -812,13 +811,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case GE:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->integer >= r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				BoolValue* value = new BoolValue( l_int->integer >= r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -835,13 +834,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case GT:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				BoolValue* value = new BoolValue( l_cell->integer > r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				BoolValue* value = new BoolValue( l_int->integer > r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -858,13 +857,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case Plus:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				IntValue* value = new IntValue( l_cell->integer + r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				IntValue* value = new IntValue( l_int->integer + r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -881,13 +880,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case Minus:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				IntValue* value = new IntValue( l_cell->integer - r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				IntValue* value = new IntValue( l_int->integer - r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -904,13 +903,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case Times:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				IntValue* value = new IntValue( l_cell->integer * r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				IntValue* value = new IntValue( l_int->integer * r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -927,13 +926,13 @@ Value* BinOp::interpret( SymbolTable t )
 			
 			
 		{case Div:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				IntValue* value = new IntValue( l_cell->integer / r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				IntValue* value = new IntValue( l_int->integer / r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -950,13 +949,13 @@ Value* BinOp::interpret( SymbolTable t )
 		
 		
 		{case Mod:
-			if ( lhs->value_type == Value_IntCell && rhs->value_type == Value_IntCell )
+			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
 			{
-				IntCell* l_cell = dynamic_cast<IntCell*>( lhs );
-				IntCell* r_cell = dynamic_cast<IntCell*>( rhs );
-				IntValue* value = new IntValue( l_cell->integer % r_cell->integer, line, column );
-				delete l_cell;
-				delete r_cell;
+				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
+				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
+				IntValue* value = new IntValue( l_int->integer % r_int->integer, line, column );
+				delete l_int;
+				delete r_int;
 				delete lhs;
 				delete rhs;
 				return value;
@@ -1115,7 +1114,7 @@ ProcValue::~ProcValue()
 //===----------------------------------------------------------------------===//
 void SymbolTable::enterTable( string ID, int line, int column )
 {
-	pair<string, map<string, Value>* > symbol = make_pair( ID, new map<string, Value>() );
+	pair<string, map<string, Value*>* > symbol = make_pair( ID, new map<string, Value*>() );
 	symbol_table.push( symbol );
 }
 
@@ -1140,22 +1139,48 @@ void SymbolTable::bind( string ID, int line, int column, Value* v )
 {
 	Value* value = lookUp( ID, line, column );
 	if ( value->value_type == Value_Undefined )
-		symbol_table.top().second->insert( map<string, Value>::value_type( ID, *v ) );
+		symbol_table.top().second->insert( map<string, Value*>::value_type( ID, v ) );
 	else
 	{
 		cout << "(!) " << ID << " is defined at " << value->line << ":" << value->column << " and should not be re-defined at " << line << ":" << column << endl;
 		exit( 1 );
 	}
 	
-	// Debugging: print stack's top map
-	for ( pair<string, Value> p : *symbol_table.top().second )
+	// debugging: print stack's top map
+	for ( pair<string, Value*> p : *symbol_table.top().second )
 	{
-		cout << get<0>( p ) << ": " << nameOf( get<1>( p ).value_type ) << endl;
-		if ( get<1>( p ).value_type == Value_IntCell )
+		cout << get<0>( p ) << ": " << nameOf( get<1>( p )->value_type );
+		
+		if ( get<1>( p )->value_type == Value_IntCell )
 		{
-			IntCell* c = dynamic_cast<IntCell*>( &get<1>( p ) );
-			cout << c->integer << endl; //sth wrong here
+			IntCell* c = dynamic_cast<IntCell*>( get<1>( p ) );
+			cout << " = " << c->integer;
 		}
+		else if ( get<1>( p )->value_type == Value_BoolCell )
+		{
+			BoolCell* c = dynamic_cast<BoolCell*>( get<1>( p ) );
+			
+			if ( c->boolean )
+				cout << " = true";
+			else
+				cout << " = false";
+		}
+		else if ( get<1>( p )->value_type == Value_IntValue )
+		{
+			IntValue* c = dynamic_cast<IntValue*>( get<1>( p ) );
+			cout << " = " << c->integer;
+		}
+		else if ( get<1>( p )->value_type == Value_BoolValue )
+		{
+			BoolValue* c = dynamic_cast<BoolValue*>( get<1>( p ) );
+			
+			if ( c->boolean )
+				cout << " = true";
+			else
+				cout << " = false";
+		}
+		cout << endl;
+		
 	}
 	cout << "---" << endl;
 	//
@@ -1168,9 +1193,9 @@ void SymbolTable::bind( string ID, int line, int column, Value* v )
 //===----------------------------------------------------------------------===//
 Value* SymbolTable::lookUp( string ID, int line, int column )
 {
-	map<string, Value>* map = symbol_table.top().second;
+	map<string, Value*>* map = symbol_table.top().second;
 	if ( map->find( ID ) != map->end() )
-		return &map->at( ID );
+		return map->at( ID );
 	return new Value( line, column );
 }
 
