@@ -665,310 +665,67 @@ Value* BinOp::interpret( SymbolTable t )
 	Value* lhs = left->interpret( t );
 	Value* rhs = right->interpret( t );
 	
-	
-	// Using switch might be longer than using nested if,
-	// but it is the most modular and straight-fwd
-	switch ( op )
+	if ( ( lhs->value_type == Value_BoolValue || lhs->value_type == Value_BoolCell ) &&
+		 ( rhs->value_type == Value_BoolValue || rhs->value_type == Value_BoolCell ) &&
+		 ( op == And || op == Or ) )
 	{
-		{case And:
-			if ( lhs->value_type == Value_BoolValue && rhs->value_type == Value_BoolValue )
-			{
-				BoolValue* l_bool = dynamic_cast<BoolValue*>( lhs );
-				BoolValue* r_bool = dynamic_cast<BoolValue*>( rhs );
-				BoolValue* value = new BoolValue( l_bool->boolean && r_bool->boolean, line, column );
-				delete l_bool;
-				delete r_bool;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform operation " << nameOf( And )
-					 << " on " << nameOf( lhs->value_type )
-					 << " at " << lhs->line << ":" << lhs->column
-					 << " and " << nameOf( rhs->value_type )
-					 << " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case Or:
-			if ( lhs->value_type == Value_BoolValue && rhs->value_type == Value_BoolValue )
-			{
-				BoolValue* l_bool = dynamic_cast<BoolValue*>( lhs );
-				BoolValue* r_bool = dynamic_cast<BoolValue*>( rhs );
-				BoolValue* value = new BoolValue( l_bool->boolean || r_bool->boolean, line, column );
-				delete l_bool;
-				delete r_bool;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform operation " << nameOf( Or )
-				<< " on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case EQ:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				BoolValue* value = new BoolValue( l_int->integer == r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '==' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case NE:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				BoolValue* value = new BoolValue( l_int->integer != r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '<>' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
+		bool l_bool, r_bool;
 		
-			
-		{case LE:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				BoolValue* value = new BoolValue( l_int->integer <= r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '<=' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case LT:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				BoolValue* value = new BoolValue( l_int->integer < r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '<' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case GE:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				BoolValue* value = new BoolValue( l_int->integer >= r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '>=' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case GT:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				BoolValue* value = new BoolValue( l_int->integer > r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '>' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case Plus:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				IntValue* value = new IntValue( l_int->integer + r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '+' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case Minus:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				IntValue* value = new IntValue( l_int->integer - r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '-' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case Times:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				IntValue* value = new IntValue( l_int->integer * r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform '*' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
-			
-			
-		{case Div:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				IntValue* value = new IntValue( l_int->integer / r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform 'div' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
-		}
+		if ( lhs->value_type == Value_BoolValue )
+			l_bool = dynamic_cast<BoolValue*>( lhs )->boolean;
+		else
+			l_bool = dynamic_cast<BoolCell*>( lhs )->boolean;
+		if ( rhs->value_type == Value_BoolValue )
+			r_bool = dynamic_cast<BoolValue*>( rhs )->boolean;
+		else
+			r_bool = dynamic_cast<BoolCell*>( rhs )->boolean;
 		
-		
-		{case Mod:
-			if ( lhs->value_type == Value_IntValue && rhs->value_type == Value_IntValue )
-			{
-				IntValue* l_int = dynamic_cast<IntValue*>( lhs );
-				IntValue* r_int = dynamic_cast<IntValue*>( rhs );
-				IntValue* value = new IntValue( l_int->integer % r_int->integer, line, column );
-				delete l_int;
-				delete r_int;
-				delete lhs;
-				delete rhs;
-				return value;
-			}
-			else
-			{
-				cout << "(!) Cannot perform 'mod' on " << nameOf( lhs->value_type )
-				<< " at " << lhs->line << ":" << lhs->column
-				<< " and " << nameOf( rhs->value_type )
-				<< " at " << rhs->line << ":" << rhs->column << endl;
-				exit( 1 );
-			}
+		switch ( op )
+		{
+			case And:	return new BoolValue( l_bool && r_bool, line, column );
+			case Or:	return new BoolValue( l_bool || r_bool, line, column );
+			default:	return NULL;
 		}
+	}
+	else if ( ( lhs->value_type == Value_IntValue || lhs->value_type == Value_IntCell ) &&
+			  ( rhs->value_type == Value_IntValue || rhs->value_type == Value_IntCell ) &&
+			  op != And && op != Or )
+	{
+		int l_int, r_int;
+		
+		if ( lhs->value_type == Value_IntValue )
+			l_int = dynamic_cast<IntValue*>( lhs )->integer;
+		else
+			l_int = dynamic_cast<IntCell*>( lhs )->integer;
+		if ( rhs->value_type == Value_IntValue )
+			r_int = dynamic_cast<IntValue*>( rhs )->integer;
+		else
+			r_int = dynamic_cast<IntCell*>( rhs )->integer;
+		
+		switch ( op )
+		{
+			case EQ:	return new BoolValue( l_int == r_int, line, column );
+			case NE:	return new BoolValue( l_int != r_int, line, column );
+			case LE:	return new BoolValue( l_int <= r_int, line, column );
+			case LT:	return new BoolValue( l_int < r_int, line, column );
+			case GE:	return new BoolValue( l_int >= r_int, line, column );
+			case GT:	return new BoolValue( l_int > r_int, line, column );
+			case Plus:	return new IntValue( l_int + r_int, line, column );
+			case Minus:	return new IntValue( l_int - r_int, line, column );
+			case Times:	return new IntValue( l_int * r_int, line, column );
+			case Div:	return new IntValue( l_int / r_int, line, column );
+			case Mod:	return new IntValue( l_int % r_int, line, column );
+			default:	return NULL;
+		}
+	}
+	else
+	{
+		cout << "(!) Cannot perform operation " << nameOf( op )
+		<< " on " << nameOf( lhs->value_type )
+		<< " at " << lhs->line << ":" << lhs->column
+		<< " and " << nameOf( rhs->value_type )
+		<< " at " << rhs->line << ":" << rhs->column << endl;
+		exit( 1 );
 	}
 }
 
