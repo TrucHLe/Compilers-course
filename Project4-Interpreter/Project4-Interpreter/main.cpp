@@ -46,7 +46,7 @@ int main(int argc, const char * argv[])
 	// Xcode
 	
 	cout << "Enter file name: ";
-	cin >> filename;
+	getline( cin, filename );
 	 
 	input.open( filename );
 	 
@@ -61,21 +61,22 @@ int main(int argc, const char * argv[])
 	
 	// Interpret
 	// /Users/Bamboo/Developer/Compilers-course/Project4-Interpreter/Project4-Interpreter/test0.txt
-	/*
+	
 	Parser parser( input );
-	ASTNode* node = parser.parse();
+	ASTNode* node = parser.parse(); //make parse return Program* and delete extra interpreters
+	
 	node->interpret();
-	delete node; //check later
-	*/
+	//delete node;
+	
 	
 	
 	// Parse
-	
+	/*
 	Parser parser( input );
 	ASTNode* node = parser.parse();
 	cout << node->toString("");
 	delete node;
-	
+	*/
 	
 	
 	

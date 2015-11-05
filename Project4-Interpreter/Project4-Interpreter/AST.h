@@ -12,9 +12,10 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <stack>
+#include <vector>
 #include <list>
 #include <map>
+#include <iterator>
 using namespace std;
 
 
@@ -761,6 +762,7 @@ struct Value
 {
 	int line;	// for error
 	int column;	// message
+	
 	ValueType value_type;
 	
 	Value()
@@ -778,6 +780,10 @@ struct Value
 	}
 	
 	virtual ~Value() {}
+	virtual int getIntValue() = 0;
+	virtual bool getBoolValue() = 0;
+	virtual void setValue( int i ) = 0;
+	virtual void setValue( bool b ) = 0;
 };
 
 
@@ -792,6 +798,10 @@ struct IntValue : Value
 	}
 	
 	~IntValue() {}
+	int getIntValue();
+	bool getBoolValue();
+	void setValue( int i );
+	void setValue( bool b );
 };
 
 
@@ -806,6 +816,10 @@ struct BoolValue : Value
 	}
 	
 	~BoolValue() {}
+	int getIntValue();
+	bool getBoolValue();
+	void setValue( int i );
+	void setValue( bool b );
 };
 
 
@@ -820,7 +834,10 @@ struct IntCell : Value
 	}
 	
 	~IntCell() {}
-	void set( int i );
+	int getIntValue();
+	bool getBoolValue();
+	void setValue( int i );
+	void setValue( bool b );
 };
 
 
@@ -835,7 +852,10 @@ struct BoolCell : Value
 	}
 	
 	~BoolCell() {}
-	void set( bool b );
+	int getIntValue();
+	bool getBoolValue();
+	void setValue( int i );
+	void setValue( bool b );
 };
 
 
@@ -852,6 +872,10 @@ struct ProcValue : Value
 	}
 	
 	~ProcValue();
+	int getIntValue();
+	bool getBoolValue();
+	void setValue( int i );
+	void setValue( bool b );
 };
 
 
@@ -861,11 +885,11 @@ struct ProcValue : Value
 //===----------------------------------------------------------------------===//
 struct SymbolTable
 {
-	stack<pair<string, map<string, Value*>* > > symbol_table;
+	vector<pair<string, map<string, Value*>* > > symbol_table;
 	
 	SymbolTable()
 	{
-		symbol_table = stack<pair<string, map<string, Value*>* > >();
+		symbol_table = vector<pair<string, map<string, Value*>* > >();
 	}
 	
 	void enterTable( string ID, int line, int column );
