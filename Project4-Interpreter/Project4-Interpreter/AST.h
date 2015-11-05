@@ -750,10 +750,10 @@ struct Value
 	}
 	
 	virtual ~Value() {}
-	virtual int getIntValue() = 0;
-	virtual bool getBoolValue() = 0;
-	virtual void setValue( int i ) = 0;
-	virtual void setValue( bool b ) = 0;
+	virtual int getIntValue( int lin, int col ) = 0;
+	virtual bool getBoolValue( int lin, int col ) = 0;
+	virtual void setValue( int i, int lin, int col ) = 0;
+	virtual void setValue( bool b, int lin, int col ) = 0;
 };
 
 
@@ -768,10 +768,10 @@ struct IntValue : Value
 	}
 	
 	~IntValue() {}
-	int getIntValue();
-	bool getBoolValue();
-	void setValue( int i );
-	void setValue( bool b );
+	int getIntValue( int lin, int col );
+	bool getBoolValue( int lin, int col );
+	void setValue( int i, int lin, int col );
+	void setValue( bool b, int lin, int col );
 };
 
 
@@ -786,10 +786,10 @@ struct BoolValue : Value
 	}
 	
 	~BoolValue() {}
-	int getIntValue();
-	bool getBoolValue();
-	void setValue( int i );
-	void setValue( bool b );
+	int getIntValue( int lin, int col );
+	bool getBoolValue( int lin, int col );
+	void setValue( int i, int lin, int col );
+	void setValue( bool b, int lin, int col );
 };
 
 
@@ -804,10 +804,10 @@ struct IntCell : Value
 	}
 	
 	~IntCell() {}
-	int getIntValue();
-	bool getBoolValue();
-	void setValue( int i );
-	void setValue( bool b );
+	int getIntValue( int lin, int col );
+	bool getBoolValue( int lin, int col );
+	void setValue( int i, int lin, int col );
+	void setValue( bool b, int lin, int col );
 };
 
 
@@ -822,10 +822,10 @@ struct BoolCell : Value
 	}
 	
 	~BoolCell() {}
-	int getIntValue();
-	bool getBoolValue();
-	void setValue( int i );
-	void setValue( bool b );
+	int getIntValue( int lin, int col );
+	bool getBoolValue( int lin, int col );
+	void setValue( int i, int lin, int col );
+	void setValue( bool b, int lin, int col );
 };
 
 
@@ -842,10 +842,10 @@ struct ProcValue : Value
 	}
 	
 	~ProcValue();
-	int getIntValue();
-	bool getBoolValue();
-	void setValue( int i );
-	void setValue( bool b );
+	int getIntValue( int lin, int col );
+	bool getBoolValue( int lin, int col );
+	void setValue( int i, int lin, int col );
+	void setValue( bool b, int lin, int col );
 };
 
 
