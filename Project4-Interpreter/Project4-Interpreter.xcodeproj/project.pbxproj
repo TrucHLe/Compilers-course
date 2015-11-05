@@ -26,7 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4D4D9E001BE86DB8001F66CC /* test0.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test0.txt; sourceTree = "<group>"; };
+		4D64CDF91BEB01690002BF24 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
 		4DE1188B1BE548A300720FE3 /* Project4-Interpreter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Project4-Interpreter"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE1188E1BE548A300720FE3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4DE118951BE548C500720FE3 /* AST.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST.cpp; sourceTree = "<group>"; };
@@ -80,7 +80,7 @@
 				4DE118971BE548C500720FE3 /* Constants.h */,
 				4DE1189E1BE548D400720FE3 /* StateTransitionTable.tsv */,
 				4DE118981BE548C500720FE3 /* Grammar.txt */,
-				4D4D9E001BE86DB8001F66CC /* test0.txt */,
+				4D64CDF91BEB01690002BF24 /* test.txt */,
 			);
 			path = "Project4-Interpreter";
 			sourceTree = "<group>";

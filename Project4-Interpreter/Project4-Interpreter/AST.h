@@ -52,13 +52,6 @@ struct Id;
 struct True;
 struct False;
 
-static bool deleteAllConstDecl( ConstDecl* c );
-static bool deleteAllVarDecl( VarDecl* v );
-static bool deleteAllProcDecl( ProcDecl* v );
-static bool deleteAllParam( Param* p );
-static bool deleteAllStmt( Stmt* s );
-static bool deleteAllExpr( Expr* e );
-static bool deleteAllItem( Item* i );
 
 
 enum ASTNodeType
@@ -172,8 +165,6 @@ struct ASTNode
 	
 	virtual ~ASTNode() {}
 	virtual string toString( string indent ) = 0;
-	virtual Value* interpret() = 0;
-	virtual Value* interpret( SymbolTable t ) = 0;
 };
 
 
@@ -199,7 +190,6 @@ struct Program : ASTNode
 	
 	string toString( string indent );
 	Value* interpret();
-	Value* interpret( SymbolTable t );
 };
 
 
@@ -228,7 +218,6 @@ struct Block : ASTNode
 	~Block();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -254,8 +243,8 @@ struct ConstDecl : ASTNode
 	~ConstDecl() {}
 	
 	string toString( string indent );
-	Value* interpret();
-	Value* interpret( SymbolTable t );};
+	Value* interpret( SymbolTable t );
+};
 
 
 
@@ -279,7 +268,6 @@ struct VarDecl : ASTNode
 	~VarDecl() {}
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -307,7 +295,6 @@ struct ProcDecl : ASTNode
 	~ProcDecl();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -335,8 +322,6 @@ struct ValParam : Param
 	~ValParam() {}
 	
 	string toString( string indent );
-	Value* interpret();
-	Value* interpret( SymbolTable t );
 };
 
 
@@ -358,8 +343,6 @@ struct VarParam : Param
 	~VarParam() {}
 	
 	string toString( string indent );
-	Value* interpret();
-	Value* interpret( SymbolTable t );
 };
 
 
@@ -367,7 +350,10 @@ struct VarParam : Param
 //===----------------------------------------------------------------------===//
 // Statement Node
 //===----------------------------------------------------------------------===//
-struct Stmt : ASTNode {};
+struct Stmt : ASTNode
+{
+	virtual Value* interpret( SymbolTable t ) = 0;
+};
 
 struct Assign : Stmt
 {
@@ -386,7 +372,6 @@ struct Assign : Stmt
 	~Assign();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -409,7 +394,6 @@ struct Call : Stmt
 	~Call();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 	void call( list<Param*> params, Block* block, list<Value*> args, SymbolTable	t );
 };
@@ -431,7 +415,6 @@ struct Sequence : Stmt
 	~Sequence();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -454,7 +437,6 @@ struct IfThen : Stmt
 	~IfThen();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -479,7 +461,6 @@ struct IfThenElse : Stmt
 	~IfThenElse();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -502,7 +483,6 @@ struct While : Stmt
 	~While();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -523,7 +503,6 @@ struct Prompt : Stmt
 	~Prompt() {}
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -546,7 +525,6 @@ struct Prompt2 : Stmt
 	~Prompt2() {}
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -567,7 +545,6 @@ struct Print : Stmt
 	~Print();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -593,8 +570,6 @@ struct ExprItem : Item
 	~ExprItem();
 	
 	string toString( string indent );
-	Value* interpret();
-	Value* interpret( SymbolTable t );
 };
 
 
@@ -614,8 +589,6 @@ struct StringItem : Item
 	~StringItem() {}
 	
 	string toString( string indent );
-	Value* interpret();
-	Value* interpret( SymbolTable t );
 };
 
 
@@ -623,7 +596,10 @@ struct StringItem : Item
 //===----------------------------------------------------------------------===//
 // Expression Node
 //===----------------------------------------------------------------------===//
-struct Expr : ASTNode {};
+struct Expr : ASTNode
+{
+	virtual Value* interpret( SymbolTable t ) = 0;
+};
 
 struct BinOp : Expr
 {
@@ -644,7 +620,6 @@ struct BinOp : Expr
 	~BinOp();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -667,7 +642,6 @@ struct UnOp : Expr
 	~UnOp();
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -688,7 +662,6 @@ struct Num : Expr
 	~Num() {}
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -709,7 +682,6 @@ struct Id : Expr
 	~Id() {}
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -729,7 +701,6 @@ struct True : Expr
 	~True() {}
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -749,7 +720,6 @@ struct False : Expr
 	~False() {}
 	
 	string toString( string indent );
-	Value* interpret();
 	Value* interpret( SymbolTable t );
 };
 
@@ -895,6 +865,7 @@ struct SymbolTable
 	void enterTable( string ID, int line, int column );
 	void exitTable();
 	void bind( string ID, int line, int column, Value* v );
+	void printFrontMap(); // debugging purpose
 	Value* lookUp( string ID, int line, int column );
 };
 

@@ -19,15 +19,20 @@ Program::~Program()
 
 Block::~Block()
 {
-	consts.remove_if( deleteAllConstDecl );
-	vars.remove_if( deleteAllVarDecl );
-	procs.remove_if( deleteAllProcDecl );
-	body.remove_if( deleteAllStmt );
+	for ( ConstDecl* c : consts )
+		delete c;
+	for ( VarDecl* v : vars )
+		delete v;
+	for ( ProcDecl* p : procs )
+		delete p;
+	for ( Stmt* b : body )
+		delete b;
 }
 
 ProcDecl::~ProcDecl()
-{
-	params.remove_if( deleteAllParam );
+{	
+	for ( Param* p : params )
+		delete p;
 	delete block;
 }
 
@@ -38,12 +43,14 @@ Assign::~Assign()
 
 Call::~Call()
 {
-	args.remove_if( deleteAllExpr );
+	for ( Expr* a : args )
+		delete a;
 }
 
 Sequence::~Sequence()
 {
-	body.remove_if( deleteAllStmt );
+	for ( Stmt* b : body )
+		delete b;
 }
 
 IfThen::~IfThen()
@@ -67,7 +74,9 @@ While::~While()
 
 Print::~Print()
 {
-	items.remove_if( deleteAllItem );
+	for ( Item* i : items )
+		if ( i->node_type == Node_ExprItem )
+			delete i;
 }
 
 ExprItem::~ExprItem()
@@ -84,51 +93,6 @@ BinOp::~BinOp()
 UnOp::~UnOp()
 {
 	delete expr;
-}
-
-//===----------------------------------------------------------------------===//
-// Delete all pointers from list of pointers
-//===----------------------------------------------------------------------===//
-static bool deleteAllConstDecl( ConstDecl* c )
-{
-	delete c;
-	return true;
-};
-
-static bool deleteAllVarDecl( VarDecl* v )
-{
-	delete v;
-	return true;
-}
-
-static bool deleteAllProcDecl( ProcDecl* v )
-{
-	delete v;
-	return true;
-}
-
-static bool deleteAllStmt( Stmt* s )
-{
-	delete s;
-	return true;
-}
-
-static bool deleteAllParam( Param* p )
-{
-	delete p;
-	return true;
-}
-
-static bool deleteAllExpr( Expr* e )
-{
-	delete e;
-	return true;
-}
-
-static bool deleteAllItem( Item* i )
-{
-	delete i;
-	return true;
 }
 
 
@@ -441,8 +405,8 @@ Value* Call::interpret( SymbolTable t )
 	
 	if ( value->params.size() != arguments.size() )
 	{
-		cout << "(!) The number of parameters does not match the number of arguments of " << ID
-			 << " at " << line << ":" << column << endl;
+		cout << "(!) The number of parameters does not match the number of arguments of "
+			 << ID << " at " << line << ":" << column << endl;
 		exit( 1 );
 	}
 	
@@ -594,32 +558,19 @@ Value* BinOp::interpret( SymbolTable t )
 	
 	switch ( op )
 	{
-		case And:
-			return new BoolValue( lhs->getBoolValue() && rhs->getBoolValue(), line, column );
-		case Or:
-			return new BoolValue( lhs->getBoolValue() || rhs->getBoolValue(), line, column );
-		case EQ:
-			return new BoolValue( lhs->getIntValue() == rhs->getIntValue(), line, column );
-		case NE:
-			return new BoolValue( lhs->getIntValue() != rhs->getIntValue(), line, column );
-		case LE:
-			return new BoolValue( lhs->getIntValue() <= rhs->getIntValue(), line, column );
-		case LT:
-			return new BoolValue( lhs->getIntValue() < rhs->getIntValue(), line, column );
-		case GE:
-			return new BoolValue( lhs->getIntValue() >= rhs->getIntValue(), line, column );
-		case GT:
-			return new BoolValue( lhs->getIntValue() > rhs->getIntValue(), line, column );
-		case Plus:
-			return new IntValue( lhs->getIntValue() + rhs->getIntValue(), line, column );
-		case Minus:
-			return new IntValue( lhs->getIntValue() - rhs->getIntValue(), line, column );
-		case Times:
-			return new IntValue( lhs->getIntValue() * rhs->getIntValue(), line, column );
-		case Div:
-			return new IntValue( lhs->getIntValue() / rhs->getIntValue(), line, column );
-		case Mod:
-			return new IntValue( lhs->getIntValue() % rhs->getIntValue(), line, column );
+		case And:	return new BoolValue( lhs->getBoolValue() && rhs->getBoolValue(), line, column );
+		case Or:	return new BoolValue( lhs->getBoolValue() || rhs->getBoolValue(), line, column );
+		case EQ:	return new BoolValue( lhs->getIntValue() == rhs->getIntValue(), line, column );
+		case NE:	return new BoolValue( lhs->getIntValue() != rhs->getIntValue(), line, column );
+		case LE:	return new BoolValue( lhs->getIntValue() <= rhs->getIntValue(), line, column );
+		case LT:	return new BoolValue( lhs->getIntValue() < rhs->getIntValue(), line, column );
+		case GE:	return new BoolValue( lhs->getIntValue() >= rhs->getIntValue(), line, column );
+		case GT:	return new BoolValue( lhs->getIntValue() > rhs->getIntValue(), line, column );
+		case Plus:	return new IntValue( lhs->getIntValue() + rhs->getIntValue(), line, column );
+		case Minus:	return new IntValue( lhs->getIntValue() - rhs->getIntValue(), line, column );
+		case Times:	return new IntValue( lhs->getIntValue() * rhs->getIntValue(), line, column );
+		case Div:	return new IntValue( lhs->getIntValue() / rhs->getIntValue(), line, column );
+		case Mod:	return new IntValue( lhs->getIntValue() % rhs->getIntValue(), line, column );
 	}
 }
 
@@ -667,40 +618,6 @@ Value* False::interpret( SymbolTable t )
 {
 	return new BoolValue( boolean, line, column );
 }
-
-
-
-//===---------------------------------===//
-// Dummy interpreters
-//===---------------------------------===//
-Value* Program::interpret( SymbolTable t ) { return NULL; }
-Value* Block::interpret() { return NULL; }
-Value* ConstDecl::interpret() { return NULL; }
-Value* VarDecl::interpret() { return NULL; }
-Value* ProcDecl::interpret() { return NULL; }
-Value* ValParam::interpret() { return NULL; }
-Value* ValParam::interpret( SymbolTable t ) { return NULL; }
-Value* VarParam::interpret() { return NULL; }
-Value* VarParam::interpret( SymbolTable t ) { return NULL; }
-Value* Assign::interpret() { return NULL; }
-Value* Call::interpret() { return NULL; }
-Value* Sequence::interpret() { return NULL; }
-Value* IfThen::interpret() { return NULL; }
-Value* IfThenElse::interpret() { return NULL; }
-Value* While::interpret() { return NULL; }
-Value* Prompt::interpret() { return NULL; }
-Value* Prompt2::interpret() { return NULL; }
-Value* Print::interpret() { return NULL; }
-Value* ExprItem::interpret() { return NULL; }
-Value* ExprItem::interpret( SymbolTable t ) { return NULL; }
-Value* StringItem::interpret() { return NULL; }
-Value* StringItem::interpret( SymbolTable t ) { return NULL; }
-Value* BinOp::interpret() { return NULL; }
-Value* UnOp::interpret() { return NULL; }
-Value* Num::interpret() { return NULL; }
-Value* Id::interpret() { return NULL; }
-Value* True::interpret() { return NULL; }
-Value* False::interpret() { return NULL; }
 
 
 
@@ -859,7 +776,8 @@ void ProcValue::setValue( bool b )
 
 ProcValue::~ProcValue()
 {
-	params.remove_if( deleteAllParam );
+	for ( Param* p : params )
+		delete p;
 	delete block;
 }
 
@@ -874,9 +792,6 @@ void SymbolTable::enterTable( string ID, int line, int column )
 {
 	pair<string, map<string, Value*>* > symbol = make_pair( ID, new map<string, Value*>() );
 	symbol_table.push_back( symbol );
-	
-	// debugging
-	// cout << "current scope: " << symbol_table.back().first << endl;
 }
 
 
@@ -903,56 +818,44 @@ void SymbolTable::bind( string ID, int line, int column, Value* v )
 		current_map->insert( map<string, Value*>::value_type( ID, v ) );
 	else
 	{
-		cout << "(!) " << ID << " is defined at " << v->line << ":" << v->column << " and should not be re-defined at " << line << ":" << column << endl;
+		cout << "(!) " << ID << " is defined at " << v->line << ":" << v->column
+			 << " and should not be re-defined at " << line << ":" << column << endl;
 		exit( 1 );
 	}
 	
-	// debugging: print stack's top map
-	/*
+	//printFrontMap();
+}
+
+
+
+//===----------------------------------------------------------------------===//
+// Print the map of the symbol table's front element for debugging
+//===----------------------------------------------------------------------===//
+void SymbolTable::printFrontMap()
+{
+	cout << "---" << symbol_table.back().first << "---" << endl;
 	for ( pair<string, Value*> p : *symbol_table.back().second )
 	{
-		cout << get<0>( p ) << ": " << nameOf( get<1>( p )->value_type );
+		cout << p.first; //<< " :" << nameOf( p.second->value_type );
 		
-		if ( get<1>( p )->value_type == Value_IntCell )
+		if ( p.second->value_type == Value_IntValue || p.second->value_type == Value_IntCell )
+			cout << " = " << p.second->getIntValue();
+		else if ( p.second->value_type == Value_BoolValue || p.second->value_type == Value_BoolCell )
 		{
-			IntCell* c = dynamic_cast<IntCell*>( get<1>( p ) );
-			cout << " = " << c->integer;
-		}
-		else if ( get<1>( p )->value_type == Value_BoolCell )
-		{
-			BoolCell* c = dynamic_cast<BoolCell*>( get<1>( p ) );
-			
-			if ( c->boolean )
-				cout << " = true";
-			else
-				cout << " = false";
-		}
-		else if ( get<1>( p )->value_type == Value_IntValue )
-		{
-			IntValue* c = dynamic_cast<IntValue*>( get<1>( p ) );
-			cout << " = " << c->integer;
-		}
-		else if ( get<1>( p )->value_type == Value_BoolValue )
-		{
-			BoolValue* c = dynamic_cast<BoolValue*>( get<1>( p ) );
-			
-			if ( c->boolean )
+			if ( p.second->getBoolValue() )
 				cout << " = true";
 			else
 				cout << " = false";
 		}
 		else
 		{
-			ProcValue* c = dynamic_cast<ProcValue*>( get<1>( p ) );
-			cout << " = " << c->params.size();
+			ProcValue* v = dynamic_cast<ProcValue*>( p.second );
+			cout << " = " << v->params.size() << " parameters";
 		}
 		cout << endl;
-		
 	}
-	cout << "---" << endl;
-	*/
+	cout << endl;
 }
-
 
 
 //===----------------------------------------------------------------------===//

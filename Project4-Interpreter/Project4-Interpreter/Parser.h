@@ -27,7 +27,7 @@ private:
 public:
 	Parser( ifstream& i );
 	
-	ASTNode* parse(); //main
+	Program* parse(); //main
 	Token advance();
 	Token match( int tokenType );
 	bool check( int tokenType );
@@ -40,16 +40,16 @@ public:
 	VarDecl* parseVarDecl();
 	ProcDecl* parseProcDecl();
 	Stmt* parseStmt();
-	Stmt* parseStmtID( string i, int lin, int col ); //return terminal ID Stmt here
-	Stmt* parseStmtIf( Expr* t, Stmt* tr, int lin, int col ); //return terminal If Stmt here
-	Stmt* parseStmtPrompt( string m, int lin, int col ); //return terminal Prompt Stmt here
+	Stmt* parseStmtID( string i, int lin, int col );
+	Stmt* parseStmtIf( Expr* t, Stmt* tr, int lin, int col );
+	Stmt* parseStmtPrompt( string m, int lin, int col );
 	Param* parseParam();
 	Expr* parseExpr();
-	Expr* parseExprRest( Expr* e, int lin, int col ); //return terminal Expr here
+	Expr* parseExprRest( Expr* e, int lin, int col );
 	Expr* parseSimpleExpr();
-	Expr* parseSimpleExprRest( Expr* e, int lin, int col ); //return terminal Expr here
+	Expr* parseSimpleExprRest( Expr* e, int lin, int col );
 	Expr* parseTerm();
-	Expr* parseTermRest( Expr* e, int lin, int col ); //return terminal Expr here
+	Expr* parseTermRest( Expr* e, int lin, int col );
 	Expr* parseFactor();
 	Item* parseItem();
 	

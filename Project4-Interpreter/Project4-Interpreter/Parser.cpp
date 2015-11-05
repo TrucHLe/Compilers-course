@@ -733,9 +733,9 @@ list<Item*> Parser::parseItemsRest()
 //===----------------------------------------------------------------------===//
 // The main Parser
 //===----------------------------------------------------------------------===//
-ASTNode* Parser::parse()
+Program* Parser::parse()
 {
-	ASTNode* node = parseProgram();
+	Program* node = parseProgram();
 	match( EOF_T );
 	return node;
 }
