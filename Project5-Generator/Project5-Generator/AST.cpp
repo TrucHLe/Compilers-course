@@ -1,6 +1,6 @@
 //
 //  AST.cpp -- Abstract Syntax Tree
-//	Project4-Interpreter
+//  Project5-Generator
 //
 //  Created by Truc Le on 10/31/15.
 //  Copyright (c) 2015 Truc Le. All rights reserved.
