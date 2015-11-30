@@ -62,7 +62,7 @@ int main(int argc, const char * argv[])
 	
 	
 	// Interpret
-	// /Users/Bamboo/Developer/Compilers-course/Project4-Interpreter/Project4-Interpreter/test0.txt
+	// /Users/Bamboo/Developer/Compilers-course/Project4-Interpreter/Project4-Interpreter/test.txt
 	Parser parser( input );
 	Program* node = parser.parse();
 	node->interpret();

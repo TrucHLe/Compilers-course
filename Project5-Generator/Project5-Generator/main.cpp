@@ -22,7 +22,7 @@ int main(int argc, const char * argv[])
 	
 	
 	// CLI
-	
+	/*
 	if ( argc != 2 )
 	{
 		cout << "(!) Fail to run program. Please enter a filename." << endl;
@@ -41,11 +41,11 @@ int main(int argc, const char * argv[])
 		cout << endl;
 		return 0;
 	}
-	
+	*/
 	
 	
 	// Xcode
-	/*
+	
 	 cout << "Enter file name: ";
 	 getline( cin, filename );
 	 
@@ -57,12 +57,12 @@ int main(int argc, const char * argv[])
 		cout << endl;
 		return 0;
 	 }
-	 */
+	
 	
 	
 	
 	// Interpret
-	// /Users/Bamboo/Developer/Compilers-course/Project4-Interpreter/Project4-Interpreter/test0.txt
+	// /Users/Bamboo/Developer/Compilers-course/Project5-Generator/Project5-Generator/test.txt
 	Parser parser( input );
 	Program* node = parser.parse();
 	node->interpret();
