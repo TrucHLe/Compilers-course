@@ -614,23 +614,65 @@ Value* Print::interpret( SymbolTable<Value>* t )
 Value* BinOp::interpret( SymbolTable<Value>* t )
 {
 	Value* lhs = left->interpret( t );
-	Value* rhs = right->interpret( t );
+	Value* rhs;
 	
 	switch ( op )
 	{
-		case And:	return new BoolValue( lhs->getBoolValue( lhs->line, lhs->column ) && rhs->getBoolValue( rhs->line, rhs->column ), line, column );
-		case Or:	return new BoolValue( lhs->getBoolValue( lhs->line, lhs->column ) || rhs->getBoolValue( rhs->line, rhs->column ), line, column );
-		case EQ:	return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) == rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case NE:	return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) != rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case LE:	return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) <= rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case LT:	return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) < rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case GE:	return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) >= rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case GT:	return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) > rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case Plus:	return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) + rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case Minus:	return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) - rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case Times:	return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) * rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case Div:	return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) / rhs->getIntValue( rhs->line, rhs->column ), line, column );
-		case Mod:	return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) % rhs->getIntValue( rhs->line, rhs->column ), line, column );
+		case And:
+			if ( lhs->getBoolValue( lhs->line, lhs->column ) )
+				return right->interpret( t );
+			else
+				return lhs;
+			
+		case Or:
+			if ( lhs->getBoolValue( lhs->line, lhs->column ) )
+				return lhs;
+			else
+				return right->interpret( t );
+			
+		case EQ:
+			rhs = right->interpret( t );
+			return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) == rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case NE:
+			rhs = right->interpret( t );
+			return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) != rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case LE:
+			rhs = right->interpret( t );
+			return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) <= rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case LT:
+			rhs = right->interpret( t );
+			return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) < rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case GE:
+			rhs = right->interpret( t );
+			return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) >= rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case GT:
+			rhs = right->interpret( t );
+			return new BoolValue( lhs->getIntValue( lhs->line, lhs->column ) > rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case Plus:
+			rhs = right->interpret( t );
+			return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) + rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case Minus:
+			rhs = right->interpret( t );
+			return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) - rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case Times:
+			rhs = right->interpret( t );
+			return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) * rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case Div:
+			rhs = right->interpret( t );
+			return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) / rhs->getIntValue( rhs->line, rhs->column ), line, column );
+			
+		case Mod:
+			rhs = right->interpret( t );
+			return new IntValue( lhs->getIntValue( lhs->line, lhs->column ) % rhs->getIntValue( rhs->line, rhs->column ), line, column );
 	}
 }
 
@@ -950,13 +992,12 @@ Val* Assign::typecheck( SymbolTable<Val>* t )
 
 Val* Call::typecheck( SymbolTable<Val>* t )
 {
-	Val* look_up= t->lookUp( ID, line, column );
+	Val* look_up = t->lookUp( ID, line, column );
 	
 	// Need this check to prepare for dynamic cast
-	if ( look_up == NULL || nameOf( look_up->val_type ).compare( "proc" ) != 0 )
+	if ( look_up == NULL || look_up->val_type != Val_ProcVal )
 	{
-		cout << "(!) Expected a procedure value at "
-			 << line << ":" << column << endl;
+		cout << "(!) Expected a procedure at " << line << ":" << column << endl;
 		exit( 1 );
 	}
 	
@@ -965,7 +1006,7 @@ Val* Call::typecheck( SymbolTable<Val>* t )
 	
 	for ( Expr* arg : args )
 	{
-		Val* v= arg->typecheck( t );
+		Val* v = arg->typecheck( t );
 		arguments.push_back( v );
 	}
 	
@@ -996,8 +1037,7 @@ void Call::match( list<Param*> params, list<Val*> args )
 			if ( nameOf( arg->val_type ).compare( "int" ) == 0 || nameOf( arg->val_type ).compare( "bool" ) == 0 ) {}
 			else
 			{
-				cout << "(!) Expected either an integer value or a boolean value at "
-					 << line << ":" << column << endl;
+				cout << "(!) Expected either an integer or a boolean at " << line << ":" << column << endl;
 				exit( 1 );
 			}
 		}
@@ -1006,14 +1046,289 @@ void Call::match( list<Param*> params, list<Val*> args )
 			if ( arg->val_type == Val_IntVar || arg->val_type == Val_BoolVar ) {}
 			else
 			{
-				cout << "(!) Expected either an integer variable or a boolean variable at "
-					 << line << ":" << column << endl;
+				cout << "(!) Expected either an integer variable or a boolean variable at " << line << ":" << column << endl;
 				exit( 1 );
 			}
 		}
 		match( params, args );
 	}
 }
+
+
+Val* Sequence::typecheck( SymbolTable<Val>* t )
+{
+	for ( Stmt* b : body )
+		b->typecheck( t );
+	return NULL;
+}
+
+
+Val* IfThen::typecheck( SymbolTable<Val>* t )
+{
+	Val* value = test->typecheck( t );
+	if ( nameOf( value->val_type ).compare( "bool" ) != 0 )
+	{
+		cout << "(!) Expected a boolean at " << line << ":" << column << endl;
+		exit( 1 );
+	}
+	trueClause->typecheck( t );
+	return NULL;
+}
+
+
+Val* IfThenElse::typecheck( SymbolTable<Val>* t )
+{
+	Val* value = test->typecheck( t );
+	if ( nameOf( value->val_type ).compare( "bool" ) != 0 )
+	{
+		cout << "(!) Expected a boolean at " << line << ":" << column << endl;
+		exit( 1 );
+	}
+	trueClause->typecheck( t );
+	falseClause->typecheck( t );
+	return NULL;
+}
+
+
+Val* While::typecheck( SymbolTable<Val>* t )
+{
+	Val* value = test->typecheck( t );
+	if ( nameOf( value->val_type ).compare( "bool" ) != 0 )
+	{
+		cout << "(!) Expected a boolean at " << line << ":" << column << endl;
+		exit( 1 );
+	}
+	body->typecheck( t );
+	return NULL;
+}
+
+
+Val* Prompt::typecheck( SymbolTable<Val>* t )
+{
+	return NULL;
+}
+
+
+Val* Prompt2::typecheck( SymbolTable<Val>* t )
+{
+	Val* lhs = t->lookUp( ID, line, column );
+	if ( lhs->val_type != Val_IntVar )
+	{
+		cout << "(!) Expected an integer variable at " << line << ":" << column << endl;
+		exit( 1 );
+	}
+	return NULL;
+}
+
+
+Val* Print::typecheck( SymbolTable<Val>* t )
+{
+	for ( Item* i : items )
+	{
+		if ( i->node_type == Node_ExprItem )
+		{
+			ExprItem* item = dynamic_cast<ExprItem*>( i );
+			Val* value = item->expr->typecheck( t );
+			if ( nameOf( value->val_type ).compare( "int" ) != 0 )
+			{
+				cout << "(!) Expected an integer at " << line << ":" << column << endl;
+				exit( 1 );
+			}
+		}
+		else {}
+	}
+	return NULL;
+}
+
+
+Val* BinOp::typecheck( SymbolTable<Val>* t )
+{
+	Val* lhs = left->typecheck( t );
+	Val* rhs = right->typecheck( t );
+	
+	switch ( op )
+	{
+		case And:
+			if ( nameOf( lhs->val_type ).compare( "bool" ) == 0 && nameOf( rhs->val_type ).compare( "bool" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected booleans at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+			
+		case Or:
+			if ( nameOf( lhs->val_type ).compare( "bool" ) == 0 && nameOf( rhs->val_type ).compare( "bool" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected booleans at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+		
+		case EQ:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+			
+		case NE:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+			
+		case LE:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+			
+		case LT:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+			
+		case GE:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+			
+		case GT:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+			
+			
+		case Plus:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new IntVal( line, column );
+			
+			
+		case Minus:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new IntVal( line, column );
+			
+			
+		case Times:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new IntVal( line, column );
+			
+			
+		case Div:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new IntVal( line, column );
+			
+			
+		case Mod:
+			if ( nameOf( lhs->val_type ).compare( "int" ) == 0 && nameOf( rhs->val_type ).compare( "int" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected integers at " << lhs->line << ":" << lhs->column << " and " << rhs->line << ":" << rhs->column << endl;
+				exit( 1 );
+			}
+			return new IntVal( line, column );
+	}
+}
+
+
+Val* UnOp::typecheck( SymbolTable<Val>* t )
+{
+	Val* value = expr->typecheck( t );
+	
+	switch ( op )
+	{
+		case Neg:
+			if ( nameOf( value->val_type ).compare( "int" ) != 0 )
+			{
+				cout << "(!) Expected an integer at " << line << ":" << column << endl;
+				exit( 1 );
+			}
+			return new IntVal( line, column );
+		
+		case Not:
+			if ( nameOf( value->val_type ).compare( "bool" ) != 0 )
+			{
+				cout << "(!) Expected a boolean at " << line << ":" << column << endl;
+				exit( 1 );
+			}
+			return new BoolVal( line, column );
+	}
+}
+
+
+Val* Num::typecheck( SymbolTable<Val>* t )
+{
+	return new IntVal( line, column );
+}
+
+
+Val* Id::typecheck( SymbolTable<Val>* t )
+{
+	return t->lookUp( ID, line, column );
+}
+
+
+Val* True::typecheck( SymbolTable<Val>* t )
+{
+	return new BoolVal( line, column );
+}
+
+
+Val* False::typecheck( SymbolTable<Val>* t )
+{
+	return new BoolVal( line, column );
+}
+
+
 
 //===----------------------------------------------------------------------===//
 // [T] Check Val type
@@ -1038,7 +1353,11 @@ bool ProcVal::isVar()
 {
 	return false;
 }
-
+ProcVal::~ProcVal()
+{
+	for ( Param* p : params )
+		delete p;
+}
 
 
 //===----------------------------------------------------------------------===//
