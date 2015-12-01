@@ -446,22 +446,13 @@ Value* Call::interpret( SymbolTable<Value>* t )
 {
 	Value* look_up = t->lookUp( ID, line, column );
 	
-	if ( look_up == NULL )
+	// Need this check to prepare for dynamic cast
+	if ( look_up == NULL || look_up->value_type != Value_ProcValue )
 	{
-		cout << "(!) Expected " << nameOf( Value_ProcValue )
-		<< " at " << line << ":" << column
-		<< " but found " << nameOf( Value_Undefined ) << endl;
+		cout << "(!) Expected a procedure value at "
+			 << line << ":" << column << endl;
 		exit( 1 );
 	}
-	
-	if ( look_up->value_type != Value_ProcValue )
-	{
-		cout << "(!) Expected " << nameOf( Value_ProcValue )
-			 << " at " << line << ":" << column
-			 << " but found " << nameOf( look_up->value_type ) << endl;
-		exit( 1 );
-	}
-	
 	
 	ProcValue* value = dynamic_cast<ProcValue*>( look_up );
 	list<Value*> arguments;
@@ -518,9 +509,9 @@ void Call::call( list<Param*> params, Block* block, list<Value*> args, SymbolTab
 			else
 			{
 				cout << "(!) Cannot pass " << nameOf( arg->value_type )
-				<< " " << ID << " defined at " << arg->line << ":" << arg->column
-				<< " to a parameter of type " << nameOf( param->data_type )
-				<< " at " << param->line << ":" << param->column << endl;
+					 << " " << ID << " defined at " << arg->line << ":" << arg->column
+					 << " to a parameter of type " << nameOf( param->data_type )
+					 << " at " << param->line << ":" << param->column << endl;
 				exit( 1 );
 			}
 		}
@@ -865,64 +856,187 @@ ProcValue::~ProcValue()
 //===----------------------------------------------------------------------===//
 // [T] Typecheck AST nodes
 //===----------------------------------------------------------------------===//
-
-
-
-//===----------------------------------------------------------------------===//
-// [T] Get and check Val type
-//===----------------------------------------------------------------------===//
-string IntVal::getValType()
+Val* Program::typecheck()
 {
-	return val_type;
+	SymbolTable<Val>* t = new SymbolTable<Val>;
+	t->enterTable( name, line, column );
+	block->typecheck( t );
+	t->exitTable();
+	return NULL;
 }
 
+
+Val* Block::typecheck( SymbolTable<Val>* t )
+{
+	for ( ConstDecl* c : consts )
+		c->typecheck( t );
+	for ( VarDecl* v : vars )
+		v->typecheck( t );
+	
+	// Add each ProcDecl to symbol table before typecheck to allow for mutual recursion
+	for ( ProcDecl* p : procs )
+		t->bind( p->ID, p->line, p->column, new ProcVal( p->params, p->line, p->column ) );
+	
+	for ( ProcDecl* p : procs )
+		p->typecheck( t );
+	for ( Stmt* b : body )
+		b->typecheck( t );
+	return NULL;
+}
+
+
+Val* ConstDecl::typecheck( SymbolTable<Val>* t )
+{
+	t->bind( ID, line, column, new IntVal( line, column ) );
+	return  NULL;
+}
+
+
+Val* VarDecl::typecheck( SymbolTable<Val>* t )
+{
+	if ( data_type == IntType )
+		t->bind( ID, line, column, new IntVar( line, column ) );
+	else
+		t->bind( ID, line, column, new BoolVar( line, column ) );
+	return NULL;
+}
+
+
+Val* ProcDecl::typecheck( SymbolTable<Val>* t )
+{
+	t->enterTable( ID, line, column );
+	
+	// dbc Param is either ValParam or VarParam, how to determine IntVar or BoolVar?
+	// Is this how to get param.type (int/bool)?
+	for ( Param* p : params )
+	{
+		Val* v = t->lookUp( p->ID, p->line, p->column );
+		
+		if ( nameOf( v->val_type ).compare( "int" ) == 0 )
+			t->bind( p->ID, p->line, p->column, new IntVar( p->line, p->column ) );
+		else
+			t->bind( p->ID, p->line, p->column, new BoolVar( p->line, p->column ) );
+	}
+	
+	block->typecheck( t );
+	t->exitTable();
+	return NULL;
+}
+
+
+Val* Assign::typecheck( SymbolTable<Val>* t )
+{
+	Val* lhs = t->lookUp( ID, line, column );
+	Val* rhs = expr->typecheck( t );
+	
+	if ( !lhs->isVar() )
+	{
+		cout << "(!) Expected " << ID
+			 << " to be a variable at "
+			 << line << ":" << column << endl;
+		exit( 1 );
+	}
+	if ( nameOf( lhs->val_type ).compare( nameOf( rhs->val_type ) ) != 0 )
+	{
+		cout << "(!) Cannot assign a value typed "
+			 << nameOf( rhs->val_type ) << " to " << ID
+			 << " which has type " << nameOf( lhs->val_type )
+			 << " at " << line << ":" << column << endl;
+		exit( 1 );
+	}
+	return NULL;
+}
+
+
+Val* Call::typecheck( SymbolTable<Val>* t )
+{
+	Val* look_up= t->lookUp( ID, line, column );
+	
+	// Need this check to prepare for dynamic cast
+	if ( look_up == NULL || nameOf( look_up->val_type ).compare( "proc" ) != 0 )
+	{
+		cout << "(!) Expected a procedure value at "
+			 << line << ":" << column << endl;
+		exit( 1 );
+	}
+	
+	ProcVal* value = dynamic_cast<ProcVal*>( look_up );
+	list<Val*> arguments;
+	
+	for ( Expr* arg : args )
+	{
+		Val* v= arg->typecheck( t );
+		arguments.push_back( v );
+	}
+	
+	if ( value->params.size() != arguments.size() )
+	{
+		cout << "(!) The number of parameters does not match the number of arguments of "
+			 << ID << " at " << line << ":" << column << endl;
+		exit( 1 );
+	}
+	
+	match( value->params, arguments );
+	return NULL;
+}
+
+
+void Call::match( list<Param*> params, list<Val*> args )
+{
+	if ( params.empty() && args.empty() ) {}
+	else
+	{
+		Param* par = params.front();
+		Val* arg = args.front();
+		params.pop_front();
+		args.pop_front();
+		
+		if ( par->node_type == Node_ValParam )
+		{
+			if ( nameOf( arg->val_type ).compare( "int" ) == 0 || nameOf( arg->val_type ).compare( "bool" ) == 0 ) {}
+			else
+			{
+				cout << "(!) Expected either an integer value or a boolean value at "
+					 << line << ":" << column << endl;
+				exit( 1 );
+			}
+		}
+		else
+		{
+			if ( arg->val_type == Val_IntVar || arg->val_type == Val_BoolVar ) {}
+			else
+			{
+				cout << "(!) Expected either an integer variable or a boolean variable at "
+					 << line << ":" << column << endl;
+				exit( 1 );
+			}
+		}
+		match( params, args );
+	}
+}
+
+//===----------------------------------------------------------------------===//
+// [T] Check Val type
+//===----------------------------------------------------------------------===//
 bool IntVal::isVar()
 {
 	return false;
 }
-
-
-string BoolVal::getValType()
-{
-	return val_type;
-}
-
 bool BoolVal::isVar()
 {
 	return false;
 }
-
-
-string IntVar::getValType()
-{
-	return val_type;
-}
-
 bool IntVar::isVar()
 {
 	return true;
 }
-
-
-string BoolVar::getValType()
-{
-	return val_type;
-}
-
 bool BoolVar::isVar()
 {
 	return true;
 }
-
-
-string ProcVal::getValType()
-{
-	return val_type;
-}
-
 bool ProcVal::isVar()
 {
-	return false; // dbc "isVar is undefined"
+	return false;
 }
 
 
@@ -979,5 +1093,18 @@ string nameOf( ValueType valueType )
 		case Value_IntCell:		return "an integer cell";
 		case Value_BoolCell:	return "a boolean cell";
 		case Value_ProcValue:	return "a procedure value";
+	}
+}
+
+string nameOf( ValType valType )
+{
+	switch ( valType )
+	{
+		case Val_Undefined:	return "undefined";
+		case Val_IntVal:	return "int";
+		case Val_BoolVal:	return "bool";
+		case Val_IntVar:	return "int";
+		case Val_BoolVar:	return "bool";
+		case Val_ProcVal:	return "proc"; // dbc "isVar is undefined"
 	}
 }

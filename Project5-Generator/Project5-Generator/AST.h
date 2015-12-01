@@ -178,7 +178,7 @@ string nameOf( DataType dataType );
 string nameOf( Op1 op1 );
 string nameOf( Op2 op2 );
 string nameOf( ValueType valueType );
-
+string nameOf( ValType valType );
 
 
 
@@ -226,7 +226,7 @@ struct Program : ASTNode
 	
 	string toString( string indent );
 	Value* interpret();
-	//Val* typecheck();
+	Val* typecheck();
 };
 
 
@@ -256,7 +256,7 @@ struct Block : ASTNode
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -282,7 +282,7 @@ struct ConstDecl : ASTNode
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -308,7 +308,7 @@ struct VarDecl : ASTNode
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -336,7 +336,7 @@ struct ProcDecl : ASTNode
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -344,13 +344,14 @@ struct ProcDecl : ASTNode
 //===----------------------------------------------------------------------===//
 // [AST] Parameter Node
 //===----------------------------------------------------------------------===//
-struct Param : ASTNode {};
-
-struct ValParam : Param
+struct Param : ASTNode
 {
 	string ID;
 	DataType data_type;
-	
+};
+
+struct ValParam : Param
+{
 	ValParam( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
@@ -369,9 +370,6 @@ struct ValParam : Param
 
 struct VarParam : Param
 {
-	string ID;
-	DataType data_type;
-	
 	VarParam( string i, DataType t, int lin, int col )
 	{
 		ID			= i;
@@ -394,7 +392,7 @@ struct VarParam : Param
 struct Stmt : ASTNode
 {
 	virtual Value* interpret( SymbolTable<Value>* t ) = 0;
-	//virtual //Val* typecheck( SymbolTable<Val>* t ) = 0;
+	virtual Val* typecheck( SymbolTable<Val>* t ) = 0;
 };
 
 struct Assign : Stmt
@@ -415,7 +413,7 @@ struct Assign : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -439,8 +437,8 @@ struct Call : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	void call( list<Param*> params, Block* block, list<Value*> args, SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
-	void match( list<Param*> params, list<Value*> args );
+	Val* typecheck( SymbolTable<Val>* t );
+	void match( list<Param*> params, list<Val*> args );
 };
 
 
@@ -461,7 +459,7 @@ struct Sequence : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -484,7 +482,7 @@ struct IfThen : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -509,7 +507,7 @@ struct IfThenElse : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -532,7 +530,7 @@ struct While : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -553,7 +551,7 @@ struct Prompt : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -576,7 +574,7 @@ struct Prompt2 : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -597,7 +595,7 @@ struct Print : Stmt
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -651,7 +649,7 @@ struct StringItem : Item
 struct Expr : ASTNode
 {
 	virtual Value* interpret( SymbolTable<Value>* t ) = 0;
-	//virtual //Val* typecheck( SymbolTable<Val>* t ) = 0;
+	virtual Val* typecheck( SymbolTable<Val>* t ) = 0;
 };
 
 struct BinOp : Expr
@@ -674,7 +672,7 @@ struct BinOp : Expr
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -697,7 +695,7 @@ struct UnOp : Expr
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -718,7 +716,7 @@ struct Num : Expr
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -739,7 +737,7 @@ struct Id : Expr
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -759,7 +757,7 @@ struct True : Expr
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -779,7 +777,7 @@ struct False : Expr
 	
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
-	//Val* typecheck( SymbolTable<Val>* t );
+	Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -924,23 +922,22 @@ struct Val
 {
 	int line;
 	int column;
-	string val_type;
+	ValType val_type;
 	
 	Val()
 	{
 		line		= 1;
 		column		= 1;
-		val_type	= "undefined";
+		val_type	= Val_Undefined;
 	}
 	Val( int lin, int col )
 	{
 		line		= lin;
 		column		= col;
-		val_type	= "undefined";
+		val_type	= Val_Undefined;
 	}
 	
 	virtual ~Val() {}
-	virtual string getValType() = 0;
 	virtual bool isVar() = 0;
 };
 
@@ -951,11 +948,10 @@ struct IntVal : Val
 	{
 		line		= lin;
 		column		= col;
-		val_type	= "int";
+		val_type	= Val_IntVal;
 	}
 	
 	~IntVal() {}
-	string getValType();
 	bool isVar();
 };
 
@@ -966,11 +962,10 @@ struct BoolVal : Val
 	{
 		line		= lin;
 		column		= col;
-		val_type	= "bool";
+		val_type	= Val_BoolVal;
 	}
 	
 	~BoolVal() {}
-	string getValType();
 	bool isVar();
 };
 
@@ -981,11 +976,10 @@ struct IntVar : Val
 	{
 		line		= lin;
 		column		= col;
-		val_type	= "int";
+		val_type	= Val_IntVar;
 	}
 	
 	~IntVar() {}
-	string getValType();
 	bool isVar();
 };
 
@@ -996,11 +990,10 @@ struct BoolVar : Val
 	{
 		line		= lin;
 		column		= col;
-		val_type	= "bool";
+		val_type	= Val_BoolVar;
 	}
 	
 	~BoolVar() {}
-	string getValType();
 	bool isVar();
 };
 
@@ -1013,11 +1006,10 @@ struct ProcVal : Val
 	{
 		line		= lin;
 		column		= col;
-		val_type	= "undefined";
+		val_type	= Val_ProcVal;
 	}
 	
 	~ProcVal();
-	string getValType();
 	bool isVar();
 };
 
