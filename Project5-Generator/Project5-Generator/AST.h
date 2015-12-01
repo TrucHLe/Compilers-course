@@ -16,6 +16,7 @@
 #include <list>
 #include <map>
 #include <iterator>
+#include <type_traits>	//is_same
 using namespace std;
 
 
@@ -179,8 +180,6 @@ string nameOf( Op1 op1 );
 string nameOf( Op2 op2 );
 string nameOf( ValueType valueType );
 string nameOf( ValType valType );
-
-
 
 
 //===----------------------------------------------------------------------===//
@@ -1004,6 +1003,7 @@ struct ProcVal : Val
 	
 	ProcVal( list<Param*> p, int lin, int col )
 	{
+		params		= p;
 		line		= lin;
 		column		= col;
 		val_type	= Val_ProcVal;
@@ -1028,10 +1028,10 @@ struct SymbolTable
 		symbol_table = vector<pair<string, map<string, T*>* > >();
 	}
 	
-	void enterTable( string ID, int line, int column );
-	void exitTable();
-	void bind( string ID, int line, int column, T* v );
 	T* lookUp( string ID, int line, int column );
+	void enterTable( string ID, int line, int column );
+	void bind( string ID, int line, int column, T* v );
+	void exitTable();
 };
 
 

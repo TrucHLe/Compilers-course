@@ -303,11 +303,27 @@ string False::toString( string indent )
 //===----------------------------------------------------------------------===//
 
 //-------------------------------//
+// Look up ID in the last map
+//-------------------------------//
+template <typename T>
+T* SymbolTable<T>::lookUp( string ID, int line, int column )
+{
+	for ( int i = (int) symbol_table.size() - 1; i > -1; --i )
+	{
+		map<string, T*>* map = symbol_table.at( i ).second;
+		if ( map->find( ID ) != map->end() )
+			return map->at( ID );
+	}
+	return NULL;
+}
+
+
+//-------------------------------//
 // Push a new pair of a program's
 // ID and its corresponding
 // value declerations and values
 // maps to the symbol table.
-// Only called by Program and Call
+// Only called by Program, Call, Match
 //-------------------------------//
 template <typename T>
 void SymbolTable<T>::enterTable( string ID, int line, int column )
@@ -319,22 +335,9 @@ void SymbolTable<T>::enterTable( string ID, int line, int column )
 
 
 //-------------------------------//
-// Pop the top element of
-// the symbol table
-//-------------------------------//
-template <typename T>
-void SymbolTable<T>::exitTable()
-{
-	delete symbol_table.back().second;
-	symbol_table.pop_back();
-}
-
-
-//-------------------------------//
-// Create a new pair of
+// Push a new pair of
 // value decleration and value
-// and push it to
-// the symbol table's top map
+// to the last map
 //-------------------------------//
 template <typename T>
 void SymbolTable<T>::bind( string ID, int line, int column, T* v )
@@ -352,21 +355,14 @@ void SymbolTable<T>::bind( string ID, int line, int column, T* v )
 
 
 
-
 //-------------------------------//
-// Look up ID in the
-// symbol table's top map
+// Pop the last map
 //-------------------------------//
 template <typename T>
-T* SymbolTable<T>::lookUp( string ID, int line, int column )
+void SymbolTable<T>::exitTable()
 {
-	for ( int i = (int) symbol_table.size() - 1; i > -1; --i )
-	{
-		map<string, T*>* map = symbol_table.at( i ).second;
-		if ( map->find( ID ) != map->end() )
-			return map->at( ID );
-	}
-	return NULL;
+	delete symbol_table.back().second;
+	symbol_table.pop_back();
 }
 
 
@@ -947,14 +943,9 @@ Val* VarDecl::typecheck( SymbolTable<Val>* t )
 Val* ProcDecl::typecheck( SymbolTable<Val>* t )
 {
 	t->enterTable( ID, line, column );
-	
-	// dbc Param is either ValParam or VarParam, how to determine IntVar or BoolVar?
-	// Is this how to get param.type (int/bool)?
 	for ( Param* p : params )
 	{
-		Val* v = t->lookUp( p->ID, p->line, p->column );
-		
-		if ( nameOf( v->val_type ).compare( "int" ) == 0 )
+		if ( p->data_type == IntType )
 			t->bind( p->ID, p->line, p->column, new IntVar( p->line, p->column ) );
 		else
 			t->bind( p->ID, p->line, p->column, new BoolVar( p->line, p->column ) );
@@ -993,8 +984,8 @@ Val* Assign::typecheck( SymbolTable<Val>* t )
 Val* Call::typecheck( SymbolTable<Val>* t )
 {
 	Val* look_up = t->lookUp( ID, line, column );
+
 	
-	// Need this check to prepare for dynamic cast
 	if ( look_up == NULL || look_up->val_type != Val_ProcVal )
 	{
 		cout << "(!) Expected a procedure at " << line << ":" << column << endl;
@@ -1004,18 +995,19 @@ Val* Call::typecheck( SymbolTable<Val>* t )
 	ProcVal* value = dynamic_cast<ProcVal*>( look_up );
 	list<Val*> arguments;
 	
+	
 	for ( Expr* arg : args )
 	{
 		Val* v = arg->typecheck( t );
 		arguments.push_back( v );
 	}
-	
 	if ( value->params.size() != arguments.size() )
 	{
 		cout << "(!) The number of parameters does not match the number of arguments of "
 			 << ID << " at " << line << ":" << column << endl;
 		exit( 1 );
 	}
+	
 	
 	match( value->params, arguments );
 	return NULL;
@@ -1361,7 +1353,7 @@ ProcVal::~ProcVal()
 
 
 //===----------------------------------------------------------------------===//
-// [P] Return name of DataType, Op1, Op2, and ValueType
+// [P] Return names and types of DataType, Op1, Op2, and ValueType
 //===----------------------------------------------------------------------===//
 
 string nameOf( DataType dataType )
@@ -1426,4 +1418,14 @@ string nameOf( ValType valType )
 		case Val_BoolVar:	return "bool";
 		case Val_ProcVal:	return "proc"; // dbc "isVar is undefined"
 	}
+}
+
+string nameOf( Value* value )
+{
+	return nameOf( value->value_type );
+}
+
+string nameOf( Val* val )
+{
+	return nameOf( val->val_type );
 }

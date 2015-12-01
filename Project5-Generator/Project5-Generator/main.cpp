@@ -60,25 +60,16 @@ int main(int argc, const char * argv[])
 	
 	
 	
-	
 	// Interpret
 	// /Users/Bamboo/Developer/Compilers-course/Project5-Generator/Project5-Generator/test.txt
 	Parser parser( input );
 	Program* node = parser.parse();
-	//node->interpret();
-	node->typecheck();
+	
+	//cout << node->toString("");	// Print AST
+	//node->interpret();			// Interpret
+	node->typecheck();			// Typecheck
 	delete node;
-	
-	
-	
-	// Parse
-	/*
-	 Parser parser( input );
-	 Program* node = parser.parse();
-	 cout << node->toString("");
-	 delete node;
-	 */
-	
+
 	
 	
 	// Scan
