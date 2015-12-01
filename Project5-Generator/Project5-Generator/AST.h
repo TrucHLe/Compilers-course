@@ -119,6 +119,7 @@ enum Op2
 //===----------------------------------------------------------------------===//
 // Tree-Walking Functions [F]
 //===----------------------------------------------------------------------===//
+template <typename T>
 struct SymbolTable;
 
 //===-------------------------------===//
@@ -225,7 +226,7 @@ struct Program : ASTNode
 	
 	string toString( string indent );
 	Value* interpret();
-	Val* typecheck();
+	//Val* typecheck();
 };
 
 
@@ -254,8 +255,8 @@ struct Block : ASTNode
 	~Block();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -280,8 +281,8 @@ struct ConstDecl : ASTNode
 	~ConstDecl() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -306,8 +307,8 @@ struct VarDecl : ASTNode
 	~VarDecl() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -334,8 +335,8 @@ struct ProcDecl : ASTNode
 	~ProcDecl();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -392,7 +393,8 @@ struct VarParam : Param
 //===----------------------------------------------------------------------===//
 struct Stmt : ASTNode
 {
-	virtual Value* interpret( SymbolTable* t ) = 0;
+	virtual Value* interpret( SymbolTable<Value>* t ) = 0;
+	//virtual //Val* typecheck( SymbolTable<Val>* t ) = 0;
 };
 
 struct Assign : Stmt
@@ -412,8 +414,8 @@ struct Assign : Stmt
 	~Assign();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -435,9 +437,9 @@ struct Call : Stmt
 	~Call();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	void call( list<Param*> params, Block* block, list<Value*> args, SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	void call( list<Param*> params, Block* block, list<Value*> args, SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 	void match( list<Param*> params, list<Value*> args );
 };
 
@@ -458,8 +460,8 @@ struct Sequence : Stmt
 	~Sequence();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -481,8 +483,8 @@ struct IfThen : Stmt
 	~IfThen();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -506,8 +508,8 @@ struct IfThenElse : Stmt
 	~IfThenElse();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -529,8 +531,8 @@ struct While : Stmt
 	~While();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -550,8 +552,8 @@ struct Prompt : Stmt
 	~Prompt() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -573,8 +575,8 @@ struct Prompt2 : Stmt
 	~Prompt2() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -594,8 +596,8 @@ struct Print : Stmt
 	~Print();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -648,7 +650,8 @@ struct StringItem : Item
 //===----------------------------------------------------------------------===//
 struct Expr : ASTNode
 {
-	virtual Value* interpret( SymbolTable* t ) = 0;
+	virtual Value* interpret( SymbolTable<Value>* t ) = 0;
+	//virtual //Val* typecheck( SymbolTable<Val>* t ) = 0;
 };
 
 struct BinOp : Expr
@@ -670,8 +673,8 @@ struct BinOp : Expr
 	~BinOp();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -693,8 +696,8 @@ struct UnOp : Expr
 	~UnOp();
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -714,8 +717,8 @@ struct Num : Expr
 	~Num() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -735,8 +738,8 @@ struct Id : Expr
 	~Id() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -755,8 +758,8 @@ struct True : Expr
 	~True() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -775,8 +778,8 @@ struct False : Expr
 	~False() {}
 	
 	string toString( string indent );
-	Value* interpret( SymbolTable* t );
-	Val* typecheck( SymbolTable t );
+	Value* interpret( SymbolTable<Value>* t );
+	//Val* typecheck( SymbolTable<Val>* t );
 };
 
 
@@ -1021,22 +1024,22 @@ struct ProcVal : Val
 
 
 //===----------------------------------------------------------------------===//
-// [F] Symbol Table
+// [F] Symbol Table Template
 //===----------------------------------------------------------------------===//
+template <typename T>
 struct SymbolTable
 {
-	vector<pair<string, map<string, Value*>* > > symbol_table;
+	vector<pair<string, map<string, T*>* > > symbol_table;
 	
 	SymbolTable()
 	{
-		symbol_table = vector<pair<string, map<string, Value*>* > >();
+		symbol_table = vector<pair<string, map<string, T*>* > >();
 	}
 	
 	void enterTable( string ID, int line, int column );
 	void exitTable();
-	void bind( string ID, int line, int column, Value* v );
-	void printFrontMap(); // debugging purpose
-	Value* lookUp( string ID, int line, int column );
+	void bind( string ID, int line, int column, T* v );
+	T* lookUp( string ID, int line, int column );
 };
 
 

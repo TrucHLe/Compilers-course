@@ -309,9 +309,10 @@ string False::toString( string indent )
 // maps to the symbol table.
 // Only called by Program and Call
 //-------------------------------//
-void SymbolTable::enterTable( string ID, int line, int column )
+template <typename T>
+void SymbolTable<T>::enterTable( string ID, int line, int column )
 {
-	pair<string, map<string, Value*>* > symbol = make_pair( ID, new map<string, Value*>() );
+	pair<string, map<string, T*>* > symbol = make_pair( ID, new map<string, T*>() );
 	symbol_table.push_back( symbol );
 }
 
@@ -321,7 +322,8 @@ void SymbolTable::enterTable( string ID, int line, int column )
 // Pop the top element of
 // the symbol table
 //-------------------------------//
-void SymbolTable::exitTable()
+template <typename T>
+void SymbolTable<T>::exitTable()
 {
 	delete symbol_table.back().second;
 	symbol_table.pop_back();
@@ -334,63 +336,33 @@ void SymbolTable::exitTable()
 // and push it to
 // the symbol table's top map
 //-------------------------------//
-void SymbolTable::bind( string ID, int line, int column, Value* v )
+template <typename T>
+void SymbolTable<T>::bind( string ID, int line, int column, T* v )
 {
-	map<string, Value*>* current_map = symbol_table.back().second;
+	map<string, T*>* current_map = symbol_table.back().second;
 	if ( current_map->find( ID ) == current_map->end() )
-		current_map->insert( map<string, Value*>::value_type( ID, v ) );
+		current_map->insert( pair<string, T*>( ID, v ) );
 	else
 	{
 		cout << "(!) " << ID << " is defined at " << v->line << ":" << v->column
 		<< " and should not be re-defined at " << line << ":" << column << endl;
 		exit( 1 );
 	}
-	
-	//printFrontMap();
 }
 
 
-//-------------------------------//
-// Print the map of the
-// symbol table's front element
-// for debugging purpose
-//-------------------------------//
-void SymbolTable::printFrontMap()
-{
-	cout << "---" << symbol_table.back().first << "---" << endl;
-	for ( pair<string, Value*> p : *symbol_table.back().second )
-	{
-		cout << p.first; //<< " :" << nameOf( p.second->value_type );
-		
-		if ( p.second->value_type == Value_IntValue || p.second->value_type == Value_IntCell )
-			cout << " = " << p.second->getIntValue( p.second->line, p.second->column );
-		else if ( p.second->value_type == Value_BoolValue || p.second->value_type == Value_BoolCell )
-		{
-			if ( p.second->getBoolValue( p.second->line, p.second->column ) )
-				cout << " = true";
-			else
-				cout << " = false";
-		}
-		else
-		{
-			ProcValue* v = dynamic_cast<ProcValue*>( p.second );
-			cout << " = " << v->params.size() << " parameters";
-		}
-		cout << endl;
-	}
-	cout << endl;
-}
 
 
 //-------------------------------//
 // Look up ID in the
 // symbol table's top map
 //-------------------------------//
-Value* SymbolTable::lookUp( string ID, int line, int column )
+template <typename T>
+T* SymbolTable<T>::lookUp( string ID, int line, int column )
 {
 	for ( int i = (int) symbol_table.size() - 1; i > -1; --i )
 	{
-		map<string, Value*>* map = symbol_table.at( i ).second;
+		map<string, T*>* map = symbol_table.at( i ).second;
 		if ( map->find( ID ) != map->end() )
 			return map->at( ID );
 	}
@@ -404,7 +376,7 @@ Value* SymbolTable::lookUp( string ID, int line, int column )
 //===----------------------------------------------------------------------===//
 Value* Program::interpret()
 {
-	SymbolTable* t = new SymbolTable();
+	SymbolTable<Value>* t = new SymbolTable<Value>();
 	t->enterTable( name, line, column );
 	block->interpret( t );
 	t->exitTable();
@@ -412,7 +384,7 @@ Value* Program::interpret()
 }
 
 
-Value* Block::interpret( SymbolTable* t )
+Value* Block::interpret( SymbolTable<Value>* t )
 {
 	for ( ConstDecl* c : consts )
 		c->interpret( t );
@@ -426,14 +398,14 @@ Value* Block::interpret( SymbolTable* t )
 }
 
 
-Value* ConstDecl::interpret( SymbolTable* t )
+Value* ConstDecl::interpret( SymbolTable<Value>* t )
 {
 	t->bind( ID, line, column, new IntValue( value, line, column ) );
 	return NULL;
 }
 
 
-Value* VarDecl::interpret( SymbolTable* t )
+Value* VarDecl::interpret( SymbolTable<Value>* t )
 {
 	if ( data_type == IntType )
 		t->bind( ID, line, column, new IntCell( 0, line, column ) );
@@ -443,14 +415,14 @@ Value* VarDecl::interpret( SymbolTable* t )
 }
 
 
-Value* ProcDecl::interpret( SymbolTable* t )
+Value* ProcDecl::interpret( SymbolTable<Value>* t )
 {
 	t->bind( ID, line, column, new ProcValue( params, block, line, column ) );
 	return NULL;
 }
 
 
-Value* Assign::interpret( SymbolTable* t )
+Value* Assign::interpret( SymbolTable<Value>* t )
 {
 	Value* lhs = t->lookUp( ID, line, column );
 	Value* rhs = expr->interpret( t );
@@ -470,7 +442,7 @@ Value* Assign::interpret( SymbolTable* t )
 }
 
 
-Value* Call::interpret( SymbolTable* t )
+Value* Call::interpret( SymbolTable<Value>* t )
 {
 	Value* look_up = t->lookUp( ID, line, column );
 	
@@ -515,7 +487,7 @@ Value* Call::interpret( SymbolTable* t )
 }
 
 
-void Call::call( list<Param*> params, Block* block, list<Value*> args, SymbolTable* t )
+void Call::call( list<Param*> params, Block* block, list<Value*> args, SymbolTable<Value>* t )
 {
 	if ( params.empty() && args.empty() )
 		block->interpret( t );
@@ -557,7 +529,7 @@ void Call::call( list<Param*> params, Block* block, list<Value*> args, SymbolTab
 }
 
 
-Value* Sequence::interpret( SymbolTable* t )
+Value* Sequence::interpret( SymbolTable<Value>* t )
 {
 	for ( Stmt* b : body )
 		b->interpret( t );
@@ -565,7 +537,7 @@ Value* Sequence::interpret( SymbolTable* t )
 }
 
 
-Value* IfThen::interpret( SymbolTable* t )
+Value* IfThen::interpret( SymbolTable<Value>* t )
 {
 	Value* value = test->interpret( t );
 	if ( value->getBoolValue( line, column ) )
@@ -574,7 +546,7 @@ Value* IfThen::interpret( SymbolTable* t )
 }
 
 
-Value* IfThenElse::interpret( SymbolTable* t )
+Value* IfThenElse::interpret( SymbolTable<Value>* t )
 {
 	Value* value = test->interpret( t );
 	if ( value->getBoolValue( line, column ) )
@@ -585,7 +557,7 @@ Value* IfThenElse::interpret( SymbolTable* t )
 }
 
 
-Value* While::interpret( SymbolTable* t )
+Value* While::interpret( SymbolTable<Value>* t )
 {
 	Value* value = test->interpret( t );
 	while ( value->getBoolValue( line, column ) )
@@ -597,7 +569,7 @@ Value* While::interpret( SymbolTable* t )
 }
 
 
-Value* Prompt::interpret( SymbolTable* t )
+Value* Prompt::interpret( SymbolTable<Value>* t )
 {
 	string input;
 	cout << message;
@@ -606,7 +578,7 @@ Value* Prompt::interpret( SymbolTable* t )
 }
 
 
-Value* Prompt2::interpret( SymbolTable* t )
+Value* Prompt2::interpret( SymbolTable<Value>* t )
 {
 	Value* lhs = t->lookUp( ID, line, column );
 	string input;
@@ -627,7 +599,7 @@ Value* Prompt2::interpret( SymbolTable* t )
 }
 
 
-Value* Print::interpret( SymbolTable* t )
+Value* Print::interpret( SymbolTable<Value>* t )
 {
 	for ( Item* i : items )
 	{
@@ -648,7 +620,7 @@ Value* Print::interpret( SymbolTable* t )
 }
 
 
-Value* BinOp::interpret( SymbolTable* t )
+Value* BinOp::interpret( SymbolTable<Value>* t )
 {
 	Value* lhs = left->interpret( t );
 	Value* rhs = right->interpret( t );
@@ -672,7 +644,7 @@ Value* BinOp::interpret( SymbolTable* t )
 }
 
 
-Value* UnOp::interpret( SymbolTable* t )
+Value* UnOp::interpret( SymbolTable<Value>* t )
 {
 	Value* value = expr->interpret( t );
 	
@@ -686,13 +658,13 @@ Value* UnOp::interpret( SymbolTable* t )
 }
 
 
-Value* Num::interpret( SymbolTable* t )
+Value* Num::interpret( SymbolTable<Value>* t )
 {
 	return new IntValue( value, line, column );
 }
 
 
-Value* Id::interpret( SymbolTable* t )
+Value* Id::interpret( SymbolTable<Value>* t )
 {
 	Value* value = t->lookUp( ID, line, column );
 	if ( value != NULL )
@@ -705,13 +677,13 @@ Value* Id::interpret( SymbolTable* t )
 }
 
 
-Value* True::interpret( SymbolTable* t )
+Value* True::interpret( SymbolTable<Value>* t )
 {
 	return new BoolValue( boolean, line, column );
 }
 
 
-Value* False::interpret( SymbolTable* t )
+Value* False::interpret( SymbolTable<Value>* t )
 {
 	return new BoolValue( boolean, line, column );
 }
