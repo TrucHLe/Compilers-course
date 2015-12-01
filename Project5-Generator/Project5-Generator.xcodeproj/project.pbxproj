@@ -38,10 +38,10 @@
 		4DFD38B61C0CF9F2009C8CDD /* Scanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scanner.h; sourceTree = "<group>"; };
 		4DFD38B71C0CF9F2009C8CDD /* StateTransitionTable.tsv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = StateTransitionTable.tsv; sourceTree = "<group>"; };
 		4DFD38B81C0CF9F2009C8CDD /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
-		4DFD38BC1C0CFA1D009C8CDD /* YASLGeneration.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASLGeneration.pdf; sourceTree = "<group>"; };
-		4DFD38BD1C0CFA1D009C8CDD /* YASLTypechecking.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASLTypechecking.pdf; sourceTree = "<group>"; };
-		4DFD38BE1C0CFA1D009C8CDD /* YASMSpec.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASMSpec.pdf; sourceTree = "<group>"; };
-		4DFD38BF1C0CFA36009C8CDD /* YASLSemantics.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASLSemantics.pdf; sourceTree = "<group>"; };
+		4DFD38C01C0CFF4C009C8CDD /* YASLGeneration.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASLGeneration.pdf; sourceTree = "<group>"; };
+		4DFD38C11C0CFF4C009C8CDD /* YASLInterpretation.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASLInterpretation.pdf; sourceTree = "<group>"; };
+		4DFD38C21C0CFF4C009C8CDD /* YASLTypechecking.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASLTypechecking.pdf; sourceTree = "<group>"; };
+		4DFD38C31C0CFF4C009C8CDD /* YASMSpecification.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = YASMSpecification.pdf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,10 +85,10 @@
 				4DFD38B71C0CF9F2009C8CDD /* StateTransitionTable.tsv */,
 				4DFD38B21C0CF9F2009C8CDD /* Grammar.txt */,
 				4DFD38B81C0CF9F2009C8CDD /* test.txt */,
-				4DFD38BF1C0CFA36009C8CDD /* YASLSemantics.pdf */,
-				4DFD38BD1C0CFA1D009C8CDD /* YASLTypechecking.pdf */,
-				4DFD38BC1C0CFA1D009C8CDD /* YASLGeneration.pdf */,
-				4DFD38BE1C0CFA1D009C8CDD /* YASMSpec.pdf */,
+				4DFD38C01C0CFF4C009C8CDD /* YASLGeneration.pdf */,
+				4DFD38C11C0CFF4C009C8CDD /* YASLInterpretation.pdf */,
+				4DFD38C21C0CFF4C009C8CDD /* YASLTypechecking.pdf */,
+				4DFD38C31C0CFF4C009C8CDD /* YASMSpecification.pdf */,
 			);
 			path = "Project5-Generator";
 			sourceTree = "<group>";
