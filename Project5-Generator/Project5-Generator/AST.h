@@ -166,7 +166,7 @@ enum ValType
 
 
 //===-------------------------------===//
-// Intermediate Code Generation [G]
+// YASM Code Generation [G]
 //===-------------------------------===//
 struct Info;
 struct ConstInfo;
@@ -238,6 +238,7 @@ struct Program : ASTNode
 	string toString( string indent );
 	Value* interpret();
 	Val* typecheck();
+	Info* generate();
 };
 
 
@@ -268,6 +269,7 @@ struct Block : ASTNode
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -294,6 +296,7 @@ struct ConstDecl : ASTNode
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -320,6 +323,7 @@ struct VarDecl : ASTNode
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -348,6 +352,7 @@ struct ProcDecl : ASTNode
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -359,6 +364,7 @@ struct Param : ASTNode
 {
 	string ID;
 	DataType data_type;
+	virtual Info* generate( SymbolTable<Info>* t ) = 0;
 };
 
 struct ValParam : Param
@@ -375,6 +381,7 @@ struct ValParam : Param
 	~ValParam() {}
 	
 	string toString( string indent );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -393,6 +400,7 @@ struct VarParam : Param
 	~VarParam() {}
 	
 	string toString( string indent );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -404,6 +412,7 @@ struct Stmt : ASTNode
 {
 	virtual Value* interpret( SymbolTable<Value>* t ) = 0;
 	virtual Val* typecheck( SymbolTable<Val>* t ) = 0;
+	virtual Info* generate( SymbolTable<Info>* t ) = 0;
 };
 
 struct Assign : Stmt
@@ -425,6 +434,7 @@ struct Assign : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -450,6 +460,8 @@ struct Call : Stmt
 	void call( list<Param*> params, Block* block, list<Value*> args, SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
 	void match( list<Param*> params, list<Val*> args );
+	Info* generate( SymbolTable<Info>* t );
+	void setup( list<Param*> params, list<Value*> args, SymbolTable<Info>* t );
 };
 
 
@@ -471,6 +483,7 @@ struct Sequence : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -494,6 +507,7 @@ struct IfThen : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -519,6 +533,7 @@ struct IfThenElse : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -563,6 +578,7 @@ struct Prompt : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -586,6 +602,7 @@ struct Prompt2 : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -607,6 +624,7 @@ struct Print : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -661,6 +679,7 @@ struct Expr : ASTNode
 {
 	virtual Value* interpret( SymbolTable<Value>* t ) = 0;
 	virtual Val* typecheck( SymbolTable<Val>* t ) = 0;
+	virtual Info* generate( SymbolTable<Info>* t ) = 0;
 };
 
 struct BinOp : Expr
@@ -684,6 +703,7 @@ struct BinOp : Expr
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -707,6 +727,7 @@ struct UnOp : Expr
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -728,6 +749,7 @@ struct Num : Expr
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -749,6 +771,7 @@ struct Id : Expr
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -769,6 +792,7 @@ struct True : Expr
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -789,6 +813,7 @@ struct False : Expr
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -917,7 +942,12 @@ struct ProcValue : Value
 		value_type	= Value_ProcValue;
 	}
 	
-	~ProcValue();
+	~ProcValue()
+	{
+		for ( Param* p : params )
+			delete p;
+		delete block;
+	}
 	int getIntValue( int lin, int col );
 	bool getBoolValue( int lin, int col );
 	void setValue( int i, int lin, int col );
@@ -1021,7 +1051,11 @@ struct ProcVal : Val
 		val_type	= Val_ProcVal;
 	}
 	
-	~ProcVal();
+	~ProcVal()
+	{
+		for ( Param* p : params )
+			delete p;
+	}
 	bool isVar();
 };
 
@@ -1101,7 +1135,11 @@ struct ProcInfo : Info
 		info_type	= Info_ProcInfo;
 	}
 	
-	~ProcInfo() {}
+	~ProcInfo()
+	{
+		for ( Param* p : params )
+			delete p;
+	}
 };
 
 
@@ -1115,7 +1153,7 @@ struct SymbolTable
 	vector<pair<string, map<string, T*>* > > symbol_table;
 	int level;
 	int offset;
-	int param_offset;
+	int param;
 	int sequence;
 	
 	SymbolTable()
@@ -1123,7 +1161,7 @@ struct SymbolTable
 		symbol_table	= vector<pair<string, map<string, T*>* > >();
 		level			= 0;
 		offset			= 0;
-		param_offset	= 0;
+		param			= 0;
 		sequence		= 0;
 	}
 	

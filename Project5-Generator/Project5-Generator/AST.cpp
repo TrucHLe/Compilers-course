@@ -926,13 +926,6 @@ void ProcValue::setValue( bool b, int lin, int col )
 	exit( 1 );
 }
 
-ProcValue::~ProcValue()
-{
-	for ( Param* p : params )
-		delete p;
-	delete block;
-}
-
 
 
 //===----------------------------------------------------------------------===//
@@ -1036,7 +1029,7 @@ Val* Call::typecheck( SymbolTable<Val>* t )
 		exit( 1 );
 	}
 	
-	ProcVal* value = dynamic_cast<ProcVal*>( look_up );
+	ProcVal* proc_val = dynamic_cast<ProcVal*>( look_up );
 	list<Val*> arguments;
 	
 	
@@ -1045,7 +1038,7 @@ Val* Call::typecheck( SymbolTable<Val>* t )
 		Val* v = arg->typecheck( t );
 		arguments.push_back( v );
 	}
-	if ( value->params.size() != arguments.size() )
+	if ( proc_val->params.size() != arguments.size() )
 	{
 		cout << "(!) The number of parameters does not match the number of arguments of "
 			 << ID << " at " << line << ":" << column << endl;
@@ -1053,7 +1046,7 @@ Val* Call::typecheck( SymbolTable<Val>* t )
 	}
 	
 	
-	match( value->params, arguments );
+	match( proc_val->params, arguments );
 	return NULL;
 }
 
@@ -1389,17 +1382,113 @@ bool ProcVal::isVar()
 {
 	return false;
 }
-ProcVal::~ProcVal()
+
+
+
+//===----------------------------------------------------------------------===//
+// [G] Generate YASM Code
+//===----------------------------------------------------------------------===//
+Info* Program::generate()
 {
+	SymbolTable<Info>* t = new SymbolTable<Info>();
+	t->enterTable( name );
+	block->generate( t );
+	t->exitTable();
+	cout << "HALT" << endl;
+	return NULL;
+}
+
+
+Info* Block::generate( SymbolTable<Info>* t )
+{
+	string s = t->newLabel();
+	cout << "BRANCH " << s << endl;
+	
+	for ( ConstDecl* c : consts )
+		c->generate( t );
+	
+	t->offset = 0;
+	
+	for ( VarDecl* v : vars )
+		v->generate( t );
+	for ( ProcDecl* p : procs )
+		t->bind( p->ID, new ProcInfo( t->newLabel(), p->params ) );
+	for ( ProcDecl* p : procs )
+		p->generate( t );
+	
+	cout << "LABEL " << s << endl;
+	int n = (int) vars.size();
+	int l = t->level;
+	cout << "ENTER " << l << endl;
+	cout << "RESERVE " << n << endl;
+
+	for ( Stmt* b : body )
+		b->generate( t );
+	
+	cout << "DROP " << n << endl;
+	cout << "EXIT " << l << endl;
+	return NULL;
+}
+
+
+Info* ConstDecl::generate( SymbolTable<Info>* t )
+{
+	t->bind( ID, new ConstInfo( value ) );
+	return NULL;
+}
+
+
+Info* VarDecl::generate( SymbolTable<Info>* t )
+{
+	t->offset -= 1;
+	t->bind( ID, new VarInfo( t->level, t->offset ) );
+	return NULL;
+}
+
+
+Info* ProcDecl::generate( SymbolTable<Info>* t )
+{
+	ProcInfo* proc_info = dynamic_cast<ProcInfo*>( t->lookUp( ID ) );
+	t->enterTable( ID );
+	t->param = 1;
+	
+	params.reverse();
 	for ( Param* p : params )
-		delete p;
+		p->generate( t );
+	
+	cout << "LABEL " << proc_info->label << endl;
+	block->generate( t );
+	cout << "RETURN" << endl;
+	t->exitTable();
+	return NULL;
+}
+
+
+Info* ValParam::generate( SymbolTable<Info>* t )
+{
+	t->param += 1;
+	t->bind( ID, new VarInfo( t->level, t->param ) );
+	return NULL;
+}
+
+
+Info* VarParam::generate( SymbolTable<Info>* t )
+{
+	t->param += 1;
+	t->bind( ID, new RefInfo( t->level, t->param ) );
+	return NULL;
+}
+
+
+Info* Assign::generate( SymbolTable<Info>* t )
+{
+	
 }
 
 
 //===----------------------------------------------------------------------===//
 // [P] Return names and types of DataType, Op1, Op2, and ValueType
 //===----------------------------------------------------------------------===//
-
 string nameOf( DataType dataType )
 {
 	switch ( dataType )
@@ -1462,14 +1551,4 @@ string nameOf( ValType valType )
 		case Val_BoolVar:	return "bool";
 		case Val_ProcVal:	return "proc"; // dbc "isVar is undefined"
 	}
-}
-
-string nameOf( Value* value )
-{
-	return nameOf( value->value_type );
-}
-
-string nameOf( Val* val )
-{
-	return nameOf( val->val_type );
 }
