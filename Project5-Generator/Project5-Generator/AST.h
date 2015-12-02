@@ -183,6 +183,8 @@ enum InfoType
 	Info_ProcInfo
 };
 
+void lvalue( string ID, SymbolTable<Info>* t );
+
 
 //===-------------------------------===//
 // Printing [P]
@@ -461,7 +463,7 @@ struct Call : Stmt
 	Val* typecheck( SymbolTable<Val>* t );
 	void match( list<Param*> params, list<Val*> args );
 	Info* generate( SymbolTable<Info>* t );
-	void setup( list<Param*> params, list<Value*> args, SymbolTable<Info>* t );
+	void setup( list<Param*> params, list<Expr*> args, SymbolTable<Info>* t );
 };
 
 
@@ -557,6 +559,7 @@ struct While : Stmt
 	string toString( string indent );
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 
@@ -680,6 +683,7 @@ struct Expr : ASTNode
 	virtual Value* interpret( SymbolTable<Value>* t ) = 0;
 	virtual Val* typecheck( SymbolTable<Val>* t ) = 0;
 	virtual Info* generate( SymbolTable<Info>* t ) = 0;
+	virtual Info* generate( SymbolTable<Info>* t, string y, string n ) = 0;
 };
 
 struct BinOp : Expr
@@ -704,6 +708,7 @@ struct BinOp : Expr
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
 	Info* generate( SymbolTable<Info>* t );
+	Info* generate( SymbolTable<Info>* t, string y, string n );
 };
 
 
@@ -728,6 +733,7 @@ struct UnOp : Expr
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
 	Info* generate( SymbolTable<Info>* t );
+	Info* generate( SymbolTable<Info>* t, string y, string n );
 };
 
 
@@ -750,6 +756,7 @@ struct Num : Expr
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
 	Info* generate( SymbolTable<Info>* t );
+	Info* generate( SymbolTable<Info>* t, string y, string n );
 };
 
 
@@ -772,6 +779,7 @@ struct Id : Expr
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
 	Info* generate( SymbolTable<Info>* t );
+	Info* generate( SymbolTable<Info>* t, string y, string n );
 };
 
 
@@ -793,6 +801,7 @@ struct True : Expr
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
 	Info* generate( SymbolTable<Info>* t );
+	Info* generate( SymbolTable<Info>* t, string y, string n );
 };
 
 
@@ -814,6 +823,7 @@ struct False : Expr
 	Value* interpret( SymbolTable<Value>* t );
 	Val* typecheck( SymbolTable<Val>* t );
 	Info* generate( SymbolTable<Info>* t );
+	Info* generate( SymbolTable<Info>* t, string y, string n );
 };
 
 

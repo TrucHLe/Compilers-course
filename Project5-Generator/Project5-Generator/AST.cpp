@@ -1070,7 +1070,7 @@ void Call::match( list<Param*> params, list<Val*> args )
 				exit( 1 );
 			}
 		}
-		else
+		else // Node_VarParam
 		{
 			if ( arg->val_type == Val_IntVar || arg->val_type == Val_BoolVar ) {}
 			else
@@ -1482,8 +1482,129 @@ Info* VarParam::generate( SymbolTable<Info>* t )
 
 Info* Assign::generate( SymbolTable<Info>* t )
 {
-	
+	expr->generate( t );
+	lvalue( ID, t );
+	cout << "STORE" << endl;
+	return NULL;
 }
+
+
+Info* Call::generate( SymbolTable<Info>* t )
+{
+	ProcInfo* proc_info = dynamic_cast<ProcInfo*>( t->lookUp( ID ) );
+	setup( proc_info->params, args, t );
+	cout << "CALL " << proc_info->label << endl;
+	cout << "DROP " << proc_info->params.size() << endl;
+	return NULL;
+}
+
+
+void Call::setup( list<Param*> params, list<Expr*> args, SymbolTable<Info>* t )
+{
+	if ( params.empty() && args.empty() ) {}
+	else
+	{
+		Param* par = params.front();
+		Expr* arg = args.front();
+		params.pop_front();
+		args.pop_front();
+		
+		if ( par->node_type == Node_ValParam )
+			arg->generate( t );
+		else // Node_VarParam == reference parameter
+		{
+			Id* ID2 = dynamic_cast<Id*>( arg );
+			lvalue( ID2->ID, t );
+		}
+		setup( params, args, t );
+	}
+}
+
+
+Info* Sequence::generate( SymbolTable<Info>* t )
+{
+	for ( Stmt* b : body )
+		b->generate( t );
+	return NULL;
+}
+
+
+Info* IfThen::generate( SymbolTable<Info>* t )
+{
+	string y = t->newLabel();
+	string n = t->newLabel();
+	test->generate( t, y, n );
+	cout << "LABEL " << y << endl;
+	trueClause->generate( t );
+	cout << "LABEL " << n << endl;
+	return NULL;
+}
+
+
+Info* IfThenElse::generate( SymbolTable<Info>* t )
+{
+	string y = t->newLabel();
+	string n = t->newLabel();
+	string s = t->newLabel();
+	test->generate( t, y, n );
+	cout << "LABEL " << y << endl;
+	trueClause->generate( t );
+	cout << "BRANCH " << s << endl;
+	cout << "LABEL " << n << endl;
+	falseClause->generate( t );
+	cout << "LABEL " << s << endl;
+	return NULL;
+}
+
+
+Info* While::generate( SymbolTable<Info>* t )
+{
+	string y = t->newLabel();
+	string n = t->newLabel();
+	string s = t->newLabel();
+	cout << "LABEL " << s << endl;
+	test->generate( t, y, n );
+	cout << "LABEL " << y << endl;
+	body->generate( t );
+	cout << "BRANCH " << s << endl;
+	cout << "LABEL " << n << endl;
+	return NULL;
+}
+
+
+Info* Prompt::generate( SymbolTable<Info>* t )
+{
+	string input;
+	cout << message;
+	getline( cin, input );
+	cout << "READLINE" << endl;
+	return NULL;
+}
+
+
+
+//-------------------------------//
+// Generate code to push the address of either
+// a simple variable or a reference (var parameter)
+//-------------------------------//
+void lvalue( string ID, SymbolTable<Info>* t )
+{
+	Info* look_up = t->lookUp( ID );
+	if ( look_up->info_type == Info_VarInfo )
+	{
+		VarInfo* info = dynamic_cast<VarInfo*>( look_up );
+		cout << "ADDRESS " << info->level << ", " << info->offset << endl;
+	}
+	else // Info_RefInfo
+	{
+		RefInfo* info = dynamic_cast<RefInfo*>( look_up );
+		cout << "ADDRESS " << info->level << ", " << info->offset << endl;
+		cout << "LOAD" << endl;
+	}
+}
+
+
+
 
 
 //===----------------------------------------------------------------------===//
