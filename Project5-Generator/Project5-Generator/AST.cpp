@@ -342,6 +342,7 @@ void SymbolTable<T>::enterTable( string ID, int line, int column )
 {
 	pair<string, map<string, T*>* > symbol = make_pair( ID, new map<string, T*>() );
 	symbol_table.push_back( symbol );
+	level +=  1;
 }
 
 template <typename T>
@@ -349,6 +350,7 @@ void SymbolTable<T>::enterTable( string ID )
 {
 	pair<string, map<string, T*>* > symbol = make_pair( ID, new map<string, T*>() );
 	symbol_table.push_back( symbol );
+	level +=  1;
 }
 
 
@@ -387,6 +389,7 @@ void SymbolTable<T>::exitTable()
 {
 	delete symbol_table.back().second;
 	symbol_table.pop_back();
+	level -= 1;
 }
 
 
@@ -406,6 +409,7 @@ int SymbolTable<T>::getLevel()
 template <typename T>
 string SymbolTable<T>::newLabel()
 {
+	sequence += 1;
 	return "_" + to_string( sequence );
 }
 
@@ -1574,9 +1578,7 @@ Info* While::generate( SymbolTable<Info>* t )
 
 Info* Prompt::generate( SymbolTable<Info>* t )
 {
-	string input;
 	printChar( message );
-	getline( cin, input );
 	cout << "READLINE" << endl;
 	return NULL;
 }
@@ -1584,10 +1586,8 @@ Info* Prompt::generate( SymbolTable<Info>* t )
 
 Info* Prompt2::generate( SymbolTable<Info>* t )
 {
-	string input;
 	printChar( message + " " );
-	getline( cin, input );
-	cout << "READINT" << endl; // dbc do we use input for anything?
+	cout << "READINT" << endl;
 	lvalue( ID, t );
 	cout << "STORE" << endl;
 	return NULL;
@@ -1617,27 +1617,46 @@ Info* Print::generate( SymbolTable<Info>* t )
 
 Info* BinOp::generate( SymbolTable<Info>* t )
 {
-	left->generate( t );
-	right->generate( t );
-	
+	string y, n, s;
 	switch ( op )
 	{
 		case Plus:
+			left->generate( t );
+			right->generate( t );
 			cout << "ADD" << endl;
 			break;
 		case Minus:
+			left->generate( t );
+			right->generate( t );
 			cout << "SUB" << endl;
 			break;
 		case Times:
+			left->generate( t );
+			right->generate( t );
 			cout << "MUL" << endl;
 			break;
 		case Div:
+			left->generate( t );
+			right->generate( t );
 			cout << "DIV" << endl;
 			break;
 		case Mod:
+			left->generate( t );
+			right->generate( t );
 			cout << "MOD" << endl;
 			break;
-		default: break;
+		default:
+			y = t->newLabel();
+			n = t->newLabel();
+			s = t->newLabel();
+			this->generate( t, y, n );
+			cout << "LABEL " << y << endl;
+			cout << "CONSTANT 1" << endl;
+			cout << "BRANCH " << s << endl;
+			cout << "LABEL " << n << endl;
+			cout << "CONSTANT 0" << endl;
+			cout << "LABEL " << s << endl;
+			break;
 	}
 	return NULL;
 }
@@ -1718,9 +1737,27 @@ Info* BinOp::generate( SymbolTable<Info>* t, string y , string n )
 
 Info* UnOp::generate( SymbolTable<Info>* t )
 {
-	cout << "CONSTANT 0" << endl;
-	expr->generate( t );
-	cout << "SUB" << endl;
+	string y, n, s;
+	switch ( op )
+	{
+		case Neg:
+			cout << "CONSTANT 0" << endl;
+			expr->generate( t );
+			cout << "SUB" << endl;
+			break;
+		default:
+			y = t->newLabel();
+			n = t->newLabel();
+			s = t->newLabel();
+			this->generate( t, y, n );
+			cout << "LABEL " << y << endl;
+			cout << "CONSTANT 1" << endl;
+			cout << "BRANCH " << s << endl;
+			cout << "LABEL " << n << endl;
+			cout << "CONSTANT 0" << endl;
+			cout << "LABEL " << s << endl;
+			break;
+	}
 	return NULL;
 }
 
@@ -1739,7 +1776,7 @@ Info* Num::generate( SymbolTable<Info>* t )
 }
 
 
-Info* Num::generate( SymbolTable<Info>* t, string y, string n ) //dummy, not supposed to be called
+Info* Num::generate( SymbolTable<Info>* t, string y, string n )
 {
 	return NULL;
 }
@@ -1827,9 +1864,9 @@ void lvalue( string ID, SymbolTable<Info>* t )
 //-------------------------------//
 void printChar( string str )
 {
-	for ( char c : str ) // dbc whether need to pass by reference
+	for ( char c : str )
 	{
-		cout << "CONSTANT " << c << endl;
+		cout << "CONSTANT " << (int) c << endl;
 		cout << "WRITECHAR" << endl;
 	}
 }
@@ -1899,6 +1936,6 @@ string nameOf( ValType valType )
 		case Val_BoolVal:	return "bool";
 		case Val_IntVar:	return "int";
 		case Val_BoolVar:	return "bool";
-		case Val_ProcVal:	return "proc"; // dbc "isVar is undefined"
+		case Val_ProcVal:	return "proc";
 	}
 }

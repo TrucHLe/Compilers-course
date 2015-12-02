@@ -15,8 +15,6 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <iterator>
-#include <type_traits>	//is_same
 using namespace std;
 
 
@@ -1169,10 +1167,10 @@ struct SymbolTable
 	SymbolTable()
 	{
 		symbol_table	= vector<pair<string, map<string, T*>* > >();
-		level			= 0;
+		level			= -1;
 		offset			= 0;
 		param			= 0;
-		sequence		= 0;
+		sequence		= -1;
 	}
 	
 	// Functions without line and column are for Code Generation, in which

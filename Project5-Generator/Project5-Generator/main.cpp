@@ -8,9 +8,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "Constants.h"	//for testing, removable
-#include "Scanner.h"	//for testing, removable
-#include "Parser.h"		//for testing, removable
+#include "Parser.h"
 
 using namespace std;
 using std::ifstream;
@@ -68,21 +66,22 @@ int main(int argc, const char * argv[])
 	//cout << node->toString("");	// Print AST
 	//node->interpret();			// Interpret
 	node->typecheck();			// Typecheck
+	node->generate();			// Generate YASM Code
 	delete node;
 
 	
 	
 	// Scan
 	/*
-	 Scanner scanner( input );
-	 Token token;
-	 do
-	 {
+	Scanner scanner( input );
+	Token token;
+	do
+	{
 		token = scanner.next();
 		cout << token << endl;
-	 } while ( token.type != EOF_T );
-	 cout << endl;
-	 */
+	} while ( token.type != EOF_T );
+	cout << endl;
+	*/
 	
 	
 	return 0;
