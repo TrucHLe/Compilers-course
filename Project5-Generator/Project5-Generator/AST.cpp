@@ -1716,6 +1716,91 @@ Info* BinOp::generate( SymbolTable<Info>* t, string y , string n )
 }
 
 
+Info* UnOp::generate( SymbolTable<Info>* t )
+{
+	cout << "CONSTANT 0" << endl;
+	expr->generate( t );
+	cout << "SUB" << endl;
+	return NULL;
+}
+
+
+Info* UnOp::generate( SymbolTable<Info>* t, string y, string n )
+{
+	expr->generate( t, n, y );
+	return NULL;
+}
+
+
+Info* Num::generate( SymbolTable<Info>* t )
+{
+	cout << "CONSTANT " << value << endl;
+	return NULL;
+}
+
+
+Info* Num::generate( SymbolTable<Info>* t, string y, string n ) //dummy, not supposed to be called
+{
+	return NULL;
+}
+
+
+Info* Id::generate( SymbolTable<Info>* t )
+{
+	Info* look_up = t->lookUp( ID );
+	if ( look_up->info_type == Info_ConstInfo )
+	{
+		ConstInfo* info = dynamic_cast<ConstInfo*>( look_up );
+		cout << "CONSTANT " << info->constant << endl;
+	}
+	else
+	{
+		lvalue( ID, t );
+		cout << "LOAD" << endl;
+	}
+	return NULL;
+}
+
+
+Info* Id::generate( SymbolTable<Info>* t, string y, string n )
+{
+	lvalue( ID, t );
+	cout << "LOAD" << endl;
+	cout << "BRANCHZERO " << n << endl;
+	cout << "BRANCH " << y << endl;
+	return NULL;
+}
+
+
+Info* True::generate( SymbolTable<Info>* t )
+{
+	cout << "CONSTANT 1" << endl;
+	return NULL;
+}
+
+
+Info* True::generate( SymbolTable<Info>* t, string y, string n )
+{
+	cout << "BRANCH " << y << endl;
+	return NULL;
+}
+
+
+Info* False::generate( SymbolTable<Info>* t )
+{
+	cout << "CONSTANT 0" << endl;
+	return NULL;
+}
+
+
+Info* False::generate( SymbolTable<Info>* t, string y, string n )
+{
+	cout << "BRANCH " << n << endl;
+	return NULL;
+}
+
+
+
 //-------------------------------//
 // Generate code to push the address of either
 // a simple variable or a reference (var parameter)
