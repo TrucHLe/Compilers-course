@@ -20,7 +20,7 @@ int main(int argc, const char * argv[])
 	
 	
 	// CLI
-	/*
+	
 	if ( argc != 2 )
 	{
 		cout << "(!) Fail to run program. Please enter a filename." << endl;
@@ -39,23 +39,23 @@ int main(int argc, const char * argv[])
 		cout << endl;
 		return 0;
 	}
-	*/
+	
 	
 	
 	// Xcode
+	/*
+	cout << "Enter file name: ";
+	getline( cin, filename );
 	
-	 cout << "Enter file name: ";
-	 getline( cin, filename );
+	input.open( filename );
 	 
-	 input.open( filename );
-	 
-	 if ( input.fail() )
-	 {
+	if ( input.fail() )
+	{
 		cout << "(!) Cannot find " << filename << endl;
 		cout << endl;
 		return 0;
-	 }
-	
+	}
+	*/
 	
 	
 	// Interpret
