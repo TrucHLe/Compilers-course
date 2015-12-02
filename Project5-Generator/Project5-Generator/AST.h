@@ -652,7 +652,6 @@ struct ExprItem : Item
 	~ExprItem();
 	
 	string toString( string indent );
-	Info* generate( SymbolTable<Info>* t );
 };
 
 

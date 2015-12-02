@@ -1601,7 +1601,7 @@ Info* Print::generate( SymbolTable<Info>* t )
 		if ( i->node_type == Node_ExprItem )
 		{
 			ExprItem* item = dynamic_cast<ExprItem*>( i );
-			item->generate( t );
+			item->expr->generate( t );
 			cout << "WRITEINT" << endl;
 		}
 		else // Node_StringItem
@@ -1614,6 +1614,106 @@ Info* Print::generate( SymbolTable<Info>* t )
 	return NULL;
 }
 
+
+Info* BinOp::generate( SymbolTable<Info>* t )
+{
+	left->generate( t );
+	right->generate( t );
+	
+	switch ( op )
+	{
+		case Plus:
+			cout << "ADD" << endl;
+			break;
+		case Minus:
+			cout << "SUB" << endl;
+			break;
+		case Times:
+			cout << "MUL" << endl;
+			break;
+		case Div:
+			cout << "DIV" << endl;
+			break;
+		case Mod:
+			cout << "MOD" << endl;
+			break;
+		default: break;
+	}
+	return NULL;
+}
+
+
+Info* BinOp::generate( SymbolTable<Info>* t, string y , string n )
+{
+	string s;
+	switch ( op )
+	{
+		case And:
+			s = t->newLabel();
+			left->generate( t, s, n );
+			cout << "LABEL " << s << endl;
+			right->generate( t, y, n );
+			break;
+			
+		case Or:
+			s = t->newLabel();
+			left->generate( t, y, s );
+			cout << "LABEL " << s << endl;
+			right->generate( t, y, n );
+			break;
+			
+		case EQ:
+			left->generate( t );
+			right->generate( t );
+			cout << "SUB" << endl;
+			cout << "BRANCHZERO " << y << endl;
+			cout << "BRANCH " << n << endl;
+			break;
+			
+		case NE:
+			left->generate( t );
+			right->generate( t );
+			cout << "SUB" << endl;
+			cout << "BRANCHZERO " << n << endl;
+			cout << "BRANCH " << y << endl;
+			break;
+			
+		case LT:
+			left->generate( t );
+			right->generate( t );
+			cout << "SUB" << endl;
+			cout << "BRANCHNEG " << y << endl;
+			cout << "BRANCH " << n << endl;
+			break;
+			
+		case GE:
+			left->generate( t );
+			right->generate( t );
+			cout << "SUB" << endl;
+			cout << "BRANCHNEG " << n << endl;
+			cout << "BRANCH " << y << endl;
+			break;
+			
+		case GT:
+			right->generate( t );
+			left->generate( t );
+			cout << "SUB" << endl;
+			cout << "BRANCHNEG " << y << endl;
+			cout << "BRANCH " << n << endl;
+			break;
+			
+		case LE:
+			right->generate( t );
+			left->generate( t );
+			cout << "SUB" << endl;
+			cout << "BRANCHNEG " << n << endl;
+			cout << "BRANCH " << y << endl;
+			break;
+		
+		default: break;
+	}
+	return NULL;
+}
 
 
 //-------------------------------//
