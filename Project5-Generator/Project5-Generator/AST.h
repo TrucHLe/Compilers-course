@@ -184,7 +184,7 @@ enum InfoType
 };
 
 void lvalue( string ID, SymbolTable<Info>* t );
-
+void printChar( string str );
 
 //===-------------------------------===//
 // Printing [P]
@@ -652,6 +652,7 @@ struct ExprItem : Item
 	~ExprItem();
 	
 	string toString( string indent );
+	Info* generate( SymbolTable<Info>* t );
 };
 
 

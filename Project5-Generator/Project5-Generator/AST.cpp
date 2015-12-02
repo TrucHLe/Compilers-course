@@ -640,7 +640,7 @@ Value* Print::interpret( SymbolTable<Value>* t )
 			Value* value = item->expr->interpret( t );
 			cout << value->getIntValue( line, column );
 		}
-		else
+		else // Node_StringItem
 		{
 			StringItem* item = dynamic_cast<StringItem*>( i );
 			cout << item->message;
@@ -1575,9 +1575,42 @@ Info* While::generate( SymbolTable<Info>* t )
 Info* Prompt::generate( SymbolTable<Info>* t )
 {
 	string input;
-	cout << message;
+	printChar( message );
 	getline( cin, input );
 	cout << "READLINE" << endl;
+	return NULL;
+}
+
+
+Info* Prompt2::generate( SymbolTable<Info>* t )
+{
+	string input;
+	printChar( message + " " );
+	getline( cin, input );
+	cout << "READINT" << endl; // dbc do we use input for anything?
+	lvalue( ID, t );
+	cout << "STORE" << endl;
+	return NULL;
+}
+
+
+Info* Print::generate( SymbolTable<Info>* t )
+{
+	for ( Item* i : items )
+	{
+		if ( i->node_type == Node_ExprItem )
+		{
+			ExprItem* item = dynamic_cast<ExprItem*>( i );
+			item->generate( t );
+			cout << "WRITEINT" << endl;
+		}
+		else // Node_StringItem
+		{
+			StringItem* item = dynamic_cast<StringItem*>( i );
+			printChar( item->message );
+		}
+	}
+	cout << "WRITELINE" << endl;
 	return NULL;
 }
 
@@ -1604,6 +1637,17 @@ void lvalue( string ID, SymbolTable<Info>* t )
 }
 
 
+//-------------------------------//
+// Print a string one character at a time
+//-------------------------------//
+void printChar( string str )
+{
+	for ( char c : str ) // dbc whether need to pass by reference
+	{
+		cout << "CONSTANT " << c << endl;
+		cout << "WRITECHAR" << endl;
+	}
+}
 
 
 
