@@ -133,7 +133,6 @@ struct IntCell;
 struct BoolCell;
 struct ProcValue;
 
-
 enum ValueType
 {
 	Value_Undefined,
@@ -155,7 +154,6 @@ struct IntVar;
 struct BoolVar;
 struct ProcVal;
 
-
 enum ValType
 {
 	Val_Undefined,
@@ -170,6 +168,20 @@ enum ValType
 //===-------------------------------===//
 // Intermediate Code Generation [G]
 //===-------------------------------===//
+struct Info;
+struct ConstInfo;
+struct VarInfo;
+struct RefInfo;
+struct ProcInfo;
+
+enum InfoType
+{
+	Info_Undefined,
+	Info_ConstInfo,
+	Info_VarInfo,
+	Info_RefInfo,
+	Info_ProcInfo
+};
 
 
 //===-------------------------------===//
@@ -1000,7 +1012,7 @@ struct BoolVar : Val
 struct ProcVal : Val
 {
 	list<Param*> params;
-	
+
 	ProcVal( list<Param*> p, int lin, int col )
 	{
 		params		= p;
@@ -1016,22 +1028,117 @@ struct ProcVal : Val
 
 
 //===----------------------------------------------------------------------===//
+// [G] Info astract base class & its classes
+//===----------------------------------------------------------------------===//
+struct Info
+{
+	InfoType info_type;
+	
+	Info()
+	{
+		info_type	= Info_Undefined;
+	}
+	
+	virtual ~Info() {}
+};
+
+
+struct ConstInfo : Info
+{
+	int constant;
+	
+	ConstInfo( int cnst )
+	{
+		constant	= cnst;
+		info_type	= Info_ConstInfo;
+	}
+	
+	~ConstInfo() {}
+};
+
+
+struct VarInfo : Info
+{
+	int level;
+	int offset;
+	
+	VarInfo( int l, int o )
+	{
+		level		= l;
+		offset		= o;
+		info_type	= Info_VarInfo;
+	}
+	
+	~VarInfo() {}
+};
+
+
+struct RefInfo : Info
+{
+	int level;
+	int offset;
+	
+	RefInfo( int l, int o )
+	{
+		level		= l;
+		offset		= o;
+		info_type	= Info_RefInfo;
+	}
+	
+	~RefInfo() {}
+};
+
+
+struct ProcInfo : Info
+{
+	string label;
+	list<Param*> params;
+	
+	ProcInfo( string l, list<Param*> p )
+	{
+		label		= l;
+		params		= p;
+		info_type	= Info_ProcInfo;
+	}
+	
+	~ProcInfo() {}
+};
+
+
+
+//===----------------------------------------------------------------------===//
 // [F] Symbol Table Template
 //===----------------------------------------------------------------------===//
 template <typename T>
 struct SymbolTable
 {
 	vector<pair<string, map<string, T*>* > > symbol_table;
+	int level;
+	int offset;
+	int param_offset;
+	int sequence;
 	
 	SymbolTable()
 	{
-		symbol_table = vector<pair<string, map<string, T*>* > >();
+		symbol_table	= vector<pair<string, map<string, T*>* > >();
+		level			= 0;
+		offset			= 0;
+		param_offset	= 0;
+		sequence		= 0;
 	}
 	
+	// Functions without line and column are for Code Generation, in which
+	// printing error messages are already handled by Typechecking
+	//
 	T* lookUp( string ID, int line, int column );
+	T* lookUp( string ID );
 	void enterTable( string ID, int line, int column );
+	void enterTable( string ID );
 	void bind( string ID, int line, int column, T* v );
+	void bind( string ID, T* v );
 	void exitTable();
+	int getLevel();
+	string newLabel();
 };
 
 
